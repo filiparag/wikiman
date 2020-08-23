@@ -35,7 +35,15 @@ else
 
 fi
 
-selected="$(cat "$workdir/__final_results__" | fzf)"
+for line in $(cat "$workdir/__final_results__" | sed -r "s/ \[/\[/g") ; do
+  var_rows[${#var_rows[*]}]=${line/"["/" ["} 
+done
+
+selected="$(zenity --title="Results" --list --width=600 --height=800 --title="list" "--column=Name" "${var_rows[@]}")"
+
+
+#selected="$(cat "$workdir/__final_results__" | fzf)"
+
 
 echo "$selected" | grep -q ' \[ArchWiki\]$' && \
     links "$wiki_dir/$(echo $selected | sed 's/ \[.*\]$/.html/g')" ||

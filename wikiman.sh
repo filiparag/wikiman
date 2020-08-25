@@ -37,8 +37,6 @@ fi
 
 
 
-cat "$workdir/__final_results__"
-
 
 
 selected="$(echo "$(zenity  --title="Results" --list --width=600 --height=800 \

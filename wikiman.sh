@@ -35,14 +35,21 @@ else
 
 fi
 
-for line in $(cat "$workdir/__final_results__" | sed -r "s/ \[/\[/g") ; do
-  var_rows[${#var_rows[*]}]=${line/"["/" ["} 
-done
 
-selected="$(zenity --title="Results" --list --width=600 --height=800 --title="list" "--column=Name" "${var_rows[@]}")"
+
+cat "$workdir/__final_results__"
+
+
+
+selected="$(echo "$(zenity  --title="Results" --list --width=600 --height=800 \
+                          --column="Name" $(cat "$workdir/__final_results__" | sed 's/ //g'))" \
+                          | sed 's/\[/ \[/g')"
+
+
 
 
 #selected="$(cat "$workdir/__final_results__" | fzf)"
+
 
 
 echo "$selected" | grep -q ' \[ArchWiki\]$' && \

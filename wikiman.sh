@@ -1,43 +1,36 @@
-#! /bin/sh
+#! /bin/dash
 
-wiki_dir='/usr/share/doc/arch-wiki/html/en'
-workdir="$(mktemp -d -t 'wiki-XXXXXXXXXX')"
+search_man() {
+	
+	# Search by name
 
-find "$wiki_dir" -type f > "$workdir/__wiki_all_entries__"
-man -k . > "$workdir/__manpage_all_entries__"
+	query=$(echo "$@" | sed 's/ /\|/g')
+	
+	results="$(
+		find "/usr/share/man/man"* -type f | \
+		awk -F'/' \
+			"BEGIN {
+				IGNORECASE=1;
+			};
+			/$query/ { 
+				sub(/[a-z]*/,\"\",\$(NF-1));
+				sub(/\..*/,\"\",\$NF);
+				print \$NF \" (\"\$(NF-1) \")\"; 
+			};"
+	)"
 
-if [ $# -eq 0 ]; then
+	# Search by description
 
-    cat "$workdir/__manpage_all_entries__" | sed 's/ .*$/ [Manual]/g' >> "$workdir/__final_results__"
-    cat "$workdir/__wiki_all_entries__" | xargs -I{} realpath --relative-to="$wiki_dir" {} | sed 's/.html$/ [ArchWiki]/g' >> "$workdir/__final_results__"
+	results="${results:+$results\n}$(
+		apropos -l $@ 2>/dev/null | awk '{ print $1 " " $2 };'
+	)"
 
-    sort -h -f "$workdir/__final_results__" -o "$workdir/__final_results__"
+	# Remove duplicates
 
-else
+	results="$(
+		echo "$results" | awk '!seen[$0] {print} {++seen[$0]}'
+	)"
 
-    for word in "$@"; do
-        # rg -U -S -c "$word" "$wiki_dir" | sed 's/\(.*\)\:\(.*\)/\2\t\1/' | sort -n -r | head -n 20 > "$workdir/$word"
-        rg -U -S -c "$word" "$wiki_dir" | sed 's/\(.*\)\:\(.*\)/\2\t\1/' | sort -n -r > "$workdir/$word"
-        cat "$workdir/$word" >> "$workdir/__wiki_content_match__"
-        grep -i "$word" "$workdir/__wiki_all_entries__" >> "$workdir/__wiki_title_match__"
-        cat "$workdir/__manpage_all_entries__" | cut -d' ' -f1  | grep -e "$word" >> "$workdir/__manpage_title_match__"
-        grep -e "$word" "$workdir/__manpage_all_entries__" | cut -d' ' -f1 >> "$workdir/__manpage_content_match__"
-    done
-
-    awk -F '\t' '{a[$2] += $1} END{for (i in a) print i}' "$workdir/__wiki_content_match__" | sort -n -r | sed '/^Category/d' >>  "$workdir/__wiki_content_results__"
-
-    cat "$workdir/__manpage_title_match__" | sed 's/$/ [Manual]/g' >> "$workdir/__results__"
-    cat "$workdir/__wiki_title_match__" | xargs -I{} realpath --relative-to="$wiki_dir" {} | sed 's/.html$/ [ArchWiki]/g' >> "$workdir/__results__"
-    cat "$workdir/__manpage_content_match__" | sed 's/$/ [Manual]/g' >> "$workdir/__results__"
-    cat "$workdir/__wiki_content_results__" | xargs -I{} realpath --relative-to="$wiki_dir" {} | sed 's/.html$/ [ArchWiki]/g' >> "$workdir/__results__"
-
-    awk '!visited[$0]++' "$workdir/__results__" > "$workdir/__final_results__"
-
-fi
-
-selected="$(cat "$workdir/__final_results__" | fzf)"
-
-echo "$selected" | grep -q ' \[ArchWiki\]$' && \
-    links "$wiki_dir/$(echo $selected | sed 's/ \[.*\]$/.html/g')" ||
-    man "$(echo $selected | cut -d ' ' -f1)"
-
+	echo "$results"
+	
+}

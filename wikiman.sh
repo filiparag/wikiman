@@ -77,7 +77,7 @@ init() {
 	conf_wiki_lang="${conf_wiki_lang:-en}"
 	conf_sources="${conf_sources:-man archwiki}"
 	conf_tui_preview="${conf_tui_preview:-true}"
-	conf_tui_html="${conf_tui_html:-xdg-open}"
+	conf_tui_html="${conf_tui_html:-w3m}"
 
 }
 
@@ -361,7 +361,7 @@ Options:
       default: true
 
   -H  viewer for HTML pages
-      default: xdg-open
+      default: w3m
 
   -h  display this help and exit"
 

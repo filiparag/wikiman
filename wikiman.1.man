@@ -77,4 +77,4 @@ ls -l /usr/share/doc/arch-wiki/html
 tui_preview = true
 
 .SS TUI viewer for HTML pages:
-tui_html = xdg-open
+tui_html = w3m

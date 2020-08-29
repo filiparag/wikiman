@@ -52,6 +52,6 @@ With no *KEYWORD*, list all available results.
 
 - `-H` viewer for HTML pages
 
-    Default: xdg-open
+    Default: w3m
 
 - `-h`  display this help and exit"

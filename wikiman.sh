@@ -1,4 +1,4 @@
-#! /bin/dash
+#! /usr/bin/env dash
 
 config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
 
@@ -46,7 +46,7 @@ search_man() {
 		else
 			man_search_path="/usr/share/man/$lang/man"
 		fi
-		results="${results:+$results\n}$(
+		results_name="${results_name:+$results_name\n}$(
 			find "$man_search_path"* -type f | \
 			awk -F'/' \
 				"BEGIN {
@@ -67,8 +67,8 @@ search_man() {
 	# Search by description
 
 	for lang in $conf_man_lang; do
-		results="${results:+$results\n}$(
-			apropos -L "$lang" $@ | \
+		results_desc="${results_desc:+$results_desc\n}$(
+			eval "apropos -L $lang $*" 2>/dev/null | \
 			awk "{ 
 				gsub(/\(|\)/,\"\",\$2);
 				printf(\"%s (%s)\t$lang\tman\n\",\$1,\$2);
@@ -79,17 +79,21 @@ search_man() {
 	# Remove duplicates
 
 	results="$(
-		echo "$results" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
+		echo "$results_name\n$results_desc" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 	)"
 
 }
 
 search_wiki() {
 
-	query="$(echo "$@" | sed 's/ /\|/g')"
+	query="$(echo "$*" | sed 's/ /\|/g')"
+
+	for lang in $conf_wiki_lang; do
+		paths="$paths /usr/share/doc/arch-wiki/html/$lang"
+	done
 
 	results="$(
-		rg -U -S -c "$query" /usr/share/doc/arch-wiki/html/en/ | \
+		eval "rg -U -S -c '$query' $paths" | \
 		awk -F'/' \
 		"BEGIN {
 			count = 0
@@ -105,6 +109,8 @@ search_wiki() {
 			path = \$0
 			gsub(/:[0-9]+$/,\"\",path);
 
+			lang = \$7
+
 			if (title~/^Category:/) {
 				gsub(/^Category:/,\"\",title);
 				title = title \" (Category)\"
@@ -113,6 +119,7 @@ search_wiki() {
 			matches[count,0] = hits + 0;
 			matches[count,1] = title;
 			matches[count,2] = path;
+			matches[count,3] = lang;
 
 			count++;
 		};
@@ -123,16 +130,19 @@ search_wiki() {
 						h = matches[i,0];
 						t = matches[i,1];
 						p = matches[i,2];
+						l = matches[i,3];
 						matches[i,0] = matches[j,0];
 						matches[i,1] = matches[j,1];
 						matches[i,2] = matches[j,2];
+						matches[i,3] = matches[j,3];
 						matches[j,0] = h;
 						matches[j,1] = t;
 						matches[j,2] = p;
+						matches[j,3] = l;
 					};
 					
 			for (i = 0; i < count; i++)
-				printf(\"%s\ten\tarchwiki\t%s\n\",matches[i,1],matches[i,2]);
+				printf(\"%s\t%s\tarchwiki\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
 		};"
 	)"
 
@@ -147,7 +157,7 @@ picker_tui() {
 			if (NF==3) {
 				gsub(/ .*$/,\"\",\$1);
 				printf(\"man -L %s %s\n\",\$2,\$1);
-			} else {
+			} else if (NF==4) {
 				printf(\"xdg-open %s\n\",\$4);
 			}
 		};"
@@ -157,13 +167,15 @@ picker_tui() {
 
 init
 
-search_man $@
+search_man "$@"
 
 all_results="$results"
 
-search_wiki $@
+search_wiki "$@"
 
 all_results="${all_results:+$all_results\n}$results"
+
+# echo "$all_results"
 
 picker_tui
 

@@ -1,6 +1,10 @@
 ## About
 **wikiman** is an offline search engine for ArchWiki and manual pages combined.
 
+Wikiman provides an easy interface for browsing documentation without the need to be exact and connected to the internet.
+This is achieved by utilizing full text search for ArchWiki, partial name and description matching for man pages,
+and fuzzy filtering for search results.
+
 ## Demonstration
 
 ![Demo](demo.gif)

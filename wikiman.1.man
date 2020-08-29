@@ -39,10 +39,10 @@ quick result preview (boolean)
 default: true
 
 .HP
-.B -p
+.B -H
 .br
 viewer for HTML pages
-default: xdg-open
+default: w3m
 
 .HP
 .B -h

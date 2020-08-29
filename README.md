@@ -28,7 +28,7 @@ sudo install -Dm 644 -t '/usr/share/doc/wikiman' 'README.md'
 Download [Arch Wiki Docs](https://github.com/lahwaacz/arch-wiki-docs) and install
 them to `/usr/share/doc/arch-wiki/html/` on your system.
 
-Dependencies: `man, fzf, ripgrep, awk, xdg-utils, w3m`
+Dependencies: `man, fzf, ripgrep, awk, w3m`
 
 ## Usage
 

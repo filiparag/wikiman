@@ -1,5 +1,25 @@
 #! /usr/bin/env dash
 
+tui_preview() {
+	command="$(echo "$@" | awk -F '\t' \
+		"{
+			if (NF==3) {
+				gsub(/ .*$/,\"\",\$1);
+				printf(\"man -L %s %s\n\",\$2,\$1);
+			} else if (NF==4) {
+				printf(\"w3m '%s'\n\",\$4);
+			}
+		};"
+	)"
+
+	eval "$command"
+}
+
+if printenv WIKIMAN_TUI_PREVIEW >/dev/null; then
+	tui_preview "$@"
+	exit
+fi
+
 config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
 
 init() {
@@ -25,6 +45,14 @@ init() {
 				exit
 			}' "$config_file"
 		)"
+		conf_tui_preview="$(
+			awk -F '=' '/^[ ,\t]*tui_preview/ {
+				gsub(/#.*/,"",$2);
+				gsub(/[ ,\t]/,"",$2);
+				print $2;
+				exit
+			}' "$config_file"
+		)"
 		conf_sources="$(
 			awk -F '=' '/^[ ,\t]*sources/ {
 				gsub(","," ",$2);
@@ -39,6 +67,7 @@ init() {
 
 	conf_man_lang="${conf_man_lang:-en}"
 	conf_wiki_lang="${conf_wiki_lang:-en}"
+	conf_tui_preview="${conf_tui_preview:-true}"
 	conf_sources="${conf_sources:-man archwiki}"
 
 }
@@ -186,15 +215,21 @@ combine_results() {
 
 picker_tui() {
 
+	if [ "$conf_tui_preview" != 'false' ]; then
+
+		preview="--preview 'WIKIMAN_TUI_PREVIEW=1 wikiman {}'"
+	fi
+
 	command="$(
-	echo "$all_results" | fzf --with-nth 2,1 --delimiter '\t' | \
+		echo "$all_results" | \
+		eval "fzf --with-nth 2,1 --delimiter '\t' $preview --reverse --prompt 'wikiman > '" | \
 		awk -F '\t' \
 		"{
 			if (NF==3) {
 				gsub(/ .*$/,\"\",\$1);
 				printf(\"man -L %s %s\n\",\$2,\$1);
 			} else if (NF==4) {
-				printf(\"xdg-open %s\n\",\$4);
+					printf(\"xdg-open '%s'\n\",\$4);
 			}
 		};"
 	)"

@@ -84,7 +84,7 @@ search_man() {
 		else
 			man_search_path="/usr/share/man/$lang/man"
 		fi
-		results_name="${results_name:+$results_name\n}$(
+		res="$(
 			find "$man_search_path"* -type f | \
 			awk -F'/' \
 				"BEGIN {
@@ -100,17 +100,23 @@ search_man() {
 					printf(\"%s (%s)\t$lang\tman\n\",title,section);
 				};"
 		)"
+		results_name="$(
+			printf '%s\n%s' "$results_name" "$res"
+		)"
 	done
 
 	# Search by description
 
 	for lang in $conf_man_lang; do
-		results_desc="${results_desc:+$results_desc\n}$(
+		res="$(
 			eval "apropos -L $lang $*" 2>/dev/null | \
 			awk "{ 
 				gsub(/\(|\)/,\"\",\$2);
 				printf(\"%s (%s)\t$lang\tman\n\",\$1,\$2);
-			};"
+			}; END { print \"\n\"};"
+		)"
+		results_desc="$(
+			printf '%s\n%s' "$results_desc" "$res"
 		)"
 	done
 
@@ -306,6 +312,8 @@ if echo "$conf_sources" | grep -q '\<archwiki\>'; then
 	)"
 
 fi
+
+printf '%s' "$all_results"
 
 combine_results
 

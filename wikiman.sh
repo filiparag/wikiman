@@ -236,6 +236,28 @@ picker_tui() {
 
 }
 
+help() {
+
+	echo "Usage: wikiman [OPTION]... [KEYWORD]...
+Offline search engine for ArchWiki and manual pages combined
+
+With no KEYWORD, list all available results.
+
+Options:
+
+  -l  search language(s)
+      default: en
+
+  -s  sources to use
+      default: man, archwiki
+
+  -p  quick result preview
+      default: true
+
+  -h  display this help and exit"
+
+}
+
 init
 
 while getopts p:l:s:h o; do
@@ -250,6 +272,8 @@ while getopts p:l:s:h o; do
 	(s) conf_sources="$(
 			echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
 		)";;
+	(h) help;
+		exit;;
     (*) exit 1
   esac
 done

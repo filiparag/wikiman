@@ -25,12 +25,21 @@ init() {
 				exit
 			}' "$config_file"
 		)"
+		conf_sources="$(
+			awk -F '=' '/^[ ,\t]*sources/ {
+				gsub(","," ",$2);
+				gsub(/#.*/,"",$2);
+				print $2;
+				exit
+			}' "$config_file"
+		)"
 	else
 		echo "warning: configuration file missing, using defaults" 1>&2
 	fi
 
 	conf_man_lang="${conf_man_lang:-en}"
 	conf_wiki_lang="${conf_wiki_lang:-en}"
+	conf_sources="${conf_sources:-man archwiki}"
 
 }
 
@@ -194,6 +203,25 @@ picker_tui() {
 
 init
 
+while getopts p:l:s:h o; do
+  case $o in
+	(p) conf_tui_preview="$OPTARG";;
+	(l) conf_man_lang="$(
+			echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
+		)";
+		conf_wiki_lang="$(
+			echo "$OPTARG" | sed 's/,/ /g; s/_/-/g'
+		)";;
+	(s) conf_sources="$(
+			echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
+		)";;
+    (*) exit 1
+  esac
+done
+shift "$((OPTIND - 1))"
+
+if echo "$conf_sources" | grep -q '\<man\>'; then
+
 if [ $# = 0 ]; then 
 	search_man "."
 else
@@ -201,13 +229,19 @@ search_man "$@"
 fi
 all_results="$results"
 
+fi
+
+if echo "$conf_sources" | grep -q '\<archwiki\>'; then
+
 search_wiki "$@"
 all_results="${all_results:+$all_results\n}$results"
 
+fi
+
 combine_results
 
-# echo "$all_results"
+if echo "$all_results" | grep -cve '^\s*$' >/dev/null; then
 
-picker_tui
+	picker_tui && eval "$command"
 
-eval "$command"
+fi

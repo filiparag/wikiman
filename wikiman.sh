@@ -4,8 +4,11 @@ tui_preview() {
 	command="$(echo "$@" | awk -F '\t' \
 		"{
 			if (NF==3) {
+				sec=\$1
+				gsub(/.*\(/,\"\",sec);
+				gsub(/\).*$/,\"\",sec);
 				gsub(/ .*$/,\"\",\$1);
-				printf(\"man -L %s %s\n\",\$2,\$1);
+				printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
 			} else if (NF==4) {
 				printf(\"w3m '%s'\n\",\$4);
 			}
@@ -114,7 +117,7 @@ search_man() {
 	# Remove duplicates
 
 	results="$(
-		echo "$results_name\n$results_desc" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
+		printf '%s\n%s' "$results_name" "$results_desc" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 	)"
 
 }
@@ -213,18 +216,26 @@ combine_results() {
 picker_tui() {
 
 	if [ "$conf_tui_preview" != 'false' ]; then
-
 		preview="--preview 'WIKIMAN_TUI_PREVIEW=1 wikiman {}'"
+	fi
+
+	if [ "$(echo "$conf_man_lang" | wc -w)" = '1' ] && [ "$(echo "$conf_wiki_lang" | wc -w)" = '1' ]; then
+		columns='1'
+	else
+		columns='2,1'
 	fi
 
 	command="$(
 		echo "$all_results" | \
-		eval "fzf --with-nth 2,1 --delimiter '\t' $preview --reverse --prompt 'wikiman > '" | \
+		eval "fzf --with-nth $columns --delimiter '\t' $preview --reverse --prompt 'wikiman > '" | \
 		awk -F '\t' \
 			"{
 				if (NF==3) {
+					sec=\$1
+					gsub(/.*\(/,\"\",sec);
+					gsub(/\).*$/,\"\",sec);
 					gsub(/ .*$/,\"\",\$1);
-					printf(\"man -L %s %s\n\",\$2,\$1);
+					printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
 				} else if (NF==4) {
 					printf(\"xdg-open '%s'\n\",\$4);
 				}
@@ -290,7 +301,9 @@ fi
 if echo "$conf_sources" | grep -q '\<archwiki\>'; then
 
 	search_wiki "$@"
-	all_results="${all_results:+$all_results\n}$results"
+	all_results="$(
+		printf '%s\n%s' "$all_results" "$results"
+	)"
 
 fi
 

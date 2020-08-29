@@ -1,4 +1,4 @@
-#! /usr/bin/env dash
+#! /bin/sh
 
 tui_preview() {
 	command="$(echo "$@" | awk -F '\t' \

@@ -45,6 +45,14 @@ init() {
 				exit
 			}' "$config_file"
 		)"
+		conf_sources="$(
+			awk -F '=' '/^[ ,\t]*sources/ {
+				gsub(","," ",$2);
+				gsub(/#.*/,"",$2);
+				print $2;
+				exit
+			}' "$config_file"
+		)"
 		conf_tui_preview="$(
 			awk -F '=' '/^[ ,\t]*tui_preview/ {
 				gsub(/#.*/,"",$2);
@@ -53,10 +61,10 @@ init() {
 				exit
 			}' "$config_file"
 		)"
-		conf_sources="$(
-			awk -F '=' '/^[ ,\t]*sources/ {
-				gsub(","," ",$2);
+		conf_tui_html="$(
+			awk -F '=' '/^[ ,\t]*tui_html/ {
 				gsub(/#.*/,"",$2);
+				gsub(/ */,"",$2);
 				print $2;
 				exit
 			}' "$config_file"
@@ -67,8 +75,9 @@ init() {
 
 	conf_man_lang="${conf_man_lang:-en}"
 	conf_wiki_lang="${conf_wiki_lang:-en}"
-	conf_tui_preview="${conf_tui_preview:-true}"
 	conf_sources="${conf_sources:-man archwiki}"
+	conf_tui_preview="${conf_tui_preview:-true}"
+	conf_tui_html="${conf_tui_html:-xdg-open}"
 
 }
 
@@ -326,7 +335,7 @@ picker_tui() {
 					gsub(/ .*$/,\"\",\$1);
 					printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
 				} else if (NF==4) {
-					printf(\"xdg-open '%s'\n\",\$4);
+					printf(\"$conf_tui_html '%s'\n\",\$4);
 				}
 			};"
 	)"
@@ -351,15 +360,19 @@ Options:
   -p  quick result preview
       default: true
 
+  -H  viewer for HTML pages
+      default: xdg-open
+
   -h  display this help and exit"
 
 }
 
 init
 
-while getopts p:l:s:h o; do
+while getopts p:l:s:H:h o; do
   case $o in
 	(p) conf_tui_preview="$OPTARG";;
+	(H) conf_tui_html="$OPTARG";;
 	(l) conf_man_lang="$(
 			echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
 		)";

@@ -1,5 +1,5 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "30 August 2020" "wikiman 2.2" "wikiman manual"
+.TH "wikiman" 1 "30 August 2020" "wikiman 2.4" "wikiman manual"
 
 .SH NAME
 .B wikiman
@@ -7,7 +7,7 @@
 
 .SH SYNOPSIS
 .B wikiman
--l [languages] -s [sources] -p [preview (boolean)] <keyword>...
+-l [languages] -s [sources] -p [preview (boolean)] -H [html viewer] <keyword>...
 .br
 .B wikiman
 -h
@@ -37,6 +37,12 @@ default: man, archwiki
 .br
 quick result preview (boolean)
 default: true
+
+.HP
+.B -p
+.br
+viewer for HTML pages
+default: xdg-open
 
 .HP
 .B -h
@@ -69,3 +75,6 @@ ls -l /usr/share/doc/arch-wiki/html
 
 .SS TUI preview:
 tui_preview = true
+
+.SS TUI viewer for HTML pages:
+tui_html = xdg-open

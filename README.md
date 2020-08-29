@@ -38,16 +38,20 @@ With no *KEYWORD*, list all available results.
 
 ### Options:
 
-- `-l`  search language(s)
+- `-l` search language(s)
 
     Default: en
 
-- `-s`  sources to use
+- `-s` sources to use
  
     Default: man, archwiki
 
-- `-p`  quick result preview
+- `-p` quick result preview
  
     Default: true
+
+- `-H` viewer for HTML pages
+
+    Default: xdg-open
 
 - `-h`  display this help and exit"

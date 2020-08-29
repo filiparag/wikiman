@@ -16,6 +16,15 @@ and fuzzy filtering for search results.
 yay -Sy wikiman
 ```
 
+### Ubuntu / Debian
+
+Download latest [*.deb* package](https://github.com/filiparag/wikiman/releases/download/2.4/wikiman-2.4-2.deb).
+
+```bash
+wget 'https://github.com/filiparag/wikiman/releases/download/2.4/wikiman-2.4-2.deb'
+sudo dpkg -i wikiman-2.4-2.deb
+```
+
 ### Generic instructions
 ```bash
 git clone 'https://github.com/filiparag/wikiman'

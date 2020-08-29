@@ -148,6 +148,33 @@ search_wiki() {
 
 }
 
+combine_results() {
+
+	all_results="$(
+		echo "$all_results" | \
+		awk -F '\t' \
+			'NF>0 {
+				count++;
+				sc[$3]++;
+				sources[$3,sc[$3]+0] = $0
+			}
+			END {
+				for (var in sc) {
+					ss[var] = sc[var] + 1;
+				}
+				for (i = 0; i < count; i++) {
+					for (var in ss) {
+						if (sc[var]>0) {
+							print sources[var,ss[var]-sc[var]];
+							sc[var]--;
+						}
+					}
+				}
+			}'
+	)"
+
+}
+
 picker_tui() {
 
 	command="$(
@@ -167,13 +194,17 @@ picker_tui() {
 
 init
 
+if [ $# = 0 ]; then 
+	search_man "."
+else
 search_man "$@"
-
+fi
 all_results="$results"
 
 search_wiki "$@"
-
 all_results="${all_results:+$all_results\n}$results"
+
+combine_results
 
 # echo "$all_results"
 

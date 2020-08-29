@@ -1,0 +1,71 @@
+.\" Manual for wmrc.
+.TH "wikiman" 1 "30 August 2020" "wikiman 2.2" "wikiman manual"
+
+.SH NAME
+.B wikiman
+\- Offline search engine for ArchWiki and manual pages combined
+
+.SH SYNOPSIS
+.B wikiman
+-l [languages] -s [sources] -p [preview (boolean)] <keyword>...
+.br
+.B wikiman
+-h
+
+.SH DESCRIPTION
+.P
+Wikiman is an offline search engine for ArchWiki and manual pages combined.
+
+With no <keyword>, list all available results.
+
+.SH OPTIONS
+.HP
+.B -l
+.br
+search language(s)
+.br
+default: en
+
+.HP
+.B -s
+.br
+sources to use
+default: man, archwiki
+
+.HP
+.B -p
+.br
+quick result preview (boolean)
+default: true
+
+.HP
+.B -h
+.br
+display help and exit
+
+.SH CONFIGURATION:
+
+Default user configuration file location:
+.I
+~/.config/wikiman/wikiman.conf
+(if XDG_CONFIG_HOME is not set).
+
+.SS Sources:
+sources = man, archwiki
+
+.SS Language:
+man_lang = en es
+wiki_lang = en, pt_BR
+.PP
+.B
+List all man languages:
+.br
+ls -l /usr/share/man
+.PP
+.B
+List all ArchWiki languages:
+.br
+ls -l /usr/share/doc/arch-wiki/html
+
+.SS TUI preview:
+tui_preview = true

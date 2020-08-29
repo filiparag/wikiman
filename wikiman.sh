@@ -1,10 +1,37 @@
 #! /bin/dash
 
 config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
-cache_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
 
 init() {
-	mkdir -p "$config_dir" "$cache_dir"
+
+	mkdir -p "$config_dir"
+
+	config_file="$config_dir/wikiman.conf"
+
+	if [ -f "$config_file" ] && [ -r "$config_file" ]; then
+		conf_man_lang="$(
+			awk -F '=' '/^[ ,\t]*man_lang/ {
+				gsub(","," ",$2);
+				gsub(/#.*/,"",$2);
+				print $2;
+				exit
+			}' "$config_file"
+		)"
+		conf_wiki_lang="$(
+			awk -F '=' '/^[ ,\t]*wiki_lang/ {
+				gsub(","," ",$2);
+				gsub(/#.*/,"",$2);
+				print $2;
+				exit
+			}' "$config_file"
+		)"
+	else
+		echo "warning: configuration file missing, using defaults" 1>&2
+	fi
+
+	conf_man_lang="${conf_man_lang:-en}"
+	conf_wiki_lang="${conf_wiki_lang:-en}"
+
 }
 
 search_man() {
@@ -12,37 +39,49 @@ search_man() {
 	query="$(echo "$@" | sed 's/ /\|/g')"
 
 	# Search by name
-	
-	results="$(
-		find "/usr/share/man/man"* -type f | \
-		awk -F'/' \
-			"BEGIN {
-				IGNORECASE=1;
-			};
-			/$query/ {
-				title = \$NF
-				gsub(/\..*/,\"\",title);
 
-				section = \$(NF-1)
-				gsub(/[a-z]*/,\"\",section);
+	for lang in $conf_man_lang; do
+		if [ "$lang" = 'en' ]; then
+			man_search_path='/usr/share/man/man'
+		else
+			man_search_path="/usr/share/man/$lang/man"
+		fi
+		results="${results:+$results\n}$(
+			find "$man_search_path"* -type f | \
+			awk -F'/' \
+				"BEGIN {
+					IGNORECASE=1;
+				};
+				/$query/ {
+					title = \$NF
+					gsub(/\..*/,\"\",title);
 
-				printf(\"%s (%s)\n\",title,section);
-			};"
-	)"
+					section = \$(NF-1)
+					gsub(/[a-z]*/,\"\",section);
+
+					printf(\"%s (%s)\t$lang\tman\n\",title,section);
+				};"
+		)"
+	done
 
 	# Search by description
 
-	results="${results:+$results\n}$(
-		apropos -l $@ 2>/dev/null | \
-		awk '{ gsub(/\(|\)/,"",$2); printf("%s (%s)\n",$1,$2); };'
-	)"
+	for lang in $conf_man_lang; do
+		results="${results:+$results\n}$(
+			apropos -L "$lang" $@ | \
+			awk "{ 
+				gsub(/\(|\)/,\"\",\$2);
+				printf(\"%s (%s)\t$lang\tman\n\",\$1,\$2);
+			};"
+		)"
+	done
 
 	# Remove duplicates
 
 	results="$(
-		echo "$results" | awk '!seen[$0] {print} {++seen[$0]};'
+		echo "$results" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 	)"
-	
+
 }
 
 search_wiki() {
@@ -93,7 +132,7 @@ search_wiki() {
 					};
 					
 			for (i = 0; i < count; i++)
-				printf(\"%s\t%s\n\",matches[i,1],matches[i,2]);
+				printf(\"%s\ten\tarchwiki\t%s\n\",matches[i,1],matches[i,2]);
 		};"
 	)"
 
@@ -102,19 +141,21 @@ search_wiki() {
 picker_tui() {
 
 	command="$(
-	echo "$all_results" | fzf --with-nth 1 --delimiter '\t' | \
+	echo "$all_results" | fzf --with-nth 2,1 --delimiter '\t' | \
 		awk -F '\t' \
 		"{
-			if (NF==2)
-				printf(\"xdg-open %s\n\",\$2);
-			else {
+			if (NF==3) {
 				gsub(/ .*$/,\"\",\$1);
-				printf(\"man %s\n\",\$1);
+				printf(\"man -L %s %s\n\",\$2,\$1);
+			} else {
+				printf(\"xdg-open %s\n\",\$4);
 			}
 		};"
 	)"
 
 }
+
+init
 
 search_man $@
 

@@ -82,7 +82,12 @@ search_man() {
 		if [ "$lang" = 'en' ]; then
 			man_search_path='/usr/share/man/man'
 		else
-			man_search_path="/usr/share/man/$lang/man"
+			if [ -d "/usr/share/man/$lang" ]; then
+				man_search_path="/usr/share/man/$lang/man"
+			else
+				echo "warning: man pages for '$lang' do not exist" 1>&2
+				continue
+			fi
 		fi
 		res="$(
 			find "$man_search_path"* -type f | \
@@ -122,7 +127,7 @@ search_man() {
 
 	# Remove duplicates
 
-	results="$(
+	results_man="$(
 		printf '%s\n%s' "$results_name" "$results_desc" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 	)"
 
@@ -133,10 +138,18 @@ search_wiki() {
 	query="$(echo "$*" | sed 's/ /\|/g')"
 
 	for lang in $conf_wiki_lang; do
-		paths="$paths /usr/share/doc/arch-wiki/html/$lang"
+		if [ -d "/usr/share/doc/arch-wiki/html/$lang" ]; then
+			paths="$paths /usr/share/doc/arch-wiki/html/$lang"
+		else
+			echo "warning: ArchWiki documentation for '$lang' does not exist" 1>&2
+		fi
 	done
+	
+	if [ "$(echo "$paths" | wc -w)" = '0' ]; then
+		return
+	fi
 
-	results="$(
+	results_wiki="$(
 		eval "rg -U -S -c '$query' $paths" | \
 		awk -F'/' \
 			"BEGIN {
@@ -300,7 +313,7 @@ if echo "$conf_sources" | grep -q '\<man\>'; then
 	else
 		search_man "$@"
 	fi
-	all_results="$results"
+	all_results="$results_man"
 
 fi
 
@@ -308,17 +321,15 @@ if echo "$conf_sources" | grep -q '\<archwiki\>'; then
 
 	search_wiki "$@"
 	all_results="$(
-		printf '%s\n%s' "$all_results" "$results"
+		printf '%s\n%s' "$all_results" "$results_wiki"
 	)"
 
 fi
 
-printf '%s' "$all_results"
-
 combine_results
 
 if echo "$all_results" | grep -cve '^\s*$' >/dev/null; then
-
 	picker_tui && eval "$command"
-
+else
+	echo "search: no results for '$*'" 1>&2
 fi

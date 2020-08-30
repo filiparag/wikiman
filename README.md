@@ -30,8 +30,8 @@ sudo dpkg -i 'wikiman-2.4-2.deb'
 And install Arch Wiki Docs:
 
 ```bash
-curl -L -O 'https://github.com/filiparag/wikiman/releases/latest/download/arch-linux-docs_snapshot.tar.xz'
-sudo tar zxf 'arch-linux-docs_snapshot.tar.xz' -C /
+curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.4/arch-linux-docs_20200527-1.tar.xz'
+sudo tar zxf 'arch-linux-docs_20200527-1.tar.xz' -C /
 ```
 
 ### Generic instructions

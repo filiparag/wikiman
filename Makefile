@@ -15,10 +15,10 @@ make:
 archwiki:
 	
 	@echo 'Downoading latest snapshot...'
-	@curl -L -O '${UPSTREAM}/releases/latest/download/arch-linux-docs_snapshot.tar.xz'
+	@curl -L -O '${UPSTREAM}/releases/download/2.4/arch-linux-docs_20200527-1.tar.xz'
 	@echo 'Installing Arch Wiki...'
-	@tar zxf './arch-linux-docs_snapshot.tar.xz' -C /
-	@rm './arch-linux-docs_snapshot.tar.xz'
+	@tar zxf './arch-linux-docs_20200527-1.tar.xz' -C /
+	@rm './arch-linux-docs_20200527-1.tar.xz'
 
 install:
 
@@ -31,11 +31,13 @@ install:
 
 clean:
 
-	@rm './arch-linux-docs_snapshot.tar.xz'
+	@rm './arch-linux-docs_20200527-1.tar.xz'
 
 uninstall:
 
-	rm -f '/usr/bin/wikiman'
-	rm -f '/usr/share/man/man1/wikiman.1'
-	rm -f '/usr/share/licenses/wikiman'
-	rm -f '/usr/share/doc/wikiman'
+	@rm -f '/usr/bin/wikiman'
+
+	@rm -f '/usr/share/man/man1/wikiman.1'
+	@rm -f '/usr/share/licenses/wikiman'
+	@rm -f '/usr/share/doc/wikiman'
+	@rm -i '/etc/wikiman.conf'

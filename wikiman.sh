@@ -26,51 +26,52 @@ fi
 init() {
 
 	config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
-	config_file="$config_dir/wikiman.conf"
+	config_file_etc="/etc/wikiman.conf"
+	config_file_usr="$config_dir/wikiman.conf"
 
-	if [ -f "$config_file" ] && [ -r "$config_file" ]; then
+	[ -f "$config_file_etc" ] && [ -r "$config_file_etc" ] || \
+		config_file_etc=''
+	[ -f "$config_file_usr" ] && [ -r "$config_file_usr" ] || \
+		config_file_usr=''
+
+	if [ -z "$config_file_etc" ] && [ -z "$config_file_usr" ]; then
+		echo "warning: configuration file missing, using defaults" 1>&2
+	else
 		conf_man_lang="$(
 			awk -F '=' '/^[ ,\t]*man_lang/ {
 				gsub(","," ",$2);
 				gsub(/#.*/,"",$2);
-				print $2;
-				exit
-			}' "$config_file"
+				value = $2;
+			}; END { print value }' "$config_file_etc" "$config_file_usr"
 		)"
 		conf_wiki_lang="$(
 			awk -F '=' '/^[ ,\t]*wiki_lang/ {
 				gsub(","," ",$2);
 				gsub(/#.*/,"",$2);
-				print $2;
-				exit
-			}' "$config_file"
+				value = $2;
+			}; END { print value }' "$config_file_etc" "$config_file_usr"
 		)"
 		conf_sources="$(
 			awk -F '=' '/^[ ,\t]*sources/ {
 				gsub(","," ",$2);
 				gsub(/#.*/,"",$2);
-				print $2;
-				exit
-			}' "$config_file"
+				value = $2;
+			}; END { print value }' "$config_file_etc" "$config_file_usr"
 		)"
 		conf_tui_preview="$(
 			awk -F '=' '/^[ ,\t]*tui_preview/ {
 				gsub(/#.*/,"",$2);
 				gsub(/[ ,\t]/,"",$2);
-				print $2;
-				exit
-			}' "$config_file"
+				value = $2;
+			}; END { print value }' "$config_file_etc" "$config_file_usr"
 		)"
 		conf_tui_html="$(
 			awk -F '=' '/^[ ,\t]*tui_html/ {
 				gsub(/#.*/,"",$2);
 				gsub(/ */,"",$2);
-				print $2;
-				exit
-			}' "$config_file"
+				value = $2;
+			}; END { print value }' "$config_file_etc" "$config_file_usr"
 		)"
-	else
-		echo "warning: configuration file missing, using defaults" 1>&2
 	fi
 
 	conf_man_lang="${conf_man_lang:-en}"

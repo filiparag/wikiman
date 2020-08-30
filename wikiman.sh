@@ -82,8 +82,6 @@ init() {
 }
 
 search_man() {
-	
-	query="$(echo "$@" | sed 's/ /\|/g')"
 
 	# Search by name
 
@@ -92,7 +90,7 @@ search_man() {
 			man_search_path='/usr/share/man/man'
 		else
 			if [ -d "/usr/share/man/$lang" ]; then
-				man_search_path="/usr/share/man/$lang/man"
+				man_search_path="/usr/share/man/$lang/"
 			else
 				echo "warning: man pages for '$lang' do not exist" 1>&2
 				continue
@@ -104,9 +102,9 @@ search_man() {
 				"BEGIN {
 					IGNORECASE=1;
 				};
-				/$query/ {
+				/$rg_query/ {
 					title = \$NF
-					gsub(/\..*/,\"\",title);
+					gsub(/\.[0-9]+.*$/,\"\",title);
 
 					section = \$(NF-1)
 					gsub(/[a-z]*/,\"\",section);
@@ -122,10 +120,19 @@ search_man() {
 	# Search by description
 
 	for lang in $conf_man_lang; do
+		if [ "$lang" = 'en' ]; then
+			man_search_flag='-L en'
+		else
+			if [ -d "/usr/share/man/$lang" ]; then
+				man_search_flag="-M /usr/share/man/$lang/"
+			else
+				continue
+			fi
+		fi
 		res="$(
-			eval "apropos -L $lang $*" 2>/dev/null | \
+			eval "apropos $man_search_flag $*" 2>/dev/null | \
 			awk "{ 
-				gsub(/\(|\)/,\"\",\$2);
+				gsub(/ *\(|\)/,\"\",\$2);
 				printf(\"%s (%s)\t$lang\tman\n\",\$1,\$2);
 			}; END { print \"\n\"};"
 		)"
@@ -143,9 +150,6 @@ search_man() {
 }
 
 search_wiki() {
-
-	query="$(echo "$*" | sed 's/ /\|/g')"
-	greedy_query="\w*$(echo "$*" | sed 's/ /\\\w\*|\\w\*/g')\w*"
 
 	for lang in $conf_wiki_lang; do
 		if [ -d "/usr/share/doc/arch-wiki/html/$lang" ]; then
@@ -225,7 +229,7 @@ search_wiki() {
 	)"
 
 	results_text="$(
-		eval "rg -U -S -c '$query' $paths" | \
+		eval "rg -U -S -c '$rg_query' $paths" | \
 		awk -F'/' \
 			"BEGIN {
 				count = 0
@@ -388,6 +392,9 @@ while getopts p:l:s:H:h o; do
   esac
 done
 shift "$((OPTIND - 1))"
+
+rg_query="$(echo "$*" | sed 's/ /\|/g')"
+greedy_query="\w*$(echo "$*" | sed 's/ /\\\w\*|\\w\*/g')\w*"
 
 if echo "$conf_sources" | grep -q '\<man\>'; then
 

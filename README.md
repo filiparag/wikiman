@@ -71,4 +71,4 @@ With no *KEYWORD*, list all available results.
 
     Default: w3m
 
-- `-h`  display this help and exit"
+- `-h`  display this help and exit

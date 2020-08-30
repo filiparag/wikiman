@@ -98,7 +98,7 @@ sources = archwiki
 man_lang = en, pt, pt_BR
 
 # ArchWiki language(s)
-wiki_lang = zh_CN
+wiki_lang = zh-CN
 
 # Show previews in TUI
 tui_preview = false
@@ -111,7 +111,7 @@ To list available languages, run these commands:
 
 ```bash
 # Man pages (excluding English)
-find /usr/share/man/ -maxdepth 1 -type d -not -name 'man*' -printf '%P '
+find '/usr/share/man' -maxdepth 1 -type d -not -name 'man*' -printf '%P '
 
 # Arch Wiki
 find '/usr/share/doc/arch-wiki/html' -maxdepth 1 -type d -printf '%P '

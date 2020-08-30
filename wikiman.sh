@@ -102,15 +102,42 @@ search_man() {
 			awk -F'/' \
 				"BEGIN {
 					IGNORECASE=1;
+					count=0;
 				};
-				/$rg_query/ {
+				\$NF ~ /$rg_query/ {
 					title = \$NF
-					gsub(/\.[0-9]+.*$/,\"\",title);
+					gsub(/\.\w+$/,\"\",title);
 
-					section = \$(NF-1)
-					gsub(/[a-z]*/,\"\",section);
+					section = title
+					gsub(/^.*\./,\"\",section);
 
-					printf(\"%s (%s)\t$lang\tman\n\",title,section);
+					gsub(/\.\w+$/,\"\",title);
+
+					matched = title
+					gsub(/$rg_query/,\"\",matched)
+					accuracy = 100-length(matched)*100/length(title)
+
+					matches[count,0] = accuracy;
+					matches[count,1] = title;
+					matches[count,2] = section;
+					count++;
+				};
+				END {
+					for (i = 0; i < count; i++)
+						for (j = i; j < count; j++)
+							if (matches[i,0] < matches[j,0]) {
+								a = matches[i,0];
+								t = matches[i,1];
+								s = matches[i,2];
+								matches[i,0] = matches[j,0];
+								matches[i,1] = matches[j,1];
+								matches[i,2] = matches[j,2];
+								matches[j,0] = a;
+								matches[j,1] = t;
+								matches[j,2] = s;
+							};
+					for (i = 0; i < count; i++)
+						printf(\"%s (%s)\t$lang\tman\n\",matches[i,1],matches[i,2]);
 				};"
 		)"
 		results_name="$(

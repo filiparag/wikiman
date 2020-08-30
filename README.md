@@ -20,14 +20,15 @@ yay -Sy wikiman
 
 ### Ubuntu / Debian
 
-Download latest [*.deb* package](https://github.com/filiparag/wikiman/releases/download/2.4/wikiman-2.4-2.deb).
+Download latest *.deb* package from [Releases tab](https://github.com/filiparag/wikiman/releases/latest/).
 
 ```bash
-curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.4/wikiman-2.4-2.deb'
-sudo dpkg -i 'wikiman-2.4-2.deb'
+# Example for version 2.5
+curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.5/wikiman-2.5-1.deb'
+sudo dpkg -i 'wikiman-2.5-1.deb'
 ```
 
-And install Arch Wiki Docs:
+And install Arch Wiki Docs from a snapshot:
 
 ```bash
 curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.4/arch-linux-docs_20200527-1.tar.xz'

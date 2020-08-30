@@ -21,11 +21,16 @@ yay -Sy wikiman
 Download latest [*.deb* package](https://github.com/filiparag/wikiman/releases/download/2.4/wikiman-2.4-2.deb).
 
 ```bash
-wget 'https://github.com/filiparag/wikiman/releases/download/2.4/wikiman-2.4-2.deb'
+curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.4/wikiman-2.4-2.deb'
 sudo dpkg -i 'wikiman-2.4-2.deb'
 ```
 
-And follow instructions for installing Arch Wiki Docs below.
+And install Arch Wiki Docs:
+
+```bash
+curl -L -O 'https://github.com/filiparag/wikiman/releases/latest/download/arch-linux-docs_snapshot.tar.xz'
+sudo tar zxf 'arch-linux-docs_snapshot.tar.xz' -C /
+```
 
 ### Generic instructions
 
@@ -34,17 +39,15 @@ Dependencies: `man, fzf, ripgrep, awk, w3m`
 ```bash
 git clone 'https://github.com/filiparag/wikiman'
 cd 'wikiman'
-sudo install -Dm 755 'wikiman.sh' '/usr/bin/wikiman'
-sudo install -Dm 644 'wikiman.1.man' '/usr/share/man/man1/wikiman.1'
-sudo install -Dm 644 -t '/usr/share/licenses/wikiman' 'LICENSE'
-sudo install -Dm 644 -t '/usr/share/doc/wikiman' 'README.md'
+git checkout $(git tag | tail -1)
+make
+sudo make install
 ```
 
-Download latest snapshot of [Arch Wiki Docs](https://github.com/filiparag/wikiman/releases/download/2.4/arch-linux-docs_2020_08_30.tar.xz) and install them to `/usr/share/doc/arch-wiki/html/` on your system. You can also [compile them yourself](https://github.com/lahwaacz/arch-wiki-docs).
+If you don't have Arch Wiki Docs installed in `/usr/share/doc/arch-wiki/html/` on your system, also run:
 
 ```bash
-wget 'https://github.com/filiparag/wikiman/releases/download/2.4/arch-linux-docs_2020_08_30.tar.xz'
-sudo tar zxf 'arch-linux-docs_2020_08_30.tar.xz' -C /
+sudo make archwiki
 ```
 
 ## Usage
@@ -57,18 +60,18 @@ With no *KEYWORD*, list all available results.
 
 - `-l` search language(s)
 
-    Default: en
+    Default: *en*
 
 - `-s` sources to use
  
-    Default: man, archwiki
+    Default: *man, archwiki*
 
 - `-p` quick result preview
  
-    Default: true
+    Default: *true*
 
 - `-H` viewer for HTML pages
 
-    Default: w3m
+    Default: *w3m*
 
 - `-h`  display this help and exit

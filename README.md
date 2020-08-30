@@ -5,9 +5,11 @@ Wikiman provides an easy interface for browsing documentation without the need t
 This is achieved by utilizing full text search for ArchWiki, partial name and description matching for man pages,
 and fuzzy filtering for search results.
 
+
 ## Demonstration
 
 ![Demo](demo.gif)
+
 
 ## Installation
 
@@ -56,6 +58,7 @@ Usage: `wikiman [OPTION]... [KEYWORD]...`
 
 With no *KEYWORD*, list all available results.
 
+
 ### Options:
 
 - `-l` search language(s)
@@ -75,3 +78,41 @@ With no *KEYWORD*, list all available results.
     Default: *w3m*
 
 - `-h`  display this help and exit
+
+
+## Configuration
+
+User configuration file is located at `~/.config/wikiman/wikiman.conf`,
+and fallback system-wide configuration is `/etc/wikiman.conf`.
+
+If you have set the *XDG_CONFIG_HOME* environment variable, user configuration
+will be looked up from there instead.
+
+Example configuration file:
+
+```ini
+# Sources: man, archwiki
+sources = archwiki
+
+# Manpages language(s)
+man_lang = en, pt, pt_BR
+
+# ArchWiki language(s)
+wiki_lang = zh_CN
+
+# Show previews in TUI
+tui_preview = false
+
+# Viewer for HTML pages
+tui_html = xdg-open
+```
+
+To list available languages, run these commands:
+
+```bash
+# Man pages (excluding English)
+find /usr/share/man/ -maxdepth 1 -type d -not -name 'man*' -printf '%P '
+
+# Arch Wiki
+find '/usr/share/doc/arch-wiki/html' -maxdepth 1 -type d -printf '%P '
+```

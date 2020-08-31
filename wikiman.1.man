@@ -52,6 +52,11 @@ default: w3m
 print raw output
 
 .HP
+.B -S
+.br
+list available sources and exit
+
+.HP
 .B -h
 .br
 display help and exit

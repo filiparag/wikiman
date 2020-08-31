@@ -47,7 +47,7 @@ curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.4/arch-linu
 sudo tar zxf 'arch-linux-docs_20200527-1.tar.xz' -C /
 ```
 
-### Generic instructions
+### Manual installation
 
 Dependencies: `man, fzf, ripgrep, awk, w3m`
 
@@ -87,6 +87,8 @@ Usage: `wikiman [OPTION]... [KEYWORD]...`
 
 - `-R` print raw output
 
+- `-S`  list available sources and exit
+
 - `-h` display this help and exit
 
 
@@ -101,7 +103,7 @@ will be looked up from there instead.
 Example configuration file:
 
 ```ini
-# Sources: man, archwiki
+# Sources
 sources = archwiki
 
 # Quick search mode (only by title)

@@ -131,7 +131,8 @@ picker_tui() {
 		preview="--preview 'WIKIMAN_TUI_PREVIEW=1 wikiman {}'"
 	fi
 
-	if [ "$(echo "$conf_man_lang" | wc -w)" = '1' ] && [ "$(echo "$conf_wiki_lang" | wc -w)" = '1' ]; then
+	if [ "$(echo "$conf_man_lang" | wc -w)" = '1' ] && \
+		[ "$(echo "$conf_wiki_lang" | wc -w)" = '1' ]; then
 		columns='1'
 	else
 		columns='2,1'
@@ -139,7 +140,8 @@ picker_tui() {
 
 	command="$(
 		echo "$all_results" | \
-		eval "fzf --with-nth $columns --delimiter '\t' $preview --reverse --prompt 'wikiman > '" | \
+		eval "fzf --with-nth $columns --delimiter '\t' \
+			$preview --reverse --prompt 'wikiman > '" | \
 		awk -F '\t' \
 			"{
 				if (NF==3) {
@@ -180,13 +182,15 @@ Options:
 
   -R  print raw output
 
+  -S  list available sources and exit
+
   -h  display this help and exit"
 
 }
 
 init
 
-while getopts l:s:H:pqhR o; do
+while getopts l:s:H:pqhRS o; do
   case $o in
 	(p) conf_tui_preview='false';;
 	(H) conf_tui_html="$OPTARG";;
@@ -201,6 +205,9 @@ while getopts l:s:H:pqhR o; do
 		)";;
 	(q) conf_quick_search='true';;
 	(R) conf_raw_output='true';;
+	(S) find /usr/share/wikiman/sources/ -type f 2>/dev/null | \
+		awk -F '/' '{gsub(/\..*$/,"",$NF); print $NF; }'
+		exit;;
 	(h) help;
 		exit;;
     (*) exit 1;;
@@ -219,7 +226,8 @@ fi
 
 for src in $conf_sources; do
 
-	if ! [ -f "/usr/share/wikiman/sources/$src.sh" ] || ! [ -r "/usr/share/wikiman/sources/$src.sh" ]; then
+	if ! [ -f "/usr/share/wikiman/sources/$src.sh" ] || \
+		! [ -r "/usr/share/wikiman/sources/$src.sh" ]; then
 		echo "error: source '$src' does not exist" 1>&2
 		exit 2
 	fi

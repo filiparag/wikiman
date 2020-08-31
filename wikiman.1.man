@@ -31,16 +31,25 @@ sources to use
 default: man, archwiki
 
 .HP
+.B -q
+.br
+enable quick search mode
+
+.HP
 .B -p
 .br
-quick result preview (boolean)
-default: true
+disable quick result preview
 
 .HP
 .B -H
 .br
 viewer for HTML pages
 default: w3m
+
+.HP
+.B -R
+.br
+print raw output
 
 .HP
 .B -h
@@ -54,22 +63,33 @@ Default user configuration file location:
 ~/.config/wikiman/wikiman.conf
 (if XDG_CONFIG_HOME is not set).
 
+System-wide configuration location:
+.I
+/etc/wikiman.conf
+
 .SS Sources:
 sources = man, archwiki
 
-.SS Language:
-man_lang = en es
-wiki_lang = en, pt_BR
+.SS Quick search mode
+quick_search = false
+
+.SS Raw output
+raw_output = false
+
+.SS Language(s):
+man_lang = en
+
+wiki_lang = en
 .PP
 .B
-List all man languages:
+List all man languages besides English (en):
 .br
-ls -l /usr/share/man
+find '/usr/share/man' -maxdepth 1 -type d -not -name 'man*' -printf '%P '
 .PP
 .B
-List all ArchWiki languages:
+List all Arch Wiki languages:
 .br
-ls -l /usr/share/doc/arch-wiki/html
+find '/usr/share/doc/arch-wiki/html' -maxdepth 1 -type d -printf '%P '
 
 .SS TUI preview:
 tui_preview = true

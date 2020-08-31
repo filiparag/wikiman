@@ -67,9 +67,6 @@ sudo make archwiki
 
 Usage: `wikiman [OPTION]... [KEYWORD]...`
 
-With no *KEYWORD*, list all available results.
-
-
 ### Options:
 
 - `-l` search language(s)
@@ -80,15 +77,17 @@ With no *KEYWORD*, list all available results.
  
     Default: *man, archwiki*
 
-- `-p` quick result preview
- 
-    Default: *true*
+- `-q` enable quick search mode
+
+- `-p` disable quick result preview
 
 - `-H` viewer for HTML pages
 
     Default: *w3m*
 
-- `-h`  display this help and exit
+- `-R` print raw output
+
+- `-h` display this help and exit
 
 
 ## Configuration
@@ -104,6 +103,12 @@ Example configuration file:
 ```ini
 # Sources: man, archwiki
 sources = archwiki
+
+# Quick search mode (only by title)
+quick_search = false
+
+# Raw output (for developers)
+raw_output = false
 
 # Manpages language(s)
 man_lang = en, pt, pt_BR

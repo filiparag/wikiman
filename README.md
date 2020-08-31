@@ -20,15 +20,27 @@ yay -Sy wikiman
 
 ### Ubuntu / Debian
 
-Download latest *.deb* package from [Releases tab](https://github.com/filiparag/wikiman/releases/latest/).
+Download latest *.deb* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
 ```bash
 # Example for version 2.5
 curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.5/wikiman-2.5-1.deb'
+sudo apt update && sudo apt install 
 sudo dpkg -i 'wikiman-2.5-1.deb'
 ```
 
-And install Arch Wiki Docs from a snapshot:
+### Fedora
+
+Download latest *.rpm* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
+
+```bash
+# Example for version 2.5
+sudo dnf install 'https://github.com/filiparag/wikiman/releases/download/2.5/wikiman-2.5-1.fc32.noarch.rpm'
+```
+
+### Installing Arch Wiki Docs
+
+You can install the snapshot from this repository, or compile it yourself using [this utility](https://github.com/lahwaacz/arch-wiki-docs).
 
 ```bash
 curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.4/arch-linux-docs_20200527-1.tar.xz'
@@ -40,16 +52,14 @@ sudo tar zxf 'arch-linux-docs_20200527-1.tar.xz' -C /
 Dependencies: `man, fzf, ripgrep, awk, w3m`
 
 ```bash
+# Install latest stable version of wikiman
 git clone 'https://github.com/filiparag/wikiman'
 cd 'wikiman'
 git checkout $(git tag | tail -1)
 make
 sudo make install
-```
 
-If you don't have Arch Wiki Docs installed in `/usr/share/doc/arch-wiki/html/` on your system, also run:
-
-```bash
+# Download latest Arch Wiki Docs snapshot
 sudo make archwiki
 ```
 

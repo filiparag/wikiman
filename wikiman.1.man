@@ -7,7 +7,10 @@
 
 .SH SYNOPSIS
 .B wikiman
--l [languages] -s [sources] -p [preview (boolean)] -H [html viewer] <keyword>...
+-l [languages] -s [sources] -q -p -H [html viewer] -R <keyword>...
+.br
+.B wikiman
+-S
 .br
 .B wikiman
 -h

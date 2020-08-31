@@ -23,10 +23,7 @@ yay -Sy wikiman
 Download latest *.deb* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
 ```bash
-# Example for version 2.5
-curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.5/wikiman-2.5-1.deb'
-sudo apt update && sudo apt install 
-sudo dpkg -i 'wikiman-2.5-1.deb'
+sudo dpkg -i wikiman-*.deb
 ```
 
 ### Fedora
@@ -34,8 +31,7 @@ sudo dpkg -i 'wikiman-2.5-1.deb'
 Download latest *.rpm* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
 ```bash
-# Example for version 2.5
-sudo dnf install 'https://github.com/filiparag/wikiman/releases/download/2.5/wikiman-2.5-1.fc32.noarch.rpm'
+sudo dnf install wikiman-*.rpm
 ```
 
 ### Installing Arch Wiki Docs
@@ -49,7 +45,7 @@ sudo tar zxf 'arch-linux-docs_20200527-1.tar.xz' -C /
 
 ### Manual installation
 
-Dependencies: `man, fzf, ripgrep, awk, w3m`
+Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`
 
 ```bash
 # Install latest stable version of wikiman

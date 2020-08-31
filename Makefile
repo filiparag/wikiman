@@ -7,42 +7,53 @@ make:
 	@which ${DEPS} >/dev/null || { echo 'Error: Missing dependency!'; exit 1; }
 
 	@echo 'Checking documentation sources...'
-	@test -d '/usr/share/man' -a -r '/usr/share/man' >/dev/null || \
+	@test -d '$(prefix)/usr/share/man' -a -r '$(prefix)/usr/share/man' >/dev/null || \
 		echo 'Warning: Man pages are not available!'
-	@test -d '/usr/share/doc/arcsh-wiki/html' -a -r '/usr/share/doc/arch-wiki/html' >/dev/null || \
-		echo 'Warning: Arch Wiki is not available! Run make archwiki to install.'
+	@test -d '$(prefix)/usr/share/doc/arch-wiki/html' -a -r '$(prefix)/usr/share/doc/arch-wiki/html' >/dev/null || \
+		echo 'Warning: Arch Wiki is not available! Run make arch-wiki to install.'
+	@test -d '$(prefix)/usr/share/doc/gentoo-wiki/wiki/' -a -r '$(prefix)/usr/share/doc/gentoo-wiki/wiki/' >/dev/null || \
+		echo 'Warning: Gentoo Wiki is not available! Run make gentoo-wiki to install.'
 
-archwiki:
+arch-wiki:
 	
-	@echo 'Downoading latest snapshot...'
+	@echo 'Downoading latest Arch Wiki snapshot...'
 	@curl -L -O '${UPSTREAM}/releases/download/2.4/arch-linux-docs_20200527-1.tar.xz'
 	@echo 'Installing Arch Wiki...'
-	@tar zxf './arch-linux-docs_20200527-1.tar.xz' -C /
+	@tar zxf './arch-linux-docs_20200527-1.tar.xz' -C '$(prefix)/'
 	@rm './arch-linux-docs_20200527-1.tar.xz'
+
+gentoo-wiki:
+
+	@echo 'Downoading latest Gentoo Wiki snapshot...'
+	@curl -L -O '${UPSTREAM}/releases/download/2.7/gentoo-wiki_20200831-1.tar.xz'
+	@echo 'Installing Gentoo Wiki...'
+	@tar zxf './gentoo-wiki_20200831-1.tar.xz' -C '$(prefix)/'
+	@rm './gentoo-wiki_20200831-1.tar.xz'
 
 install:
 
-	@install -Dm 755 'wikiman.sh' '/usr/bin/wikiman'
+	@install -Dm 755 'wikiman.sh' '$(prefix)/usr/bin/wikiman'
 
-	@mkdir -p '/usr/share/wikiman'
-	@cp -r --preserve=mode 'sources' '/usr/share/wikiman/'
+	@mkdir -p '$(prefix)/usr/share/wikiman'
+	@cp -r --preserve=mode 'sources' '$(prefix)/usr/share/wikiman/'
 
-	@install -Dm 644 'wikiman.1.man' '/usr/share/man/man1/wikiman.1.gz'
-	@install -Dm 644 -t '/usr/share/licenses/wikiman' 'LICENSE'
-	@install -Dm 644 -t '/usr/share/doc/wikiman' 'README.md'
-	@install -Dm 644 -t '/etc' 'wikiman.conf'
+	@install -Dm 644 'wikiman.1.man' '$(prefix)/usr/share/man/man1/wikiman.1.gz'
+	@install -Dm 644 -t '$(prefix)/usr/share/licenses/wikiman' 'LICENSE'
+	@install -Dm 644 -t '$(prefix)/usr/share/doc/wikiman' 'README.md'
+	@install -Dm 644 -t '$(prefix)/etc' 'wikiman.conf'
 
 clean:
 
-	@rm './arch-linux-docs_20200527-1.tar.xz'
+	@rm -f './arch-linux-docs_20200527-1.tar.xz'
+	@rm -f './gentoo-wiki_20200831-1.tar.xz'
 
 uninstall:
 
-	@rm -f '/usr/bin/wikiman'
+	@rm -f '$(prefix)/usr/bin/wikiman'
 
-	@rm -rf '/usr/share/wikiman'
+	@rm -rf '$(prefix)/usr/share/wikiman'
 
-	@rm -f '/usr/share/man/man1/wikiman.1.gz'
-	@rm -rf '/usr/share/licenses/wikiman'
-	@rm -rf '/usr/share/doc/wikiman'
-	@rm -i '/etc/wikiman.conf'
+	@rm -f '$(prefix)/usr/share/man/man1/wikiman.1.gz'
+	@rm -rf '$(prefix)/usr/share/licenses/wikiman'
+	@rm -rf '$(prefix)/usr/share/doc/wikiman'
+	@rm -i '$(prefix)/etc/wikiman.conf'

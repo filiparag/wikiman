@@ -3,11 +3,11 @@
 
 .SH NAME
 .B wikiman
-\- Offline search engine for manual pages and distro wikis combined
+\- Offline search engine for Arch Wiki, Gentoo Wiki and manual pages
 
 .SH SYNOPSIS
 .B wikiman
--l [languages] -s [sources] -q -p -H [html viewer] -R <keyword>...
+[-l languages] [-s sources] -q -p [-H html_viewer] -R <keyword>...
 .br
 .B wikiman
 -S
@@ -18,6 +18,11 @@
 .SH DESCRIPTION
 .P
 Wikiman is an offline search engine for Arch Wiki, Gentoo Wiki and manual pages.
+
+Wikiman provides an easy interface for browsing documentation without the need to be exact and connected to the internet.
+This is achieved by utilizing full text search for wikis, partial name and description matching for man pages,
+and fuzzy filtering for search results.
+
 
 .SH OPTIONS
 .HP

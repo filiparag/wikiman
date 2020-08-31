@@ -1,9 +1,12 @@
 ## About
-**wikiman** is an offline search engine for ArchWiki and manual pages combined.
+**Wikiman** is an offline search engine for Arch Wiki, Gentoo Wiki and manual pages.
 
 Wikiman provides an easy interface for browsing documentation without the need to be exact and connected to the internet.
-This is achieved by utilizing full text search for ArchWiki, partial name and description matching for man pages,
+This is achieved by utilizing full text search for wikis, partial name and description matching for man pages,
 and fuzzy filtering for search results.
+
+By default, Wikiman only searches manual pages.
+Follow [these](#installing-arch-wiki-and-gentoo-wiki) instructions to enable wikis.
 
 
 ## Demonstration
@@ -34,13 +37,25 @@ Download latest *.rpm* package from [Releases](https://github.com/filiparag/wiki
 sudo dnf install wikiman-*.rpm
 ```
 
-### Installing Arch Wiki Docs
+### Installing Arch Wiki and Gentoo Wiki
 
-You can install the snapshot from this repository, or compile it yourself using [this utility](https://github.com/lahwaacz/arch-wiki-docs).
+Due to their large size, wikis don't come bundled with Wikiman.
+If you want to use them, you can download their snapshots using following commands.
 
 ```bash
+# Arch Wiki
 curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.4/arch-linux-docs_20200527-1.tar.xz'
 sudo tar zxf 'arch-linux-docs_20200527-1.tar.xz' -C /
+
+# Gentoo Wiki
+curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.7/gentoo-wiki_20200831-1.tar.xz'
+sudo tar zxf 'gentoo-wiki_20200831-1.tar.xz' -C /
+```
+
+After installation, enable them by adding them to sources variable in the [configuration file](#configuration).
+
+```ini
+sources = man, arch, gentoo
 ```
 
 ### Manual installation
@@ -56,7 +71,10 @@ make
 sudo make install
 
 # Download latest Arch Wiki Docs snapshot
-sudo make archwiki
+sudo make arch-wiki
+
+# Download latest Gentoo Wiki Docs snapshot
+sudo make gentoo-wiki
 ```
 
 ## Usage
@@ -71,7 +89,7 @@ Usage: `wikiman [OPTION]... [KEYWORD]...`
 
 - `-s` sources to use
  
-    Default: *man, archwiki*
+    Default: *man*
 
 - `-q` enable quick search mode
 
@@ -100,7 +118,7 @@ Example configuration file:
 
 ```ini
 # Sources
-sources = archwiki
+sources = man, arch, gentoo
 
 # Quick search mode (only by title)
 quick_search = false
@@ -111,7 +129,7 @@ raw_output = false
 # Manpages language(s)
 man_lang = en, pt, pt_BR
 
-# ArchWiki language(s)
+# Wiki language(s)
 wiki_lang = zh-CN
 
 # Show previews in TUI

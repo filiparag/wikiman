@@ -10,7 +10,8 @@
 # find . -name '*.html' -exec sed -i 's|https://assets.gentoo.org/tyrian/|../|g; ' {} \;
 
 # # Replace links
-# find . -name '*.html' -exec sed -i 's|https://wiki.gentoo.org/index.php?title=|/wiki/|g; ' {} \;
+# find . -name '*.html' -exec sed -i 's|https://wiki.gentoo.org/index.php?title=|/wiki/|g;' {} \;
+# find . -name '*.html' -exec sed -i 's|index.php?title=|/wiki/|g;' {} \;
 # find . -name '*.html' -exec sed -i 's/href="\/wiki\/\([^"]*\)"/href=".\/\1.html"/g; ' {} \;
 
 search() {
@@ -26,7 +27,7 @@ search() {
 		return
 	fi
 
-	rg_ignore="/^(File|Talk|Template|Template talk|Project| Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk):/"
+	rg_ignore="/^(File|Talk|Template|Template talk|Project|Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk|Foundation|Foundation talk):/"
 	langs="/$(echo "$conf_wiki_lang" | sed 's/ \+/ /g; s/^ *//g; s/ *$//g; s/ /\|/g')/"
 	nf="$(echo "$path" | awk -F '/' '{print NF+1}')"
 

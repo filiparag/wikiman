@@ -24,6 +24,9 @@ install:
 
 	@install -Dm 755 'wikiman.sh' '/usr/bin/wikiman'
 
+	@mkdir -p '/usr/share/wikiman'
+	@cp -r --preserve=mode 'sources' '/usr/share/wikiman/'
+
 	@install -Dm 644 'wikiman.1.man' '/usr/share/man/man1/wikiman.1'
 	@install -Dm 644 -t '/usr/share/licenses/wikiman' 'LICENSE'
 	@install -Dm 644 -t '/usr/share/doc/wikiman' 'README.md'
@@ -37,7 +40,9 @@ uninstall:
 
 	@rm -f '/usr/bin/wikiman'
 
-	@rm -f '/usr/share/man/man1/wikiman.1'
-	@rm -f '/usr/share/licenses/wikiman'
-	@rm -f '/usr/share/doc/wikiman'
+	@rm -rf '/usr/share/wikiman'
+
+	@rm -f '/usr/share/man/man1/wikiman.1.gz'
+	@rm -rf '/usr/share/licenses/wikiman'
+	@rm -rf '/usr/share/doc/wikiman'
 	@rm -i '/etc/wikiman.conf'

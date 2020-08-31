@@ -1,5 +1,5 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "30 August 2020" "wikiman 2.4" "wikiman manual"
+.TH "wikiman" 1 "31 August 2020" "wikiman 2.6" "wikiman manual"
 
 .SH NAME
 .B wikiman
@@ -15,8 +15,6 @@
 .SH DESCRIPTION
 .P
 Wikiman is an offline search engine for ArchWiki and manual pages combined.
-
-With no <keyword>, list all available results.
 
 .SH OPTIONS
 .HP

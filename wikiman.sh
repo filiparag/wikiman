@@ -421,18 +421,18 @@ while getopts p:l:s:H:h o; do
 done
 shift "$((OPTIND - 1))"
 
+if [ $# = 0 ]; then
+	echo "error: empty search query" 1>&2
+	exit 254
+else
+	query="$*"
 rg_query="$(echo "$*" | sed 's/ /\|/g')"
 greedy_query="\w*$(echo "$*" | sed 's/ /\\\w\*|\\w\*/g')\w*"
+fi
 
 if echo "$conf_sources" | grep -q '\<man\>'; then
-
-	if [ $# = 0 ]; then 
-		search_man "."
-	else
-		search_man "$@"
-	fi
+	search_man
 	all_results="$results_man"
-
 fi
 
 if echo "$conf_sources" | grep -q '\<archwiki\>'; then
@@ -450,4 +450,5 @@ if echo "$all_results" | grep -cve '^\s*$' >/dev/null; then
 	picker_tui && eval "$command"
 else
 	echo "search: no results for '$*'" 1>&2
+	exit 255
 fi

@@ -1,9 +1,9 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "31 August 2020" "wikiman 2.6" "wikiman manual"
+.TH "wikiman" 1 "1 September 2020" "wikiman 2.7" "wikiman manual"
 
 .SH NAME
 .B wikiman
-\- Offline search engine for ArchWiki and manual pages combined
+\- Offline search engine for manual pages and distro wikis combined
 
 .SH SYNOPSIS
 .B wikiman
@@ -17,7 +17,7 @@
 
 .SH DESCRIPTION
 .P
-Wikiman is an offline search engine for ArchWiki and manual pages combined.
+Wikiman is an offline search engine for Arch Wiki, Gentoo Wiki and manual pages.
 
 .SH OPTIONS
 .HP
@@ -31,7 +31,7 @@ default: en
 .B -s
 .br
 sources to use
-default: man, archwiki
+default: man
 
 .HP
 .B -q
@@ -76,7 +76,7 @@ System-wide configuration location:
 /etc/wikiman.conf
 
 .SS Sources:
-sources = man, archwiki
+sources = man, arch, gentoo
 
 .SS Quick search mode
 quick_search = false

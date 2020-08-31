@@ -1,8 +1,10 @@
 #!/bin/sh
 
-results=''
-
 search() {
+
+	results=''
+	results_name=''
+	results_desc=''
 
 	# Search by name
 

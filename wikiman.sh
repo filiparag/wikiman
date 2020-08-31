@@ -161,7 +161,7 @@ picker_tui() {
 help() {
 
 	echo "Usage: wikiman [OPTION]... [KEYWORD]...
-Offline search engine for ArchWiki and manual pages combined
+Offline search engine for manual pages and distro wikis combined
 
 Options:
 

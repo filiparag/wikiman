@@ -13,14 +13,21 @@
 # find . -name '*.html' -exec sed -i 's|https://wiki.gentoo.org/index.php?title=|/wiki/|g; ' {} \;
 # find . -name '*.html' -exec sed -i 's/href="\/wiki\/\([^"]*\)"/href=".\/\1.html"/g; ' {} \;
 
-results=''
-
 search() {
 
-	langs="/$(echo "$conf_wiki_lang" | sed 's/ \+/ /g; s/^ *//g; s/ *$//g; s/ /\|/g')/"
-	path="/usr/share/doc/gentoo-wiki/wiki"
-	rg_ignore="/^(File|Talk|Template|Template talk|Project| Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk):/"
+	results=''
+	results_title=''
+	results_text=''
 
+	path="/usr/share/doc/gentoo-wiki/wiki"
+
+	if ! [ -d "$path" ]; then
+		echo "warning: Gentoo Wiki documentation does not exist" 1>&2
+		return
+	fi
+
+	rg_ignore="/^(File|Talk|Template|Template talk|Project| Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk):/"
+	langs="/$(echo "$conf_wiki_lang" | sed 's/ \+/ /g; s/^ *//g; s/ *$//g; s/ /\|/g')/"
 	nf="$(echo "$path" | awk -F '/' '{print NF+1}')"
 
 	results_title="$(

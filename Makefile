@@ -27,7 +27,7 @@ install:
 	@mkdir -p '/usr/share/wikiman'
 	@cp -r --preserve=mode 'sources' '/usr/share/wikiman/'
 
-	@install -Dm 644 'wikiman.1.man' '/usr/share/man/man1/wikiman.1'
+	@install -Dm 644 'wikiman.1.man' '/usr/share/man/man1/wikiman.1.gz'
 	@install -Dm 644 -t '/usr/share/licenses/wikiman' 'LICENSE'
 	@install -Dm 644 -t '/usr/share/doc/wikiman' 'README.md'
 	@install -Dm 644 -t '/etc' 'wikiman.conf'

@@ -1,14 +1,16 @@
 #!/bin/sh
 
-results=''
-
 search() {
+
+	results=''
+	results_title=''
+	results_text=''
 
 	for lang in $conf_wiki_lang; do
 		if [ -d "/usr/share/doc/arch-wiki/html/$lang" ]; then
 			paths="$paths /usr/share/doc/arch-wiki/html/$lang"
 		else
-			echo "warning: ArchWiki documentation for '$lang' does not exist" 1>&2
+			echo "warning: Arch Wiki documentation for '$lang' does not exist" 1>&2
 		fi
 	done
 	
@@ -77,7 +79,7 @@ search() {
 						};
 						
 				for (i = 0; i < count; i++)
-					printf(\"%s\t%s\tarchwiki\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+					printf(\"%s\t%s\tarch\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
 			};"
 	)"
 
@@ -133,7 +135,7 @@ search() {
 							};
 							
 					for (i = 0; i < count; i++)
-						printf(\"%s\t%s\tarchwiki\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+						printf(\"%s\t%s\tarch\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
 				};"
 		)"
 

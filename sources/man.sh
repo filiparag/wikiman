@@ -1,5 +1,7 @@
 #!/bin/sh
 
+path='/usr/share/man'
+
 search() {
 
 	results=''
@@ -10,10 +12,10 @@ search() {
 
 	for lang in $conf_man_lang; do
 		if [ "$lang" = 'en' ]; then
-			man_search_path='/usr/share/man/man'
+			man_search_path="$path/man"
 		else
-			if [ -d "/usr/share/man/$lang" ]; then
-				man_search_path="/usr/share/man/$lang/"
+			if [ -d "path/$lang" ]; then
+				man_search_path="path/$lang/"
 			else
 				echo "warning: man pages for '$lang' do not exist" 1>&2
 				continue

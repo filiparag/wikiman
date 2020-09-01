@@ -1,18 +1,6 @@
 #!/bin/sh
 
-# # Add extension
-# find . -type f -exec mv {} {}.html \;
-
-# # Strip header and footer
-# find . -type f -print0 | xargs -0  --no-run-if-empty -I{} sh -c "cat \"{}\" | pup 'head, div#content' --pre | sponge \"{}\""
-
-# # Use local CSS
-# find . -name '*.html' -exec sed -i 's|https://assets.gentoo.org/tyrian/|../|g; ' {} \;
-
-# # Replace links
-# find . -name '*.html' -exec sed -i 's|https://wiki.gentoo.org/index.php?title=|/wiki/|g;' {} \;
-# find . -name '*.html' -exec sed -i 's|index.php?title=|/wiki/|g;' {} \;
-# find . -name '*.html' -exec sed -i 's/href="\/wiki\/\([^"]*\)"/href=".\/\1.html"/g; ' {} \;
+path='/usr/share/doc/gentoo-wiki/wiki'
 
 search() {
 
@@ -20,15 +8,16 @@ search() {
 	results_title=''
 	results_text=''
 
-	path="/usr/share/doc/gentoo-wiki/wiki"
-
 	if ! [ -d "$path" ]; then
 		echo "warning: Gentoo Wiki documentation does not exist" 1>&2
 		return
 	fi
 
 	rg_ignore="/^(File|Talk|Template|Template talk|Project|Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk|Foundation|Foundation talk):/"
-	langs="/$(echo "$conf_wiki_lang" | sed 's/ \+/ /g; s/^ *//g; s/ *$//g; s/ /\|/g')/"
+	langs="/$(
+		echo "$conf_wiki_lang" | \
+		awk '{ l=tolower($0); gsub(/ +/,"|",l); gsub(/(^\|)|(\|$)/,"",l); gsub("_","-",l); print l}'
+	)"
 	nf="$(echo "$path" | awk -F '/' '{print NF+1}')"
 
 	results_title="$(

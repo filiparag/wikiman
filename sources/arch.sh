@@ -1,5 +1,7 @@
 #!/bin/sh
 
+path='/usr/share/doc/arch-wiki/html'
+
 search() {
 
 	results=''
@@ -7,8 +9,8 @@ search() {
 	results_text=''
 
 	for lang in $conf_wiki_lang; do
-		if [ -d "/usr/share/doc/arch-wiki/html/$lang" ]; then
-			paths="$paths /usr/share/doc/arch-wiki/html/$lang"
+		if [ -d "$path/$lang" ]; then
+			paths="$paths $path/$lang"
 		else
 			echo "warning: Arch Wiki documentation for '$lang' does not exist" 1>&2
 		fi

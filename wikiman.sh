@@ -184,6 +184,34 @@ Options:
 
 }
 
+sources() {
+
+	modules="$(
+		find /usr/share/wikiman/sources/ -type f 2>/dev/null | \
+		awk -F '/' '{
+			gsub(/\..*$/,"",$NF);
+			print $NF
+		}'
+	)"
+
+	if [ "$modules" != '' ]; then
+		printf '%-10s %6s  %s\n' 'NAME' 'PAGES' 'PATH'
+	fi
+
+	for mod in $modules; do
+
+		. "/usr/share/wikiman/sources/$mod.sh"
+		
+		if [ -d "$path" ]; then
+			count="$(find "$path" -type f | wc -l)"
+			printf '%-10s %6i  %s\n' "$mod" "$count" "$path"
+		else
+			printf '%-18s (not installed)\n' "$mod"
+		fi
+	done
+
+}
+
 init
 
 while getopts l:s:H:pqhRS o; do
@@ -201,8 +229,7 @@ while getopts l:s:H:pqhRS o; do
 		)";;
 	(q) conf_quick_search='true';;
 	(R) conf_raw_output='true';;
-	(S) find /usr/share/wikiman/sources/ -type f 2>/dev/null | \
-		awk -F '/' '{gsub(/\..*$/,"",$NF); print $NF; }'
+	(S) sources;
 		exit;;
 	(h) help;
 		exit;;

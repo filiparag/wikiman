@@ -170,6 +170,8 @@ variable with rows formatted as `NAME\tLANG\tSOURCE\tPATH`.
 - `SOURCE`  source name
 - `PATH`    path to HTML file
 
+Outside this function, variable `$path` should be set to the local database path. 
+Wikiman will probe this path when verifying if the source can be used.
 
 ## Contributions
 

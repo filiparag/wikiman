@@ -164,3 +164,14 @@ variable with rows formatted as `NAME\tLANG\tSOURCE\tPATH`.
 - `PATH`    path to HTML file
 
 
+## Contributions
+
+If you create a source module useful to general public, please share it using a 
+[pull request](https://github.com/filiparag/wikiman/pulls). Your pull request should contain:
+
+- module script file `sources/your-source.sh`
+- Makefile recipe `your-source`
+- installable snapshot of the source database `your-source-TIMESTAMP.tar.xz`
+- short description in the pull request's body
+
+Other improvements are also welcome!

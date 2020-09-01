@@ -52,7 +52,7 @@ search() {
 				count=0;
 			};
 			{
-				title = \"\"
+				title = \"\";
 				for (i=$nf+3; i<=NF; i++) {
 				 	fragment = toupper(substr(\$i,0,1))substr(\$i,2);
 					title = title ((i==$nf+3) ? \"\" : \"/\") fragment;
@@ -61,8 +61,8 @@ search() {
 				gsub(/\.html$/,\"\",title);
 				gsub(\"-\",\" \",title);
 
-				lang=\$$nf
-				path=\$0
+				lang=\$$nf;
+				path=\$0;
 
 				matched = title;
 				gsub(/$greedy_query/,\"\",matched);
@@ -109,6 +109,70 @@ search() {
 			};"
 	)"
 
-	results="$results_title"
+	if [ "$conf_quick_search" != 'true' ]; then
+
+		results_text="$(
+			eval "rg -U -S -c '$rg_query' $paths" | \
+			awk -F '/' \
+				"BEGIN {
+					IGNORECASE=1;
+					count=0;
+				};
+				\$0 !~ /.*:0$/ {
+
+					hits = \$NF;
+					gsub(/^.*:/,\"\",hits);
+
+					gsub(/:[0-9]+$/,\"\",\$0);
+
+					title = \"\"
+					for (i=$nf+3; i<=NF; i++) {
+						fragment = toupper(substr(\$i,0,1))substr(\$i,2);
+						title = title ((i==$nf+3) ? \"\" : \"/\") fragment;
+					}
+
+					gsub(/\.html$/,\"\",title);
+					gsub(\"-\",\" \",title);
+
+					lang=\$$nf;
+					path=\$0;
+
+					book = \$($nf+2);
+
+					title = sprintf(\"%s (%s)\",title,book);
+					matches[count,0] = hits;
+					matches[count,1] = title;
+					matches[count,2] = path;
+					matches[count,3] = lang;
+					count++;
+				};
+				END {
+					for (i = 0; i < count; i++)
+						for (j = i; j < count; j++)
+							if (matches[i,0] < matches[j,0]) {
+								h = matches[i,0];
+								t = matches[i,1];
+								p = matches[i,2];
+								l = matches[i,3];
+								matches[i,0] = matches[j,0];
+								matches[i,1] = matches[j,1];
+								matches[i,2] = matches[j,2];
+								matches[i,3] = matches[j,3];
+								matches[j,0] = h;
+								matches[j,1] = t;
+								matches[j,2] = p;
+								matches[j,3] = l;
+							};
+							
+					for (i = 0; i < count; i++)
+						printf(\"%s\t%s\tgentoo\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+				};"
+			)"
+
+	fi
+
+	results="$(
+		printf '%s\n%s' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
+	)"
 
 }

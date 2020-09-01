@@ -26,6 +26,8 @@ yay -Sy wikiman
 Download latest *.deb* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
 ```bash
+sudo apt update
+sudo apt install man fzf ripgrep gawk w3m
 sudo dpkg -i wikiman-*.deb
 ```
 
@@ -166,7 +168,7 @@ variable with rows formatted as `NAME\tLANG\tSOURCE\tPATH`.
 
 ## Contributions
 
-If you create a source module useful to general public, please share it using a 
+If you create a source module useful to the general public, please share it using a 
 [pull request](https://github.com/filiparag/wikiman/pulls). Your pull request should contain:
 
 - module script file `sources/your-source.sh`

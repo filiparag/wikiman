@@ -62,6 +62,10 @@ sudo make install
 Due to their large size, wikis don't come bundled with Wikiman.
 If you want to use them, you can download their snapshots using following commands.
 
+User source modules are located in `~/.config/wikiman/sources/`,
+and system-wide sources are in `/usr/share//wikiman/sources/`.
+If there is a name collision, user modules have priority over system-wide sources.
+
 Available optional sources are:
 
 - Arch Wiki (`arch`)

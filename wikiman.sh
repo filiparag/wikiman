@@ -28,16 +28,18 @@ fi
 
 init() {
 
+	# Configuration variables
+
 	config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
-	config_file_etc="/etc/wikiman.conf"
+	config_file="/etc/wikiman.conf"
 	config_file_usr="$config_dir/wikiman.conf"
 
-	[ -f "$config_file_etc" ] && [ -r "$config_file_etc" ] || \
-		config_file_etc=''
+	[ -f "$config_file" ] && [ -r "$config_file" ] || \
+		config_file=''
 	[ -f "$config_file_usr" ] && [ -r "$config_file_usr" ] || \
 		config_file_usr=''
 
-	if [ -z "$config_file_etc" ] && [ -z "$config_file_usr" ]; then
+	if [ -z "$config_file" ] && [ -z "$config_file_usr" ]; then
 		echo "warning: configuration file missing, using defaults" 1>&2
 	else
 		conf_sources="$(
@@ -45,49 +47,49 @@ init() {
 				gsub(","," ",$2);
 				gsub(/#.*/,"",$2);
 				value = $2;
-			}; END { print value }' "$config_file_etc" "$config_file_usr"
+			}; END { print value }' "$config_file" "$config_file_usr"
 		)"
 		conf_quick_search="$(
 			awk -F '=' '/^[ ,\t]*quick_search/ {
 				gsub(/#.*/,"",$2);
 				gsub(/[ \t]+/,"",$2);
 				value = $2;
-			}; END { print value }' "$config_file_etc" "$config_file_usr"
+			}; END { print value }' "$config_file" "$config_file_usr"
 		)"
 		conf_raw_output="$(
 			awk -F '=' '/^[ ,\t]*raw_output/ {
 				gsub(/#.*/,"",$2);
 				gsub(/[ \t]+/,"",$2);
 				value = $2;
-			}; END { print value }' "$config_file_etc" "$config_file_usr"
+			}; END { print value }' "$config_file" "$config_file_usr"
 		)"
 		conf_man_lang="$(
 			awk -F '=' '/^[ ,\t]*man_lang/ {
 				gsub(","," ",$2);
 				gsub(/#.*/,"",$2);
 				value = $2;
-			}; END { print value }' "$config_file_etc" "$config_file_usr"
+			}; END { print value }' "$config_file" "$config_file_usr"
 		)"
 		conf_wiki_lang="$(
 			awk -F '=' '/^[ ,\t]*wiki_lang/ {
 				gsub(","," ",$2);
 				gsub(/#.*/,"",$2);
 				value = $2;
-			}; END { print value }' "$config_file_etc" "$config_file_usr"
+			}; END { print value }' "$config_file" "$config_file_usr"
 		)"
 		conf_tui_preview="$(
 			awk -F '=' '/^[ ,\t]*tui_preview/ {
 				gsub(/#.*/,"",$2);
 				gsub(/[ \t]+/,"",$2);
 				value = $2;
-			}; END { print value }' "$config_file_etc" "$config_file_usr"
+			}; END { print value }' "$config_file" "$config_file_usr"
 		)"
 		conf_tui_html="$(
 			awk -F '=' '/^[ ,\t]*tui_html/ {
 				gsub(/#.*/,"",$2);
 				gsub(/[ \t]+/,"",$2);
 				value = $2;
-			}; END { print value }' "$config_file_etc" "$config_file_usr"
+			}; END { print value }' "$config_file" "$config_file_usr"
 		)"
 	fi
 
@@ -98,6 +100,25 @@ init() {
 	conf_wiki_lang="${conf_wiki_lang:-en}"
 	conf_tui_preview="${conf_tui_preview:-true}"
 	conf_tui_html="${conf_tui_html:-w3m}"
+
+	# Sources
+
+	sources_dir="/usr/share/wikiman/sources"
+	sources_dir_usr="$config_dir/sources"
+
+	sources="$(
+		eval "find $sources_dir_usr $sources_dir -type f" | \
+		awk -F '/' \
+			"BEGIN {OFS=\"\t\"} {
+				path = \$0;
+				name = \$NF;
+				gsub(/\..*$/,\"\",name);
+				if (sources[name]==0)
+					print name, path;
+				sources[name]++;
+
+			};"
+	)"
 
 }
 
@@ -157,7 +178,7 @@ picker_tui() {
 						printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
 					}
 				} else {
-					printf(\"$conf_tui_preview '%s'\n\",\$NF);
+					printf(\"$conf_tui_html '%s'\n\",\$NF);
 				}
 			};"
 	)"
@@ -192,27 +213,25 @@ Options:
 
 sources() {
 
-	modules="$(
-		find /usr/share/wikiman/sources/ -type f 2>/dev/null | \
-		awk -F '/' '{
-			gsub(/\..*$/,"",$NF);
-			print $NF
-		}'
-	)"
+	modules="$(echo "$sources" | awk -F '\t' '{print $1}')"
 
 	if [ "$modules" != '' ]; then
-		printf '%-10s %6s  %s\n' 'NAME' 'PAGES' 'PATH'
+		printf '%-10s %5s %6s  %s\n' 'NAME' 'STATE' 'PAGES' 'PATH'
 	fi
 
 	for mod in $modules; do
 
-		. "/usr/share/wikiman/sources/$mod.sh"
+		module_path="$(echo "$sources" | awk -F '\t' "\$1==\"$mod\" {print \$2}")"
+
+		. "$module_path"
 		
 		if [ -d "$path" ]; then
+			state="$(echo "$conf_sources" | grep -qP "$mod" && echo "+")"
 			count="$(find "$path" -type f | wc -l)"
-			printf '%-10s %6i  %s\n' "$mod" "$count" "$path"
+			printf '%-10s %3s %8i  %s\n' "$mod" "$state" "$count" "$path"
 		else
-			printf '%-18s (not installed)\n' "$mod"
+			state="$(echo "$conf_sources" | grep -qP "$mod" && echo "x")"
+			printf '%-12s %-11s (not installed)\n' "$mod" "$state"
 		fi
 	done
 
@@ -261,7 +280,9 @@ for src in $conf_sources; do
 		exit 2
 	fi
 
-	. "/usr/share/wikiman/sources/$src.sh"
+	module_path="$(echo "$sources" | awk -F '\t' "\$1==\"$src\" {print \$2}")"
+	. "$module_path"
+
 	search
 	all_results="$(
 		printf '%s\n%s' "$all_results" "$results"

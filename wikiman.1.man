@@ -1,5 +1,5 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "1 September 2020" "wikiman 2.7" "wikiman manual"
+.TH "wikiman" 1 "2 September 2020" "wikiman 2.8" "wikiman manual"
 
 .SH NAME
 .B wikiman
@@ -17,7 +17,7 @@
 
 .SH DESCRIPTION
 .P
-Wikiman is an offline search engine for Arch Wiki, Gentoo Wiki and manual pages.
+Wikiman is an offline search engine for manual pages, Arch Wiki, Gentoo Wiki and other documentation.
 
 Wikiman provides an easy interface for browsing documentation without the need to be exact and connected to the internet.
 This is achieved by utilizing full text search for wikis, partial name and description matching for man pages,
@@ -109,3 +109,20 @@ tui_preview = true
 
 .SS TUI viewer for HTML pages:
 tui_html = w3m
+
+
+.SH ADDITIONAL SOURCES:
+
+Default user sources directory:
+.I
+~/.config/wikiman/sources
+(if XDG_CONFIG_HOME is not set).
+
+System-wide sources directory:
+.I
+/usr/share/wikiman/sources
+
+.SS Installing a source:
+To install an additional source called <name>, download it using Wikiman's Makefile:
+
+sudo make install source-<name>

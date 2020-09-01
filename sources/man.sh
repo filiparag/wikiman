@@ -2,6 +2,28 @@
 
 path='/usr/share/man'
 
+get_man_path() {
+
+	man_default_paths="$(
+		manpath | awk -F':' "{
+			OFS=\" \";
+			for(i=1; i<=NF; i++)
+				if(\"$lang\"!=\"en\")
+					\$i = \$i \"/$lang\";
+				else
+					\$i = \$i \"\";
+			print \$0;
+		}"
+	)"
+
+	man_search_paths="$(
+		eval "find $man_default_paths -maxdepth 0 -printf '%p '" 2>/dev/null
+	)"
+
+	[ "$(echo "$man_search_paths" | wc -w)" -gt 0 ]
+
+}
+
 search() {
 
 	results=''
@@ -11,57 +33,35 @@ search() {
 	# Search by name
 
 	for lang in $conf_man_lang; do
-		if [ "$lang" = 'en' ]; then
-			man_search_path="$path/man"
+		if ! get_man_path; then
+			echo "warning: man pages for '$lang' do not exist" 1>&2
+			continue
 		else
-			if [ -d "path/$lang" ]; then
-				man_search_path="path/$lang/"
-			else
-				echo "warning: man pages for '$lang' do not exist" 1>&2
-				continue
-			fi
+			man_search_dirs="$(
+				eval "find $man_search_paths -maxdepth 1 -name 'man*' -printf '%p '"
+			)"
 		fi
 		res="$(
-			find "$man_search_path"* -type f | \
+			eval "find $man_search_dirs -type f" | \
 			awk -F'/' \
 				"BEGIN {
 					IGNORECASE=1;
 					count=0;
 				};
 				\$NF ~ /$rg_query/ {
-					title = \$NF
+					title = \$NF;
 					gsub(/\.\w+$/,\"\",title);
 
-					section = title
+					section = title;
 					gsub(/^.*\./,\"\",section);
 
 					gsub(/\.\w+$/,\"\",title);
 
-					matched = title
-					gsub(/$rg_query/,\"\",matched)
-					accuracy = 100-length(matched)*100/length(title)
+					matched = title;
+					gsub(/$rg_query/,\"\",matched);
+					accuracy = 100-length(matched)*100/length(title);
 
-					matches[count,0] = accuracy;
-					matches[count,1] = title;
-					matches[count,2] = section;
-					count++;
-				};
-				END {
-					for (i = 0; i < count; i++)
-						for (j = i; j < count; j++)
-							if (matches[i,0] < matches[j,0]) {
-								a = matches[i,0];
-								t = matches[i,1];
-								s = matches[i,2];
-								matches[i,0] = matches[j,0];
-								matches[i,1] = matches[j,1];
-								matches[i,2] = matches[j,2];
-								matches[j,0] = a;
-								matches[j,1] = t;
-								matches[j,2] = s;
-							};
-					for (i = 0; i < count; i++)
-						printf(\"%s (%s)\t$lang\tman\n\",matches[i,1],matches[i,2]);
+					printf(\"%f\t%s\t%s\t$lang\n\", accuracy, title, section);
 				};"
 		)"
 		results_name="$(
@@ -69,22 +69,57 @@ search() {
 		)"
 	done
 
+	# Sort name results
+
+	results_name="$(
+		echo "$results_name" | awk -F '\t' \
+			"BEGIN {
+				IGNORECASE=1;
+				count=0;
+			};
+			NF>0 {
+				matches[count,0] = \$1+0;
+				matches[count,1] = \$2;
+				matches[count,2] = \$3;
+				matches[count,3] = \$4;
+				count++;
+			};
+			END {
+				for (i = 0; i < count; i++)
+					for (j = i; j < count; j++)
+						if (matches[i,0] < matches[j,0]) {
+							a = matches[i,0];
+							t = matches[i,1];
+							s = matches[i,2];
+							l = matches[i,3];
+							matches[i,0] = matches[j,0];
+							matches[i,1] = matches[j,1];
+							matches[i,2] = matches[j,2];
+							matches[i,3] = matches[j,3];
+							matches[j,0] = a;
+							matches[j,1] = t;
+							matches[j,2] = s;
+							matches[j,3] = l;
+						};
+				for (i = 0; i < count; i++)
+					printf(\"%s (%s)\t%s\tman\n\",matches[i,1],matches[i,2],matches[i,3]);
+			};"
+	)"
+
 	# Search by description
 
 	if [ "$conf_quick_search" != 'true' ]; then
 	
 		for lang in $conf_man_lang; do
-			if [ "$lang" = 'en' ]; then
-				man_search_flag='-L en'
+			if ! get_man_path; then
+				continue
 			else
-				if [ -d "/usr/share/man/$lang" ]; then
-					man_search_flag="-M /usr/share/man/$lang/"
-				else
-					continue
-				fi
+				man_search_dirs="$(
+					echo "$man_search_paths" | sed 's/ $//g; s| |:|g'
+				)"
 			fi
 			res="$(
-				eval "apropos $man_search_flag $query" 2>/dev/null | \
+				eval "apropos -M $man_search_dirs $query" 2>/dev/null | \
 				awk "{ 
 					gsub(/ *\(|\)/,\"\",\$2);
 					printf(\"%s (%s)\t$lang\tman\n\",\$1,\$2);
@@ -100,7 +135,8 @@ search() {
 	# Remove duplicates
 
 	results="$(
-		printf '%s\n%s' "$results_name" "$results_desc" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
+		printf '%s\n%s' "$results_name" "$results_desc" | \
+		awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 	)"
 
 }

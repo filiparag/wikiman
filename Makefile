@@ -13,6 +13,8 @@ make:
 		echo 'Warning: Arch Wiki is not available! Run make arch-wiki to install.'
 	@test -d '$(prefix)/usr/share/doc/gentoo-wiki/wiki/' -a -r '$(prefix)/usr/share/doc/gentoo-wiki/wiki/' >/dev/null || \
 		echo 'Warning: Gentoo Wiki is not available! Run make gentoo-wiki to install.'
+	@test -d '$(prefix)/usr/share/doc/freebsd-docs' -a -r '$(prefix)//usr/share/doc/freebsd-docs' >/dev/null || \
+		echo 'Warning: FreeBSD Documentation is not available! Run make freebsd-docs to install.'
 
 arch-wiki:
 	
@@ -30,6 +32,14 @@ gentoo-wiki:
 	@tar zxf './gentoo-wiki_20200831-1.tar.xz' -C '$(prefix)/'
 	@rm './gentoo-wiki_20200831-1.tar.xz'
 
+freebsd-docs:
+
+	@echo 'Downoading latest FreeBSD Documentation snapshot...'
+	@curl -L -O '${UPSTREAM}/releases/download/2.8/freebsd-docs_20200901-1.tar.xz'
+	@echo 'Installing FreeBSD Documentation...'
+	@tar zxf './freebsd-docs_20200901-1.tar.xz' -C '$(prefix)/'
+	@rm './freebsd-docs_20200901-1.tar.xz'
+
 install:
 
 	@install -Dm 755 'wikiman.sh' '$(prefix)/usr/bin/wikiman'
@@ -46,6 +56,7 @@ clean:
 
 	@rm -f './arch-linux-docs_20200527-1.tar.xz'
 	@rm -f './gentoo-wiki_20200831-1.tar.xz'
+	@rm -f './freebsd-docs_20200901-1.tar.xz'
 
 uninstall:
 
@@ -57,3 +68,7 @@ uninstall:
 	@rm -rf '$(prefix)/usr/share/licenses/wikiman'
 	@rm -rf '$(prefix)/usr/share/doc/wikiman'
 	@rm -i '$(prefix)/etc/wikiman.conf'
+
+	@rm -rfi '$(prefix)/usr/share/doc/arch-wiki'
+	@rm -rfi '$(prefix)/usr/share/doc/gentoo-wiki'
+	@rm -rfi '$(prefix)/usr/share/doc/freebsd-docs'

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-path='/usr/share/doc/freebsd-doc'
+path='/usr/share/doc/freebsd-docs'
 
 search() {
 

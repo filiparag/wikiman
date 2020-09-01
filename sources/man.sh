@@ -42,7 +42,7 @@ search() {
 			)"
 		fi
 		res="$(
-			eval "find $man_search_dirs -type f" | \
+			eval "find $man_search_dirs -maxdepth 1 -type f" | \
 			awk -F'/' \
 				"BEGIN {
 					IGNORECASE=1;
@@ -61,7 +61,7 @@ search() {
 					gsub(/$rg_query/,\"\",matched);
 					accuracy = 100-length(matched)*100/length(title);
 
-					printf(\"%f\t%s\t%s\t$lang\n\", accuracy, title, section);
+					printf(\"%f\t%s\t%s\t$lang\t%s\n\", accuracy, title, section, \$0);
 				};"
 		)"
 		results_name="$(
@@ -82,6 +82,7 @@ search() {
 				matches[count,1] = \$2;
 				matches[count,2] = \$3;
 				matches[count,3] = \$4;
+				matches[count,4] = \$5;
 				count++;
 			};
 			END {
@@ -92,23 +93,29 @@ search() {
 							t = matches[i,1];
 							s = matches[i,2];
 							l = matches[i,3];
+							p = matches[i,4];
 							matches[i,0] = matches[j,0];
 							matches[i,1] = matches[j,1];
 							matches[i,2] = matches[j,2];
 							matches[i,3] = matches[j,3];
+							matches[i,4] = matches[j,4];
 							matches[j,0] = a;
 							matches[j,1] = t;
 							matches[j,2] = s;
 							matches[j,3] = l;
+							matches[j,4] = p;
 						};
 				for (i = 0; i < count; i++)
-					printf(\"%s (%s)\t%s\tman\n\",matches[i,1],matches[i,2],matches[i,3]);
+					printf(\"%s (%s)\t%s\tman\t%s\n\",matches[i,1],matches[i,2],matches[i,3],matches[i,4]);
 			};"
 	)"
 
 	# Search by description
 
-	if [ "$conf_quick_search" != 'true' ]; then
+	apropos -L en >/dev/null 2>/dev/null
+	apropos_lang_mode="$?"
+
+	if [ "$conf_quick_search" != 'true' ] && [ "$apropos_lang_mode" != '5' ]; then
 	
 		for lang in $conf_man_lang; do
 			if ! get_man_path; then
@@ -136,7 +143,7 @@ search() {
 
 	results="$(
 		printf '%s\n%s' "$results_name" "$results_desc" | \
-		awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
+		awk '!seen[$1$2$3] && NF>0 {print} {++seen[$1$2$3]};'
 	)"
 
 }

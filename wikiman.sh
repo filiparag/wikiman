@@ -3,18 +3,21 @@
 tui_preview() {
 	command="$(echo "$@" | awk -F '\t' \
 		"{
-			if (NF==3) {
-				sec=\$1
-				gsub(/.*\(/,\"\",sec);
-				gsub(/\).*$/,\"\",sec);
-				gsub(/ .*$/,\"\",\$1);
-				printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
-			} else if (NF==4) {
-				printf(\"w3m '%s'\n\",\$4);
+			if (\$3==\"man\") {
+				if (NF==4) {
+					printf(\"man -l %s\",\$4);
+				} else {
+					sec=\$1
+					gsub(/.*\(/,\"\",sec);
+					gsub(/\).*$/,\"\",sec);
+					gsub(/ .*$/,\"\",\$1);
+					printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
+				}
+			} else {
+				printf(\"w3m '%s'\n\",\$NF);
 			}
 		};"
 	)"
-
 	eval "$command"
 }
 
@@ -142,16 +145,19 @@ picker_tui() {
 		echo "$all_results" | \
 		eval "fzf --with-nth $columns --delimiter '\t' \
 			$preview --reverse --prompt 'wikiman > '" | \
-		awk -F '\t' \
-			"{
-				if (NF==3) {
-					sec=\$1
-					gsub(/.*\(/,\"\",sec);
-					gsub(/\).*$/,\"\",sec);
-					gsub(/ .*$/,\"\",\$1);
-					printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
-				} else if (NF==4) {
-					printf(\"$conf_tui_html '%s'\n\",\$4);
+			awk -F '\t' "{
+				if (\$3==\"man\") {
+					if (NF==4) {
+						printf(\"man -l %s\",\$4);
+					} else {
+						sec=\$1
+						gsub(/.*\(/,\"\",sec);
+						gsub(/\).*$/,\"\",sec);
+						gsub(/ .*$/,\"\",\$1);
+						printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
+					}
+				} else {
+					printf(\"$conf_tui_preview '%s'\n\",\$NF);
 				}
 			};"
 	)"

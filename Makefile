@@ -16,7 +16,7 @@ make:
 	@test -d '$(prefix)/usr/share/doc/freebsd-docs' -a -r '$(prefix)//usr/share/doc/freebsd-docs' >/dev/null || \
 		echo 'Warning: FreeBSD Documentation is not available! Run make freebsd-docs to install.'
 
-arch-wiki:
+source-arch:
 	
 	@echo 'Downoading latest Arch Wiki snapshot...'
 	@curl -L -O '${UPSTREAM}/releases/download/2.4/arch-linux-docs_20200527-1.tar.xz'
@@ -24,7 +24,7 @@ arch-wiki:
 	@tar zxf './arch-linux-docs_20200527-1.tar.xz' -C '$(prefix)/'
 	@rm './arch-linux-docs_20200527-1.tar.xz'
 
-gentoo-wiki:
+source-gentoo:
 
 	@echo 'Downoading latest Gentoo Wiki snapshot...'
 	@curl -L -O '${UPSTREAM}/releases/download/2.7/gentoo-wiki_20200831-1.tar.xz'
@@ -32,7 +32,7 @@ gentoo-wiki:
 	@tar zxf './gentoo-wiki_20200831-1.tar.xz' -C '$(prefix)/'
 	@rm './gentoo-wiki_20200831-1.tar.xz'
 
-freebsd-docs:
+source-fbsd:
 
 	@echo 'Downoading latest FreeBSD Documentation snapshot...'
 	@curl -L -O '${UPSTREAM}/releases/download/2.8/freebsd-docs_20200901-1.tar.xz'

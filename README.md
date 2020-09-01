@@ -148,3 +148,19 @@ find '/usr/share/man' -maxdepth 1 -type d -not -name 'man*' -printf '%P '
 # Arch Wiki
 find '/usr/share/doc/arch-wiki/html' -maxdepth 1 -type d -printf '%P '
 ```
+
+
+## Custom sources
+
+Wikiman is designed to be extensible: each source has it's module in `sources/` directory.
+
+Source modules are POSIX compliant shell scripts. Wikiman calls their `search` function whichs 
+reads `$query` and configuration variables, and puts ordered search results into `$results` 
+variable with rows formatted as `NAME\tLANG\tSOURCE\tPATH`.
+
+- `NAME`    title of the page
+- `LANG`    two letter language code (can include locale)
+- `SOURCE`  source name
+- `PATH`    path to HTML file
+
+

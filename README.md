@@ -1,12 +1,12 @@
 ## About
-**Wikiman** is an offline search engine for Arch Wiki, Gentoo Wiki and manual pages.
+**Wikiman** is an offline search engine for manual pages, Arch Wiki, Gentoo Wiki and other documentation.
 
 Wikiman provides an easy interface for browsing documentation without the need to be exact and connected to the internet.
 This is achieved by utilizing full text search for wikis, partial name and description matching for man pages,
 and fuzzy filtering for search results.
 
-By default, Wikiman only searches manual pages.
-Follow [these](#installing-arch-wiki-and-gentoo-wiki) instructions to enable wikis.
+By default, Wikiman only searches system's manual pages.
+Follow [these](#installing-additional-sources) instructions to enable optional sources.
 
 
 ## Demonstration
@@ -44,27 +44,6 @@ Download latest *.rpm* package from [Releases](https://github.com/filiparag/wiki
 sudo dnf install wikiman-*.rpm
 ```
 
-### Installing Arch Wiki and Gentoo Wiki
-
-Due to their large size, wikis don't come bundled with Wikiman.
-If you want to use them, you can download their snapshots using following commands.
-
-```bash
-# Arch Wiki
-curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.4/arch-linux-docs_20200527-1.tar.xz'
-sudo tar zxf 'arch-linux-docs_20200527-1.tar.xz' -C /
-
-# Gentoo Wiki
-curl -L -O 'https://github.com/filiparag/wikiman/releases/download/2.7/gentoo-wiki_20200831-1.tar.xz'
-sudo tar zxf 'gentoo-wiki_20200831-1.tar.xz' -C /
-```
-
-After installation, enable them by adding them to sources variable in the [configuration file](#configuration).
-
-```ini
-sources = man, arch, gentoo
-```
-
 ### Manual installation
 
 Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`
@@ -72,17 +51,32 @@ Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`
 ```bash
 # Install latest stable version of wikiman
 git clone 'https://github.com/filiparag/wikiman'
-cd 'wikiman'
+cd ./wikiman
 git checkout $(git tag | tail -1)
 make
 sudo make install
-
-# Download latest Arch Wiki Docs snapshot
-sudo make arch-wiki
-
-# Download latest Gentoo Wiki Docs snapshot
-sudo make gentoo-wiki
 ```
+
+### Installing additional sources
+
+Due to their large size, wikis don't come bundled with Wikiman.
+If you want to use them, you can download their snapshots using following commands.
+
+Available optional sources are:
+
+- Arch Wiki (`arch`)
+- Gentoo Wiki (`gentoo`)
+- FreeBSD Documentation (`fbsd`)
+
+```bash
+# Download latest Makefile
+curl -L 'https://raw.githubusercontent.com/filiparag/wikiman/master/Makefile' -o 'wikiman-makefile'
+
+# Example: install Arch Wiki
+sudo make -f ./wikiman-makefile source-arch
+```
+
+After installation, enable them by adding them to sources variable in the [configuration file](#configuration).
 
 ## Usage
 
@@ -108,7 +102,7 @@ Usage: `wikiman [OPTION]... [KEYWORD]...`
 
 - `-R` print raw output
 
-- `-S`  list available sources and exit
+- `-S` list available sources and exit
 
 - `-h` display this help and exit
 
@@ -125,10 +119,10 @@ Example configuration file:
 
 ```ini
 # Sources
-sources = man, arch, gentoo
+sources = man, arch, gentoo, fbsd
 
 # Quick search mode (only by title)
-quick_search = false
+quick_search = true
 
 # Raw output (for developers)
 raw_output = false
@@ -154,6 +148,9 @@ find '/usr/share/man' -maxdepth 1 -type d -not -name 'man*' -printf '%P '
 
 # Arch Wiki
 find '/usr/share/doc/arch-wiki/html' -maxdepth 1 -type d -printf '%P '
+
+# FreeBSD Documentation
+find '/usr/share/doc/freebsd-docs' -maxdepth 1 -type d -printf '%P '
 ```
 
 

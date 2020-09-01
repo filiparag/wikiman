@@ -10,11 +10,11 @@ make:
 	@test -d '$(prefix)/usr/share/man' -a -r '$(prefix)/usr/share/man' >/dev/null || \
 		echo 'Warning: Man pages are not available!'
 	@test -d '$(prefix)/usr/share/doc/arch-wiki/html' -a -r '$(prefix)/usr/share/doc/arch-wiki/html' >/dev/null || \
-		echo 'Warning: Arch Wiki is not available! Run make arch-wiki to install.'
+		echo 'Warning: Arch Wiki is not available! Run make source-arch to install.'
 	@test -d '$(prefix)/usr/share/doc/gentoo-wiki/wiki/' -a -r '$(prefix)/usr/share/doc/gentoo-wiki/wiki/' >/dev/null || \
-		echo 'Warning: Gentoo Wiki is not available! Run make gentoo-wiki to install.'
+		echo 'Warning: Gentoo Wiki is not available! Run make source-gentoo to install.'
 	@test -d '$(prefix)/usr/share/doc/freebsd-docs' -a -r '$(prefix)//usr/share/doc/freebsd-docs' >/dev/null || \
-		echo 'Warning: FreeBSD Documentation is not available! Run make freebsd-docs to install.'
+		echo 'Warning: FreeBSD Documentation is not available! Run make source-fbsd to install.'
 
 source-arch:
 	

@@ -16,6 +16,35 @@ make:
 	@test -d '$(prefix)/usr/share/doc/freebsd-docs' -a -r '$(prefix)//usr/share/doc/freebsd-docs' >/dev/null || \
 		echo 'Warning: FreeBSD Documentation is not available! Run make source-fbsd to install.'
 
+install:
+
+	@install -Dm755 './wikiman.sh' '$(prefix)/usr/bin/wikiman'
+
+	@mkdir -p '$(prefix)/usr/share/wikiman'
+	@cp -r --preserve=mode './sources' '$(prefix)/usr/share/wikiman/'
+
+	@install -Dm644 './wikiman.1.man' '$(prefix)/usr/share/man/man1/wikiman.1.gz'
+	@install -Dm644 -t '$(prefix)/usr/share/licenses/wikiman' './LICENSE'
+	@install -Dm644 -t '$(prefix)/usr/share/doc/wikiman' './README.md'
+	@install -Dm644 -t '$(prefix)/etc' './wikiman.conf'
+
+clean:
+
+	@rm -f './arch-linux-docs_20200527-1.tar.xz'
+	@rm -f './gentoo-wiki_20200831-1.tar.xz'
+	@rm -f './freebsd-docs_20200901-1.tar.xz'
+
+uninstall:
+
+	@rm -f '$(prefix)/usr/bin/wikiman'
+
+	@rm -rf '$(prefix)/usr/share/wikiman'
+
+	@rm -f '$(prefix)/usr/share/man/man1/wikiman.1.gz'
+	@rm -rf '$(prefix)/usr/share/licenses/wikiman'
+	@rm -rf '$(prefix)/usr/share/doc/wikiman'
+	@rm -i '$(prefix)/etc/wikiman.conf'
+
 source-arch:
 	
 	@echo 'Downoading latest Arch Wiki snapshot...'
@@ -40,34 +69,7 @@ source-fbsd:
 	@tar zxf './freebsd-docs_20200901-1.tar.xz' -C '$(prefix)/'
 	@rm './freebsd-docs_20200901-1.tar.xz'
 
-install:
-
-	@install -Dm 755 'wikiman.sh' '$(prefix)/usr/bin/wikiman'
-
-	@mkdir -p '$(prefix)/usr/share/wikiman'
-	@cp -r --preserve=mode 'sources' '$(prefix)/usr/share/wikiman/'
-
-	@install -Dm 644 'wikiman.1.man' '$(prefix)/usr/share/man/man1/wikiman.1.gz'
-	@install -Dm 644 -t '$(prefix)/usr/share/licenses/wikiman' 'LICENSE'
-	@install -Dm 644 -t '$(prefix)/usr/share/doc/wikiman' 'README.md'
-	@install -Dm 644 -t '$(prefix)/etc' 'wikiman.conf'
-
-clean:
-
-	@rm -f './arch-linux-docs_20200527-1.tar.xz'
-	@rm -f './gentoo-wiki_20200831-1.tar.xz'
-	@rm -f './freebsd-docs_20200901-1.tar.xz'
-
-uninstall:
-
-	@rm -f '$(prefix)/usr/bin/wikiman'
-
-	@rm -rf '$(prefix)/usr/share/wikiman'
-
-	@rm -f '$(prefix)/usr/share/man/man1/wikiman.1.gz'
-	@rm -rf '$(prefix)/usr/share/licenses/wikiman'
-	@rm -rf '$(prefix)/usr/share/doc/wikiman'
-	@rm -i '$(prefix)/etc/wikiman.conf'
+uninstall-sources:
 
 	@rm -rfi '$(prefix)/usr/share/doc/arch-wiki'
 	@rm -rfi '$(prefix)/usr/share/doc/gentoo-wiki'

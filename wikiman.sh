@@ -303,6 +303,17 @@ while getopts l:s:H:f:pqhRSk o; do
 done
 shift "$((OPTIND - 1))"
 
+# Dependency check
+
+DEPS="man fzf rg awk w3m $conf_fuzzy_finder"
+
+for dependency in $DEPS; do
+	which "$dependency" >/dev/null || {
+		echo "error: missing dependency: cannot find $dependency executable!" 1>&2
+		exit 127
+	}
+done
+
 if [ $# = 0 ]; then
 	echo 'error: empty search query' 1>&2
 	exit 254

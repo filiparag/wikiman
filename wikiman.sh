@@ -84,6 +84,13 @@ init() {
 				value = $2;
 			}; END { print value }' "$config_file" "$config_file_usr"
 		)"
+		conf_tui_keep_open="$(
+			awk -F '=' '/^[ ,\t]*tui_keep_open/ {
+				gsub(/#.*/,"",$2);
+				gsub(/[ \t]+/,"",$2);
+				value = $2;
+			}; END { print value }' "$config_file" "$config_file_usr"
+		)"
 		conf_tui_html="$(
 			awk -F '=' '/^[ ,\t]*tui_html/ {
 				gsub(/#.*/,"",$2);
@@ -99,6 +106,7 @@ init() {
 	conf_man_lang="${conf_man_lang:-en}"
 	conf_wiki_lang="${conf_wiki_lang:-en}"
 	conf_tui_preview="${conf_tui_preview:-true}"
+	conf_tui_keep_open="${conf_tui_keep_open:-false}"
 	conf_tui_html="${conf_tui_html:-w3m}"
 
 	# Sources
@@ -167,10 +175,16 @@ picker_tui() {
 		columns='2,1'
 	fi
 
-	command="$(
+	choice="$(
 		echo "$all_results" | \
 		eval "fzf --with-nth $columns --delimiter '\t' \
-			$preview --reverse --prompt 'wikiman > '" | \
+			$preview --reverse --prompt 'wikiman > '"
+	)"
+
+	[ $? -ne 0 ] && return 1
+
+	command="$(
+		echo "$choice" | \
 			awk -F '\t' "{
 				if (\$3==\"man\") {
 					if (NF==4) {
@@ -204,6 +218,8 @@ Options:
   -q  enable quick search mode
 
   -p  disable quick result preview
+
+  -k  keep open after viewing a result
 
   -H  viewer for HTML pages
 
@@ -244,10 +260,11 @@ sources() {
 
 init
 
-while getopts l:s:H:pqhRS o; do
+while getopts l:s:H:pqhRSk o; do
   case $o in
 	(p) conf_tui_preview='false';;
 	(H) conf_tui_html="$OPTARG";;
+	(k) conf_tui_keep_open='true';;
 	(l) conf_man_lang="$(
 			echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
 		)";
@@ -302,7 +319,13 @@ if echo "$all_results" | grep -cve '^\s*$' >/dev/null; then
 		printf 'NAME\tLANG\tSOURCE\tPATH\n'
 		echo "$all_results"
 	else
-		picker_tui && eval "$command"
+		if [ "$conf_tui_keep_open" = 'true' ]; then
+			while picker_tui; do
+				eval "$command"
+			done
+		else
+			picker_tui && eval "$command"
+		fi
 	fi
 else
 	echo "search: no results for '$*'" 1>&2

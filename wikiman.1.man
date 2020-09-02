@@ -1,5 +1,5 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "2 September 2020" "wikiman 2.8" "wikiman manual"
+.TH "wikiman" 1 "2 September 2020" "wikiman 2.9" "wikiman manual"
 
 .SH NAME
 .B wikiman
@@ -7,7 +7,7 @@
 
 .SH SYNOPSIS
 .B wikiman
-[-l languages] [-s sources] -q -p [-H html_viewer] -R <keyword>...
+[-l languages] [-s sources] -q -p -k [-H html_viewer] -R <keyword>...
 .br
 .B wikiman
 -S
@@ -47,6 +47,11 @@ enable quick search mode
 .B -p
 .br
 disable quick result preview
+
+.HP
+.B -k
+.br
+keep open after viewing a result
 
 .HP
 .B -H
@@ -106,6 +111,9 @@ find '/usr/share/doc/arch-wiki/html' -maxdepth 1 -type d -printf '%P '
 
 .SS TUI preview:
 tui_preview = true
+
+.SS TUI keep open:
+tui_keep_open = false
 
 .SS TUI viewer for HTML pages:
 tui_html = w3m

@@ -100,6 +100,8 @@ Usage: `wikiman [OPTION]... [KEYWORD]...`
 
 - `-p` disable quick result preview
 
+- `-k` keep open after viewing a result
+
 - `-H` viewer for HTML pages
 
     Default: *w3m*
@@ -139,6 +141,9 @@ wiki_lang = zh-CN
 
 # Show previews in TUI
 tui_preview = false
+
+# Keep open after viewing a result
+tui_keep_open = true
 
 # Viewer for HTML pages
 tui_html = xdg-open

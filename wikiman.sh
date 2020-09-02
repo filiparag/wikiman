@@ -50,6 +50,13 @@ init() {
 				value = $2;
 			}; END { print value }' "$config_file" "$config_file_usr"
 		)"
+		conf_fuzzy_finder="$(
+			awk -F '=' '/^[ ,\t]*fuzzy_finder/ {
+				gsub(/#.*/,"",$2);
+				gsub(/[ \t]+/,"",$2);
+				value = $2;
+			}; END { print value }' "$config_file" "$config_file_usr"
+		)"
 		conf_quick_search="$(
 			awk -F '=' '/^[ ,\t]*quick_search/ {
 				gsub(/#.*/,"",$2);
@@ -102,6 +109,7 @@ init() {
 	fi
 
 	conf_sources="${conf_sources:-man archwiki}"
+	conf_fuzzy_finder="${conf_fuzzy_finder:-fzf}"
 	conf_quick_search="${conf_quick_search:-false}"
 	conf_raw_output="${conf_raw_output:-false}"
 	conf_man_lang="${conf_man_lang:-en}"
@@ -195,7 +203,7 @@ picker_tui() {
 
 	choice="$(
 		echo "$all_results" | \
-		eval "fzf --with-nth $columns --delimiter '\t' \
+		eval "$conf_fuzzy_finder --with-nth $columns --delimiter '\t' \
 			$preview --reverse --prompt 'wikiman > '"
 	)"
 
@@ -233,6 +241,8 @@ Options:
 
   -s  sources to use
 
+  -f  fuzzy finder to use
+
   -q  enable quick search mode
 
   -p  disable quick result preview
@@ -267,7 +277,7 @@ sources() {
 
 init
 
-while getopts l:s:H:pqhRSk o; do
+while getopts l:s:H:f:pqhRSk o; do
   case $o in
 	(p) conf_tui_preview='false';;
 	(H) conf_tui_html="$OPTARG";;
@@ -281,6 +291,7 @@ while getopts l:s:H:pqhRSk o; do
 	(s) conf_sources="$(
 			echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
 		)";;
+	(f) conf_fuzzy_finder="$OPTARG";;
 	(q) conf_quick_search='true';;
 	(R) conf_raw_output='true';;
 	(S) sources;

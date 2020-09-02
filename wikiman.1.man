@@ -39,6 +39,13 @@ sources to use
 default: man
 
 .HP
+.B -f
+.br
+fuzzy finder to use
+.br
+default: fzf
+
+.HP
 .B -q
 .br
 enable quick search mode

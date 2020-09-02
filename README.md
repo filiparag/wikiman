@@ -46,7 +46,7 @@ sudo dnf install wikiman-*.rpm
 
 ### Manual installation
 
-Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`
+Dependencies: `man`, `fzf-compatible fuzzy finder`, `ripgrep`, `awk`, `w3m`
 
 ```bash
 # Install latest stable version of wikiman
@@ -95,6 +95,10 @@ Usage: `wikiman [OPTION]... [KEYWORD]...`
 - `-s` sources to use
  
     Default: *man*
+
+- `-f` fuzzy finder to use
+
+    Default: *fzf*
 
 - `-q` enable quick search mode
 
@@ -147,6 +151,9 @@ tui_keep_open = true
 
 # Viewer for HTML pages
 tui_html = xdg-open
+
+# Fuzzy finder
+fuzzy_finder = fzf
 ```
 
 To list available languages, run these commands:

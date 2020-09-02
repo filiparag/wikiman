@@ -1,10 +1,6 @@
-DEPS = man fzf rg awk w3m
 UPSTREAM = 'https://github.com/filiparag/wikiman'
 
 make:
-
-	@echo 'Checking dependencies...'
-	@which ${DEPS} >/dev/null || { echo 'Error: Missing dependency!'; exit 1; }
 
 	@echo 'Checking documentation sources...'
 	@test -d '$(prefix)/usr/share/man' -a -r '$(prefix)/usr/share/man' >/dev/null || \

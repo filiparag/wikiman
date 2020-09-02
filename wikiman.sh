@@ -107,7 +107,7 @@ init() {
 	sources_dir_usr="$config_dir/sources"
 
 	sources="$(
-		eval "find $sources_dir_usr $sources_dir -type f" | \
+		eval "find $sources_dir_usr $sources_dir -type f 2>/dev/null" | \
 		awk -F '/' \
 			"BEGIN {OFS=\"\t\"} {
 				path = \$0;
@@ -119,6 +119,11 @@ init() {
 
 			};"
 	)"
+
+	if [ -z "$sources" ]; then
+		echo "error: no sources available" 1>&2
+		exit 3
+	fi
 
 }
 

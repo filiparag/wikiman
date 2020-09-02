@@ -1,3 +1,4 @@
+#!/usr/bin/env dash
 #!/bin/sh
 
 tui_preview() {
@@ -109,6 +110,15 @@ init() {
 	conf_tui_keep_open="${conf_tui_keep_open:-false}"
 	conf_tui_html="${conf_tui_html:-w3m}"
 
+	export conf_sources
+	export conf_quick_search
+	export conf_raw_output
+	export conf_man_lang
+	export conf_wiki_lang
+	export conf_tui_preview
+	export conf_tui_keep_open
+	export conf_tui_html
+
 	# Sources
 
 	sources_dir="/usr/share/wikiman/sources"
@@ -138,26 +148,34 @@ init() {
 combine_results() {
 
 	all_results="$(
-		echo "$all_results" | \
+		printf '%s' "$all_results" | \
 		awk -F '\t' \
-			'NF>0 {
-				count++;
+			'BEGIN {
+				OFS="\t"
+				count = 0;
+			};
+			NF>0 {
+				if (length(sc[$3])==0)
+					sc[$3] = 0;
+
+				sources[$3,sc[$3],0] = $1;
+				sources[$3,sc[$3],1] = $2;
+				sources[$3,sc[$3],2] = $4;
+
 				sc[$3]++;
-				sources[$3,sc[$3]+0] = $0
-			}
+				count++;
+			};
 			END {
-				for (var in sc) {
-					ss[var] = sc[var] + 1;
-				}
-				for (i = 0; i < count; i++) {
-					for (var in ss) {
-						if (sc[var]>0) {
-							print sources[var,ss[var]-sc[var]];
-							sc[var]--;
+				for (s in sc)
+					sc2[s] = sc[s];
+				for (i=0; i<count; i++)
+					for (s in sc)
+						if (sc[s]>=0) {
+							si = sc2[s]-sc[s];
+							print sources[s,si,0], sources[s,si,1], s, sources[s,si,2];
+							sc[s]--;
 						}
-					}
-				}
-			}'
+			};'
 	)"
 
 }
@@ -241,19 +259,8 @@ sources() {
 	fi
 
 	for mod in $modules; do
-
 		module_path="$(echo "$sources" | awk -F '\t' "\$1==\"$mod\" {print \$2}")"
-
-		. "$module_path"
-		
-		if [ -d "$path" ]; then
-			state="$(echo "$conf_sources" | grep -qP "$mod" && echo "+")"
-			count="$(find "$path" -type f | wc -l)"
-			printf '%-10s %3s %8i  %s\n' "$mod" "$state" "$count" "$path"
-		else
-			state="$(echo "$conf_sources" | grep -qP "$mod" && echo "x")"
-			printf '%-12s %-11s (not installed)\n' "$mod" "$state"
-		fi
+		"$module_path" info
 	done
 
 }
@@ -292,20 +299,22 @@ else
 	query="$*"
 	rg_query="$(echo "$*" | sed 's/ /\|/g')"
 	greedy_query="\w*$(echo "$*" | sed 's/ /\\\w\*|\\w\*/g')\w*"
+	export query
+	export rg_query
+	export greedy_query
 fi
 
 for src in $conf_sources; do
 
-	if ! [ -f "/usr/share/wikiman/sources/$src.sh" ] || \
-		! [ -r "/usr/share/wikiman/sources/$src.sh" ]; then
+	module_path="$(echo "$sources" | awk -F '\t' "\$1==\"$src\" {print \$2}")"
+
+	if [ -z "$module_path" ]; then
 		echo "error: source '$src' does not exist" 1>&2
 		exit 2
 	fi
+	
+	results="$($module_path search)"
 
-	module_path="$(echo "$sources" | awk -F '\t' "\$1==\"$src\" {print \$2}")"
-	. "$module_path"
-
-	search
 	all_results="$(
 		printf '%s\n%s' "$all_results" "$results"
 	)"

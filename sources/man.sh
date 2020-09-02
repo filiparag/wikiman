@@ -1,6 +1,20 @@
 #!/bin/sh
 
+name='man'
 path='/usr/share/man'
+
+info() {
+
+	if [ -d "$path" ]; then
+		state="$(echo "$conf_sources" | grep -qP "$name" && echo "+")"
+		count="$(find "$path" -type f | wc -l)"
+		printf '%-10s %3s %8i  %s\n' "$name" "$state" "$count" "$path"
+	else
+		state="$(echo "$conf_sources" | grep -qP "$name" && echo "x")"
+		printf '%-12s %-11s (not installed)\n' "$name" "$state"
+	fi
+
+}
 
 get_man_path() {
 
@@ -146,4 +160,8 @@ search() {
 		awk '!seen[$1$2$3] && NF>0 {print} {++seen[$1$2$3]};'
 	)"
 
+	printf '%s\n' "$results"
+
 }
+
+eval "$1"

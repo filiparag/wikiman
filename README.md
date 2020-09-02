@@ -168,7 +168,7 @@ find '/usr/share/doc/freebsd-docs' -maxdepth 1 -type d -printf '%P '
 Wikiman is designed to be extensible: each source has it's module in `sources/` directory.
 
 Source modules are POSIX compliant shell scripts. Wikiman calls their `search` function whichs 
-reads `$query` and configuration variables, and puts ordered search results into `$results` 
+reads `$query` and configuration variables, and prints results to *STDOUT*.
 variable with rows formatted as `NAME\tLANG\tSOURCE\tPATH`.
 
 - `NAME`    title of the page
@@ -176,8 +176,8 @@ variable with rows formatted as `NAME\tLANG\tSOURCE\tPATH`.
 - `SOURCE`  source name
 - `PATH`    path to HTML file
 
-Outside this function, variable `$path` should be set to the local database path. 
-Wikiman will probe this path when verifying if the source can be used.
+When listing available sources, Wikiman will call module's `info` funcion which prints
+name, state, number of pages and path of the source.
 
 ## Contributions
 

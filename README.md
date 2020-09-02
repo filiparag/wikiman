@@ -18,10 +18,10 @@ Follow [these](#installing-additional-sources) instructions to enable optional s
 
 ### Arch Linux ([AUR](https://aur.archlinux.org/packages/wikiman/))
 ```bash
-yay -Sy wikiman
+yay -Syu wikiman
 
 # Optional: Enable Arch Wiki
-yay -Sy arch-wiki-docs
+yay -Syu arch-wiki-docs
 mkdir -p ~/.config/wikiman
 echo 'sources = man, arch' >> ~/.config/wikiman/wikiman.conf
 ```

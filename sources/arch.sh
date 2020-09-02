@@ -169,6 +169,7 @@ search() {
 					OFS=\"\t\";
 				};
 				{
+
 					hits = \$NF
 					gsub(/^.*:/,\"\",hits);
 
@@ -191,7 +192,7 @@ search() {
 						title = title \" (Category)\";
 					}
 
-					matches[count,0] = hits + 0;
+					matches[count,0] = hits+0;
 					matches[count,1] = title;
 					matches[count,2] = path;
 					matches[count,3] = lang;
@@ -199,8 +200,8 @@ search() {
 					count++;
 				};
 				END {
-					for (i = 0; i < count; i++)
-						for (j = i; j < count; j++)
+					for (i = 0; i<count; i++)
+						for (j = i; j<count; j++)
 							if (matches[i,0] < matches[j,0]) {
 								h = matches[i,0];
 								t = matches[i,1];
@@ -216,15 +217,14 @@ search() {
 								matches[j,3] = l;
 							};
 							
-					for (i = 0; i < count; i++)
+					for (i=0; i<count; i++)
 						print matches[i,1], matches[i,3], \"$name\", matches[i,2];
 				};"
 		)"
 
 	fi
 
-	printf '%s\n%s\s' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
-
+	printf '%s\n%s\n' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 
 }
 

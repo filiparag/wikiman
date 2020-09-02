@@ -191,12 +191,14 @@ combine_results() {
 			END {
 				for (s in sc)
 					sc2[s] = sc[s];
-				for (i=0; i<count; i++)
+				i=0;
+				while (i<count-1)
 					for (s in sc)
-						if (sc[s]>=0) {
+						if (sc[s]>0) {
 							si = sc2[s]-sc[s];
 							print sources[s,si,0], sources[s,si,1], s, sources[s,si,2];
 							sc[s]--;
+							i++;
 						}
 			};'
 	)"

@@ -165,7 +165,7 @@ search() {
 					IGNORECASE=1;
 					count=0;
 				};
-				{
+				ND>0 {
 					hits = \$NF
 					gsub(/^.*:/,\"\",hits);
 
@@ -221,7 +221,7 @@ search() {
 								matches[j,3] = l;
 							};
 							
-					for (i = 0; i < count; i++)
+					for (i = 0; i<count; i++)
 						printf(\"%s\t%s\t$name\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
 				};"
 			)"

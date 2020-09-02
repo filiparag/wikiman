@@ -314,6 +314,15 @@ for dependency in $DEPS; do
 	}
 done
 
+# Check if fuzzy finder compatible with used fzf's parameters
+
+case $conf_fuzzy_finder in
+	'fzf'|'sk');;
+	*)
+		echo "error: $conf_fuzzy_finder is not compatible with the paramters used in this script" 1>&2
+		exit 4;;
+esac
+
 if [ $# = 0 ]; then
 	echo 'error: empty search query' 1>&2
 	exit 254

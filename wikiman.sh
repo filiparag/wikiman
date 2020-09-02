@@ -108,29 +108,12 @@ init() {
 		)"
 	fi
 
-	conf_sources="${conf_sources:-man archwiki}"
-	conf_fuzzy_finder="${conf_fuzzy_finder:-fzf}"
-	conf_quick_search="${conf_quick_search:-false}"
-	conf_raw_output="${conf_raw_output:-false}"
-	conf_man_lang="${conf_man_lang:-en}"
-	conf_wiki_lang="${conf_wiki_lang:-en}"
-	conf_tui_preview="${conf_tui_preview:-true}"
-	conf_tui_keep_open="${conf_tui_keep_open:-false}"
-	conf_tui_html="${conf_tui_html:-w3m}"
-
-	export conf_sources
-	export conf_quick_search
-	export conf_raw_output
-	export conf_man_lang
-	export conf_wiki_lang
-	export conf_tui_preview
-	export conf_tui_keep_open
-	export conf_tui_html
-
 	# Sources
 
 	sources_dir="/usr/share/wikiman/sources"
 	sources_dir_usr="$config_dir/sources"
+
+	# Detect source modules
 
 	sources="$(
 		eval "find $sources_dir_usr $sources_dir -type f 2>/dev/null" | \
@@ -150,6 +133,37 @@ init() {
 		echo "error: no sources available" 1>&2
 		exit 3
 	fi
+
+	modules="$(echo "$sources" | awk -F '\t' '{print $1}')"
+	available_sources=""
+
+	for mod in $modules; do
+		module_path="$(echo "$sources" | awk -F '\t' "\$1==\"$mod\" {print \$2}")"
+		if "$module_path" available; then
+			available_sources="$available_sources $(basename "$module_path" | cut -d'.' -f1)"
+		fi
+	done
+
+	# Set configuration variables
+
+	conf_sources="${conf_sources:-$available_sources}"
+	conf_fuzzy_finder="${conf_fuzzy_finder:-fzf}"
+	conf_quick_search="${conf_quick_search:-false}"
+	conf_raw_output="${conf_raw_output:-false}"
+	conf_man_lang="${conf_man_lang:-en}"
+	conf_wiki_lang="${conf_wiki_lang:-en}"
+	conf_tui_preview="${conf_tui_preview:-true}"
+	conf_tui_keep_open="${conf_tui_keep_open:-false}"
+	conf_tui_html="${conf_tui_html:-w3m}"
+
+	export conf_sources
+	export conf_quick_search
+	export conf_raw_output
+	export conf_man_lang
+	export conf_wiki_lang
+	export conf_tui_preview
+	export conf_tui_keep_open
+	export conf_tui_html
 
 }
 

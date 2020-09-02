@@ -3,9 +3,15 @@
 name='man'
 path='/usr/share/man'
 
+available() {
+
+	[ -d "$path" ]
+
+}
+
 info() {
 
-	if [ -d "$path" ]; then
+	if available; then
 		state="$(echo "$conf_sources" | grep -qP "$name" && echo "+")"
 		count="$(find "$path" -type f | wc -l)"
 		printf '%-10s %3s %8i  %s\n' "$name" "$state" "$count" "$path"

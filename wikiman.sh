@@ -250,6 +250,8 @@ help() {
 	echo "Usage: wikiman [OPTION]... [KEYWORD]...
 Offline search engine for manual pages and distro wikis combined
 
+If no keywords are provided, show all pages.
+
 Options:
 
   -l  search language(s)
@@ -339,9 +341,11 @@ case $conf_fuzzy_finder in
 esac
 
 if [ $# = 0 ]; then
-	echo 'error: empty search query' 1>&2
-	exit 254
+	# echo 'error: empty search query' 1>&2
+	# exit 254
+	user_action='list'
 else
+	user_action='search'
 	query="$*"
 	rg_query="$(echo "$*" | sed 's/ /\|/g')"
 	greedy_query="\w*$(echo "$*" | sed 's/ /\\\w\*|\\w\*/g')\w*"
@@ -359,7 +363,7 @@ for src in $conf_sources; do
 		exit 2
 	fi
 	
-	results="$($module_path search)"
+	results="$($module_path $user_action)"
 
 	all_results="$(
 		printf '%s\n%s' "$all_results" "$results"

@@ -1,9 +1,9 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "2 September 2020" "wikiman 2.9" "wikiman manual"
+.TH "wikiman" 1 "3 September 2020" "wikiman 2.9" "wikiman manual"
 
 .SH NAME
 .B wikiman
-\- Offline search engine for Arch Wiki, Gentoo Wiki and manual pages
+\- Offline search engine for manual pages, Arch Wiki, Gentoo Wiki and other documentation.
 
 .SH SYNOPSIS
 .B wikiman
@@ -16,6 +16,8 @@
 .br
 .B wikiman
 -h
+
+If no keywords are provided, show all pages.
 
 .SH DESCRIPTION
 .P

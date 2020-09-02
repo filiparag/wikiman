@@ -26,6 +26,9 @@ mkdir -p ~/.config/wikiman
 echo 'sources = man, arch' >> ~/.config/wikiman/wikiman.conf
 ```
 
+If you are running Manjaro, package `arch-wiki-docs` is not in official repositories.
+Follow [these](#installing-additional-sources) instructions to download it.
+
 ### Ubuntu / Debian
 
 Download latest *.deb* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
@@ -85,6 +88,8 @@ After installation, enable them by adding them to sources variable in the [confi
 ## Usage
 
 Usage: `wikiman [OPTION]... [KEYWORD]...`
+
+If no keywords are provided, show all pages.
 
 ### Options:
 

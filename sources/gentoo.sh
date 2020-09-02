@@ -22,20 +22,64 @@ info() {
 
 }
 
-search() {
+setup() {
 
-	results=''
 	results_title=''
 	results_text=''
 
 	if ! [ -d "$path" ]; then
 		echo "warning: Gentoo Wiki documentation does not exist" 1>&2
-		return
+		return 1
 	fi
 
 	rg_ignore="/^(File|Talk|Handbook Talk|Template|Template talk|Project|Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk|Foundation|Foundation talk):/"
 	langs="/$(echo "$conf_wiki_lang" | awk '{ l=tolower($0); gsub(/ +/,"|",l); gsub(/(^\|)|(\|$)/,"",l); gsub("_","-",l); print l}')/"
 	nf="$(echo "$path" | awk -F '/' '{print NF+1}')"
+
+}
+
+list() {
+
+	setup || return 1
+
+	eval "find $path -type f -name '*.html'" | awk -F '/' \
+			"BEGIN {
+				IGNORECASE=1;
+				OFS=\"\t\";
+			};
+			{
+				lang = \"en\"
+				if (NF-$nf) {
+					n = \$NF
+					gsub(/[a-z]{2}(-[a-z]{2})?\.html/,\"\",n);
+					if (n==\"\") {
+						lang = \$NF
+						gsub(/\.html$/,\"\",lang);
+						dec = 1;
+					} else {
+						dec = 0;
+					}
+					title = \"\"
+					for (i=$nf; i<=NF-dec; i++)
+						title = title ((i==$nf) ? \"\" : \"/\") \$i
+				} else {
+					title = \$NF;
+				}
+
+				gsub(/\.html$/,\"\",title);
+				gsub(\"_\",\" \",title);
+
+				path = \$0;
+
+				if (lang ~ $langs)
+					print title, lang, \"$name\", path;
+			};"
+
+}
+
+search() {
+
+	setup || return 1
 
 	results_title="$(
 		eval "find $path -type f -name '*.html'" | awk -F '/' \
@@ -108,7 +152,7 @@ search() {
 						};
 						
 				for (i = 0; i < count; i++)
-					printf(\"%s\t%s\tgentoo\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+					printf(\"%s\t%s\t$name\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
 			};"
 		)"
 
@@ -178,17 +222,13 @@ search() {
 							};
 							
 					for (i = 0; i < count; i++)
-						printf(\"%s\t%s\tgentoo\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+						printf(\"%s\t%s\t$name\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
 				};"
 			)"
 
 	fi
 
-	results="$(
-		printf '%s\n%s' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
-	)"
-
-	printf '%s\n' "$results"
+	printf '%s\n%s\n' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 
 }
 

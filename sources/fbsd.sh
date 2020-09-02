@@ -22,15 +22,14 @@ info() {
 
 }
 
-search() {
+setup() {
 
-	results=''
 	results_title=''
 	results_text=''
 
-	if ! [ -d "$path" ]; then
+	if ! available; then
 		echo "warning: FreeBSD documentation does not exist" 1>&2
-		return
+		return 1
 	fi
 
 	langs="$(echo "$conf_wiki_lang" | awk -F ' ' '{
@@ -63,6 +62,44 @@ search() {
 	fi
 
 	nf="$(echo "$path" | awk -F '/' '{print NF+1}')"
+
+}
+
+list() {
+
+	setup || return 1
+
+	eval "find $paths -type f -name '*.html'" 2>/dev/null | \
+	awk -F '/' \
+		"BEGIN {
+			IGNORECASE=1;
+			OFS=\"\t\"
+		};
+		{
+			title = \"\";
+			for (i=$nf+3; i<=NF; i++) {
+				fragment = toupper(substr(\$i,0,1))substr(\$i,2);
+				title = title ((i==$nf+3) ? \"\" : \"/\") fragment;
+			}
+
+			gsub(/\.html$/,\"\",title);
+			gsub(\"-\",\" \",title);
+
+			lang=\$$nf;
+			path=\$0;
+
+			book = \$($nf+2);
+			title = sprintf(\"%s (%s)\",title,book);
+
+			print title, lang, \"$name\", path;
+
+		};"
+
+}
+
+search() {
+
+	setup || return 1
 
 	results_title="$(
 		eval "find $paths -type f -name '*.html'" 2>/dev/null | \
@@ -125,7 +162,7 @@ search() {
 						};
 						
 				for (i = 0; i < count; i++)
-					printf(\"%s\t%s\tfbsd\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+					printf(\"%s\t%s\t$name\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
 			};"
 	)"
 
@@ -185,17 +222,13 @@ search() {
 							};
 							
 					for (i = 0; i < count; i++)
-						printf(\"%s\t%s\tfbsd\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+						printf(\"%s\t%s\t$name\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
 				};"
 			)"
 
 	fi
 
-	results="$(
-		printf '%s\n%s' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
-	)"
-
-	printf '%s\n' "$results"
+	printf '%s\n%s\n' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 
 }
 

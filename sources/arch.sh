@@ -22,11 +22,15 @@ info() {
 
 }
 
-search() {
+setup() {
 
-	results=''
 	results_title=''
 	results_text=''
+
+	if ! available; then
+		echo "warning: Arch Wiki does not exist" 1>&2
+		return 1
+	fi
 
 	for lang in $conf_wiki_lang; do
 		if [ -d "$path/$lang" ]; then
@@ -37,10 +41,52 @@ search() {
 	done
 	
 	if [ "$(echo "$paths" | wc -w)" = '0' ]; then
-		return
+		return 1
 	fi
 
 	nf="$(echo "$path" | awk -F '/' '{print NF+2}')"
+
+}
+
+list() {
+
+	setup || return 1
+
+	eval "find $paths -type f -name '*.html'" | \
+	awk -F'/' \
+		"BEGIN {
+			IGNORECASE=1;
+			OFS=\"\t\";
+		};
+		{
+			if (NF-$nf) {
+				title = \"\"
+				for (i=$nf; i<=NF; i++)
+					title = title ((i==$nf) ? \"\" : \"/\") \$i
+			} else
+				title = \$NF;
+			gsub(/\.html.*/,\"\",title);
+			gsub(\"_\",\" \",title);
+
+			path = \$0
+			gsub(/:[0-9]+$/,\"\",path);
+
+			lang = \$7;
+
+			if (title~/^Category:/) {
+				gsub(/^Category:/,\"\",title);
+				title = title \" (Category)\";
+			}
+
+			print title, lang, \"$name\", path;
+
+		};"
+
+}
+
+search() {
+
+	setup || return 1
 
 	results_title="$(
 		eval "find $paths -type f -name '*.html'" | \
@@ -109,7 +155,7 @@ search() {
 						};
 						
 				for (i = 0; i < count; i++)
-					print matches[i,1], matches[i,3], \"arch\", matches[i,2];
+					print matches[i,1], matches[i,3], \"$name\", matches[i,2];
 			};"
 	)"
 
@@ -171,17 +217,14 @@ search() {
 							};
 							
 					for (i = 0; i < count; i++)
-						print matches[i,1], matches[i,3], \"arch\", matches[i,2];
+						print matches[i,1], matches[i,3], \"$name\", matches[i,2];
 				};"
 		)"
 
 	fi
 
-	results="$(
-		printf '%s\n%s' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
-	)"
+	printf '%s\n%s\s' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 
-	printf '%s\n' "$results"
 
 }
 

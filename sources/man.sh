@@ -44,9 +44,40 @@ get_man_path() {
 
 }
 
+list() {
+
+	for lang in $conf_man_lang; do
+		if ! get_man_path; then
+			echo "warning: man pages for '$lang' do not exist" 1>&2
+			continue
+		else
+			man_search_dirs="$(
+				eval "find $man_search_paths -maxdepth 1 -name 'man*' -printf '%p '"
+			)"
+		fi
+		eval "find $man_search_dirs -maxdepth 1 -type f" | \
+		awk -F'/' \
+			"BEGIN {
+				IGNORECASE=1;
+				OFS=\"\t\"
+			};
+			\$NF ~ /$rg_query/ {
+				title = \$NF;
+				gsub(/\.\w+$/,\"\",title);
+
+				section = title;
+				gsub(/^.*\./,\"\",section);
+
+				gsub(/\.\w+$/,\"\",title);
+
+				print title, section, \"$name\", \$0;
+			};"
+	done
+
+}
+
 search() {
 
-	results=''
 	results_name=''
 	results_desc=''
 
@@ -126,7 +157,7 @@ search() {
 							matches[j,4] = p;
 						};
 				for (i = 0; i < count; i++)
-					printf(\"%s (%s)\t%s\tman\t%s\n\",matches[i,1],matches[i,2],matches[i,3],matches[i,4]);
+					printf(\"%s (%s)\t%s\t$name\t%s\n\",matches[i,1],matches[i,2],matches[i,3],matches[i,4]);
 			};"
 	)"
 
@@ -149,7 +180,7 @@ search() {
 				eval "apropos -M $man_search_dirs $query" 2>/dev/null | \
 				awk "{ 
 					gsub(/ *\(|\)/,\"\",\$2);
-					printf(\"%s (%s)\t$lang\tman\n\",\$1,\$2);
+					printf(\"%s (%s)\t$lang\t$name\n\",\$1,\$2);
 				}; END { print \"\n\"};"
 			)"
 			results_desc="$(

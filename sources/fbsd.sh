@@ -50,7 +50,7 @@ setup() {
 	for rg_l in $(echo "$langs" | sed 's|*|.*|g; s|\||\n|g'); do
 		p="$(echo "$search_paths" | grep -P "$rg_l")"
 		if [ "$?" = '0' ]; then
-			paths="$paths $p/books"
+			paths="$paths $p/*"
 		else
 			l="$(echo "$rg_l" | sed 's|_\.\*||g')"
 			echo "warning: FreeBSD documentation for '$l' does not exist" 1>&2

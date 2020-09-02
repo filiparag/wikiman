@@ -5,7 +5,7 @@ path='/usr/share/man'
 get_man_path() {
 
 	man_default_paths="$(
-		manpath | awk -F':' "{
+		manpath 2>/dev/null | awk -F':' "{
 			OFS=\" \";
 			for(i=1; i<=NF; i++)
 				if(\"$lang\"!=\"en\")

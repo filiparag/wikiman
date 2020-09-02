@@ -105,7 +105,7 @@ search() {
 						};
 						
 				for (i = 0; i < count; i++)
-					printf(\"%s\t%s\tgentoo\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+					printf(\"%s\t%s\tfbsd\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
 			};"
 	)"
 
@@ -165,7 +165,7 @@ search() {
 							};
 							
 					for (i = 0; i < count; i++)
-						printf(\"%s\t%s\tgentoo\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+						printf(\"%s\t%s\tfbsd\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
 				};"
 			)"
 

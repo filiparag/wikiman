@@ -322,11 +322,11 @@ shift "$((OPTIND - 1))"
 
 # Dependency check
 
-DEPS="man fzf rg awk w3m $conf_fuzzy_finder"
+dependencies="man fzf rg awk w3m $conf_fuzzy_finder"
 
-for dependency in $DEPS; do
-	which "$dependency" >/dev/null || {
-		echo "error: missing dependency: cannot find $dependency executable!" 1>&2
+for dep in $dependencies; do
+	which "$dep" >/dev/null 2>/dev/null || {
+		echo "error: missing dependency: cannot find $dep executable!" 1>&2
 		exit 127
 	}
 done

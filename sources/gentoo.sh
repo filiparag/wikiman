@@ -1,6 +1,20 @@
 #!/bin/sh
 
+name='gentoo'
 path='/usr/share/doc/gentoo-wiki/wiki'
+
+info() {
+
+	if [ -d "$path" ]; then
+		state="$(echo "$conf_sources" | grep -qP "$name" && echo "+")"
+		count="$(find "$path" -type f | wc -l)"
+		printf '%-10s %3s %8i  %s\n' "$name" "$state" "$count" "$path"
+	else
+		state="$(echo "$conf_sources" | grep -qP "$name" && echo "x")"
+		printf '%-12s %-11s (not installed)\n' "$name" "$state"
+	fi
+
+}
 
 search() {
 
@@ -13,7 +27,7 @@ search() {
 		return
 	fi
 
-	rg_ignore="/^(File|Talk|Template|Template talk|Project|Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk|Foundation|Foundation talk):/"
+	rg_ignore="/^(File|Talk|Handbook Talk|Template|Template talk|Project|Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk|Foundation|Foundation talk):/"
 	langs="/$(echo "$conf_wiki_lang" | awk '{ l=tolower($0); gsub(/ +/,"|",l); gsub(/(^\|)|(\|$)/,"",l); gsub("_","-",l); print l}')/"
 	nf="$(echo "$path" | awk -F '/' '{print NF+1}')"
 
@@ -168,4 +182,8 @@ search() {
 		printf '%s\n%s' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 	)"
 
+	printf '%s\n' "$results"
+
 }
+
+eval "$1"

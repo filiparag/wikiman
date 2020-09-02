@@ -1,6 +1,20 @@
 #!/bin/sh
 
+name='arch'
 path='/usr/share/doc/arch-wiki/html'
+
+info() {
+
+	if [ -d "$path" ]; then
+		state="$(echo "$conf_sources" | grep -qP "$name" && echo "+")"
+		count="$(find "$path" -type f | wc -l)"
+		printf '%-10s %3s %8i  %s\n' "$name" "$state" "$count" "$path"
+	else
+		state="$(echo "$conf_sources" | grep -qP "$name" && echo "x")"
+		printf '%-12s %-11s (not installed)\n' "$name" "$state"
+	fi
+
+}
 
 search() {
 
@@ -20,15 +34,23 @@ search() {
 		return
 	fi
 
+	nf="$(echo "$path" | awk -F '/' '{print NF+2}')"
+
 	results_title="$(
 		eval "find $paths -type f -name '*.html'" | \
 		awk -F'/' \
 			"BEGIN {
 				IGNORECASE=1;
 				count=0;
+				OFS=\"\t\";
 			};
 			{
-				title = \$NF
+				if (NF-$nf) {
+					title = \"\"
+					for (i=$nf; i<=NF; i++)
+						title = title ((i==$nf) ? \"\" : \"/\") \$i
+				} else
+					title = \$NF;
 				gsub(/\.html.*/,\"\",title);
 				gsub(\"_\",\" \",title);
 
@@ -81,7 +103,7 @@ search() {
 						};
 						
 				for (i = 0; i < count; i++)
-					printf(\"%s\t%s\tarch\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+					print matches[i,1], matches[i,3], \"arch\", matches[i,2];
 			};"
 	)"
 
@@ -91,13 +113,19 @@ search() {
 			eval "rg -U -S -c '$rg_query' $paths" | \
 			awk -F'/' \
 				"BEGIN {
-					count = 0
+					count = 0;
+					OFS=\"\t\";
 				};
 				{
 					hits = \$NF
 					gsub(/^.*:/,\"\",hits);
 
-					title = \$NF
+					if (NF-$nf) {
+						title = \"\"
+						for (i=$nf; i<=NF; i++)
+							title = title ((i==$nf) ? \"\" : \"/\") \$i
+					} else
+						title = \$NF;
 					gsub(/\.html.*/,\"\",title);
 					gsub(\"_\",\" \",title);
 
@@ -137,7 +165,7 @@ search() {
 							};
 							
 					for (i = 0; i < count; i++)
-						printf(\"%s\t%s\tarch\t%s\n\",matches[i,1],matches[i,3],matches[i,2]);
+						print matches[i,1], matches[i,3], \"arch\", matches[i,2];
 				};"
 		)"
 
@@ -147,4 +175,8 @@ search() {
 		printf '%s\n%s' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
 	)"
 
+	printf '%s\n' "$results"
+
 }
+
+eval "$1"

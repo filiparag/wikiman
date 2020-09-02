@@ -13,7 +13,7 @@ search() {
 		return
 	fi
 
-	rg_ignore="/^(File|Talk|Template|Template talk|Project|Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk|Foundation|Foundation talk):/"
+	rg_ignore="/^(File|Talk|Handbook Talk|Template|Template talk|Project|Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk|Foundation|Foundation talk):/"
 	langs="/$(echo "$conf_wiki_lang" | awk '{ l=tolower($0); gsub(/ +/,"|",l); gsub(/(^\|)|(\|$)/,"",l); gsub("_","-",l); print l}')/"
 	nf="$(echo "$path" | awk -F '/' '{print NF+1}')"
 

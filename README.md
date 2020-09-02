@@ -128,8 +128,8 @@ will be looked up from there instead.
 Example configuration file:
 
 ```ini
-# Sources
-sources = man, arch, gentoo, fbsd
+# Sources (if empty, use all available)
+sources = man, arch
 
 # Quick search mode (only by title)
 quick_search = true

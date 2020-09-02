@@ -7,7 +7,9 @@
 
 .SH SYNOPSIS
 .B wikiman
-[-l languages] [-s sources] -q -p -k [-H html_viewer] -R <keyword>...
+[-l languages] [-s sources] [-q] [-p] [-k]
+.br
+        [-f fuzzy finder] [-H html_viewer] [-R] <keyword>...
 .br
 .B wikiman
 -S
@@ -35,8 +37,9 @@ default: en
 .HP
 .B -s
 .br
-sources to use
-default: man
+sources to use (if empty, use all available)
+.br
+default: (empty)
 
 .HP
 .B -f
@@ -92,8 +95,11 @@ System-wide configuration location:
 .I
 /etc/wikiman.conf
 
-.SS Sources:
-sources = man, arch, gentoo
+.SS Sources
+sources = 
+
+.SS Fuzzy finder
+fuzzy_finder = fzf
 
 .SS Quick search mode
 quick_search = false
@@ -101,7 +107,7 @@ quick_search = false
 .SS Raw output
 raw_output = false
 
-.SS Language(s):
+.SS Language(s)
 man_lang = en
 
 wiki_lang = en
@@ -115,14 +121,19 @@ find '/usr/share/man' -maxdepth 1 -type d -not -name 'man*' -printf '%P '
 List all Arch Wiki languages:
 .br
 find '/usr/share/doc/arch-wiki/html' -maxdepth 1 -type d -printf '%P '
+.PP
+.B
+List all FreeBSD Documentation languages:
+.br
+find '/usr/share/doc/freebsd-docs' -maxdepth 1 -type d -printf '%P '
 
-.SS TUI preview:
+.SS TUI preview
 tui_preview = true
 
-.SS TUI keep open:
+.SS TUI keep open
 tui_keep_open = false
 
-.SS TUI viewer for HTML pages:
+.SS TUI viewer for HTML pages
 tui_html = w3m
 
 

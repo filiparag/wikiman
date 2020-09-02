@@ -157,6 +157,7 @@ init() {
 	conf_tui_html="${conf_tui_html:-w3m}"
 
 	export conf_sources
+	export conf_fuzzy_finder
 	export conf_quick_search
 	export conf_raw_output
 	export conf_man_lang

@@ -50,10 +50,12 @@ sudo dnf install wikiman-*.rpm
 Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`
 
 ```bash
-# Install latest stable version of wikiman
 git clone 'https://github.com/filiparag/wikiman'
 cd ./wikiman
-git checkout $(git tag | tail -1)
+
+# Switch to latest stable release (optional)
+git checkout $(git tag | sort | sort -n -t'.' -k2 | tail -n1)
+
 make
 sudo make install
 ```

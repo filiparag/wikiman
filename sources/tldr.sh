@@ -44,7 +44,7 @@ setup() {
 		
 	search_paths="$(
 		find "$path" -maxdepth 1 -mindepth 1 -type d -printf '%p\n' | \
-		grep -P "$langs"
+		awk "/$langs/"
 	)"
 
 	for rg_l in $(echo "$langs" | sed 's|*|.*|g; s|\|| |g'); do

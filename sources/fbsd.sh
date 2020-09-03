@@ -44,13 +44,13 @@ setup() {
 		
 	search_paths="$(
 		find "$path" -maxdepth 1 -mindepth 1 -type d -printf '%p\n' | \
-		grep -P "$langs"
+		awk "/$langs/"
 	)"
 
 	for rg_l in $(echo "$langs" | sed 's|*|.*|g; s|\||\n|g'); do
-		p="$(echo "$search_paths" | grep -P "$rg_l")"
-		if [ "$?" = '0' ]; then
-			paths="$paths $p/*"
+		p="$(echo "$search_paths" | awk "/$rg_l/ {printf(\"%s/* \",\$0)}")"
+		if [ "$p" != '' ]; then
+			paths="$paths $p"
 		else
 			l="$(echo "$rg_l" | sed 's|_\.\*||g')"
 			echo "warning: FreeBSD documentation for '$l' does not exist" 1>&2
@@ -88,11 +88,10 @@ list() {
 			lang=\$$nf;
 			path=\$0;
 
-			book = \$($nf+2);
+			book = \$($nf+1) \"/\" \$($nf+2);
 			title = sprintf(\"%s (%s)\",title,book);
 
 			print title, lang, \"$name\", path;
-
 		};"
 
 }
@@ -132,7 +131,7 @@ search() {
 				else
 					accuracy = 100-lm*100/length(title);
 
-				book = \$($nf+2);
+				book = \$($nf+1) \"/\" \$($nf+2);
 
 				if (accuracy > 0 || book ~ /$rg_query/) {
 					title = sprintf(\"%s (%s)\",title,book);
@@ -194,7 +193,7 @@ search() {
 					lang=\$$nf;
 					path=\$0;
 
-					book = \$($nf+2);
+					book = \$($nf+1) \"/\" \$($nf+2);
 
 					title = sprintf(\"%s (%s)\",title,book);
 					matches[count,0] = hits;

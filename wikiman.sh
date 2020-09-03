@@ -47,6 +47,8 @@ init() {
 			awk -F '=' '/^[ ,\t]*sources/ {
 				gsub(","," ",$2);
 				gsub(/#.*/,"",$2);
+				gsub(/ +/," ",$2);
+				gsub(" ","",$2);
 				value = $2;
 			}; END { print value }' "$config_file" "$config_file_usr"
 		)"

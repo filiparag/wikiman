@@ -57,7 +57,8 @@ init() {
 				gsub(\",\",\" \",\$2);
 				gsub(/#.*/,\"\",\$2);
 				gsub(/ +/,\" \",\$2);
-				gsub(\" \",\"\",\$2);
+				gsub(/^ /,\"\",\$2);
+				gsub(/ $/,\"\",\$2);
 				value = \$2;
 			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
@@ -348,7 +349,8 @@ done
 shift "$((OPTIND - 1))"
 
 # Dependency check
-dependencies="man rg $conf_awk $conf_tui_html $conf_fuzzy_finder $conf_find"
+
+dependencies="man rg w3m $conf_awk $conf_tui_html $conf_fuzzy_finder $conf_find"
 
 for dep in $dependencies; do
 	which "$dep" >/dev/null 2>/dev/null || {

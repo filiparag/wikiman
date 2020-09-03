@@ -29,7 +29,7 @@ get_man_path() {
 			OFS=\" \";
 			for(i=1; i<=NF; i++)
 				if(\"$lang\"!=\"en\")
-					\$i = \$i \"/$lang\";
+					\$i = \$i \"/$lang*\";
 				else
 					\$i = \$i \"\";
 			print \$0;

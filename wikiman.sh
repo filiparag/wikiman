@@ -242,7 +242,7 @@ picker_tui() {
 		[ "$(echo "$conf_wiki_lang" | wc -w | sed 's| ||g')" = '1' ]; then
 		columns="${source_column}1"
 	else
-		columns="${source_column},2,1"
+		columns="${source_column}2,1"
 	fi
 
 	choice="$(

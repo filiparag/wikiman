@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Targeted for Arch Linux
+
 mkdir -p ./fbsd
 cd ./fbsd
 

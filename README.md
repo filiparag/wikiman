@@ -85,6 +85,12 @@ sudo make -f ./wikiman-makefile source-arch
 
 After installation, enable them by adding them to sources variable in the [configuration file](#configuration).
 
+#### Compiling a snapshot (database build scripts)
+
+In [`build/`](https://github.com/filiparag/wikiman/tree/master/build) directory there are scripts
+for manual snapshot compilation. These scripts can have external dependencies and are not 
+recommended to be run by end users, but by Wikiman maintainers. Your mileage may vary.
+
 ## Usage
 
 Usage: `wikiman [OPTION]... [KEYWORD]...`
@@ -199,6 +205,7 @@ If you create a source module useful to the general public, please share it usin
 - module script file `sources/your-source.sh`
 - Makefile recipe `your-source`
 - installable snapshot of the source database `your-source-TIMESTAMP.tar.xz`
+- build script for the database snapshot `build/your-source.sh`
 - short description in the pull request's body
 
 Other improvements are also welcome!

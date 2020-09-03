@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Targeted for Arch Linux
+
 mkdir -p ./arch
 
 cd ./arch

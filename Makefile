@@ -1,72 +1,69 @@
-UPSTREAM = 'https://github.com/filiparag/wikiman'
+.POSIX:
 
-make:
+NAME=wikiman
+UPSTREAM=https://github.com/filiparag/wikiman
+SOURCES = '${UPSTREAM}/releases/download/'
+BUILD=./bin
 
-	@echo 'Checking documentation sources...'
-	@test -d '$(prefix)/usr/share/man' -a -r '$(prefix)/usr/share/man' >/dev/null || \
-		echo 'Warning: Man pages are not available!'
-	@test -d '$(prefix)/usr/share/doc/arch-wiki/html' -a -r '$(prefix)/usr/share/doc/arch-wiki/html' >/dev/null || \
-		echo 'Warning: Arch Wiki is not available! Run make source-arch to install.'
-	@test -d '$(prefix)/usr/share/doc/gentoo-wiki/wiki/' -a -r '$(prefix)/usr/share/doc/gentoo-wiki/wiki/' >/dev/null || \
-		echo 'Warning: Gentoo Wiki is not available! Run make source-gentoo to install.'
-	@test -d '$(prefix)/usr/share/doc/freebsd-docs' -a -r '$(prefix)/usr/share/doc/freebsd-docs' >/dev/null || \
-		echo 'Warning: FreeBSD Documentation is not available! Run make source-fbsd to install.'
 
-install:
+make: ${NAME}.sh ${NAME}.1.man ${NAME}.conf LICENSE README.md sources/
 
-	@install -Dm755 './wikiman.sh' '$(prefix)/usr/bin/wikiman'
+	@mkdir -p ${BUILD}/usr/share/${NAME} \
+		${BUILD}/usr/share/licenses/${NAME} \
+		${BUILD}/usr/share/doc/${NAME} \
+		${BUILD}/usr/share/man/man1 \
+		${BUILD}/usr/bin \
+		${BUILD}/etc
+	@install -Dm755 ./${NAME}.sh $(BUILD)/usr/bin/${NAME}
+	@cp -fr ./sources ${BUILD}/usr/share/${NAME}
+	@install -Dm644 ./LICENSE ${BUILD}/usr/share/licenses/${NAME} 
+	@install -Dm644 ./README.md ${BUILD}/usr/share/doc/wikiman 
+	@install -Dm644 ./${NAME}.conf ${BUILD}/etc
+	@tar czf ${BUILD}/usr/share/man/man1/${NAME}.1.gz ./${NAME}.1.man
 
-	@mkdir -p '$(prefix)/usr/share/wikiman'
-	@cp -r --preserve=mode './sources' '$(prefix)/usr/share/wikiman/'
+install: ${BUILD}/etc/${NAME}.conf ${BUILD}/usr/bin/${NAME} ${BUILD}/usr/share/licenses/${NAME}/LICENSE ${BUILD}/usr/share/man/man1/${NAME}.1.gz ${BUILD}/usr/share/doc/${NAME}/README.md
 
-	@install -Dm644 './wikiman.1.man' '$(prefix)/usr/share/man/man1/wikiman.1.gz'
-	@install -Dm644 -t '$(prefix)/usr/share/licenses/wikiman' './LICENSE'
-	@install -Dm644 -t '$(prefix)/usr/share/doc/wikiman' './README.md'
-	@install -Dm644 -t '$(prefix)/etc' './wikiman.conf'
+	@mkdir -p $(prefix)/
+	@cp -fr ${BUILD}/* $(prefix)/
+	
 
 clean:
 
-	@rm -f './arch-linux-docs_20200527-1.tar.xz'
-	@rm -f './gentoo-wiki_20200831-1.tar.xz'
-	@rm -f './freebsd-docs_20200901-1.tar.xz'
+	@rm -rf ./bin
 
-uninstall:
+uninstall: 
 
-	@rm -f '$(prefix)/usr/bin/wikiman'
+	@rm -rf $(prefix)/etc/${NAME}.conf $(prefix)/usr/bin/${NAME} $(prefix)/usr/share/${NAME} $(prefix)/usr/share/licenses/${NAME} $(prefix)/usr/share/man/man1/${NAME}.1.gz $(prefix)/usr/share/doc/${NAME}
 
-	@rm -rf '$(prefix)/usr/share/wikiman'
+source-install: ${BUILD}/usr/share/doc
 
-	@rm -f '$(prefix)/usr/share/man/man1/wikiman.1.gz'
-	@rm -rf '$(prefix)/usr/share/licenses/wikiman'
-	@rm -rf '$(prefix)/usr/share/doc/wikiman'
-	@rm -i '$(prefix)/etc/wikiman.conf'
+	@mkdir -p $(prefix)/
+	@cp -fr ${BUILD}/* $(prefix)/
 
 source-arch:
-	
-	@echo 'Downoading latest Arch Wiki snapshot...'
-	@curl -L -O '${UPSTREAM}/releases/download/2.4/arch-linux-docs_20200527-1.tar.xz'
-	@echo 'Installing Arch Wiki...'
-	@tar zxf './arch-linux-docs_20200527-1.tar.xz' -C '$(prefix)/'
-	@rm './arch-linux-docs_20200527-1.tar.xz'
+
+	@mkdir -p ${BUILD}/tmp ${BUILD}/usr/share/doc
+	@curl -L '${SOURCES}/2.9/arch-wiki_20200903.tar.xz' -o ${BUILD}/tmp/arch.tar.xz
+	@tar xf ${BUILD}/tmp/arch.tar.xz -C ${BUILD}
+	@rm -f ${BUILD}/tmp/arch.tar.xz
 
 source-gentoo:
 
-	@echo 'Downoading latest Gentoo Wiki snapshot...'
-	@curl -L -O '${UPSTREAM}/releases/download/2.7/gentoo-wiki_20200831-1.tar.xz'
-	@echo 'Installing Gentoo Wiki...'
-	@tar zxf './gentoo-wiki_20200831-1.tar.xz' -C '$(prefix)/'
-	@rm './gentoo-wiki_20200831-1.tar.xz'
-
+	@mkdir -p ${BUILD}/tmp ${BUILD}/usr/share/doc
+	@curl -L '${SOURCES}/2.7/gentoo-wiki_20200831-1.tar.xz' -o ${BUILD}/tmp/gentoo.tar.xz
+	@tar xf ${BUILD}/tmp/gentoo.tar.xz -C ${BUILD}
+	@rm -f ${BUILD}/tmp/gentoo.tar.xz
+	
 source-fbsd:
 
-	@echo 'Downoading latest FreeBSD Documentation snapshot...'
-	@curl -L -O '${UPSTREAM}/releases/download/2.8/freebsd-docs_20200901-1.tar.xz'
-	@echo 'Installing FreeBSD Documentation...'
-	@tar zxf './freebsd-docs_20200901-1.tar.xz' -C '$(prefix)/'
-	@rm './freebsd-docs_20200901-1.tar.xz'
+	@mkdir -p ${BUILD}/tmp ${BUILD}/usr/share/doc
+	@curl -L '${SOURCES}/2.9/freebsd-docs_20200903.tar.xz' -o ${BUILD}/tmp/fbsd.tar.xz
+	@tar xf ${BUILD}/tmp/fbsd.tar.xz -C ${BUILD}
+	@rm -f ${BUILD}/tmp/fbsd.tar.xz
 
-uninstall-sources:
+source-tldr:
 
-	@rm -rfi '$(prefix)/usr/share/doc/arch-wiki'
-	@rm -rfi '$(prefix)/usr/share/doc/gentoo-wiki'
-	@rm -rfi '$(prefix)/usr/share/doc/freebsd-docs'
+	@mkdir -p ${BUILD}/tmp ${BUILD}/usr/share/doc
+	@curl -L '${SOURCES}/2.9/tldr-pages_20200903.tar.xz' -o ${BUILD}/tmp/fbsd.tar.xz
+	@tar xf ${BUILD}/tmp/fbsd.tar.xz -C ${BUILD}
+	@rm -f ${BUILD}/tmp/fbsd.tar.xz

@@ -22,8 +22,6 @@ yay -Syu wikiman
 
 # Optional: Enable Arch Wiki
 yay -Syu arch-wiki-docs
-mkdir -p ~/.config/wikiman
-echo 'sources = man, arch' >> ~/.config/wikiman/wikiman.conf
 ```
 
 If you are running Manjaro, package `arch-wiki-docs` is not in official repositories.
@@ -47,9 +45,9 @@ Download latest *.rpm* package from [Releases](https://github.com/filiparag/wiki
 sudo dnf install wikiman-*.rpm
 ```
 
-### Manual installation
+### Manual installation for Linux and BSD
 
-Dependencies: `man`, `fzf-compatible fuzzy finder`, `ripgrep`, `awk`, `w3m`
+Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`
 
 ```bash
 # Install latest stable version of wikiman
@@ -74,16 +72,26 @@ Available optional sources are:
 - Arch Wiki (`arch`)
 - Gentoo Wiki (`gentoo`)
 - FreeBSD Documentation (`fbsd`)
+- TLDR Pages (`tldr`)
 
 ```bash
 # Download latest Makefile
 curl -L 'https://raw.githubusercontent.com/filiparag/wikiman/master/Makefile' -o 'wikiman-makefile'
 
 # Example: install Arch Wiki
-sudo make -f ./wikiman-makefile source-arch
+make -f ./wikiman-makefile source-arch
+sudo make -f ./wikiman-makefile source-install
+make -f ./wikiman-makefile clean
 ```
 
-After installation, enable them by adding them to sources variable in the [configuration file](#configuration).
+After installation, they should be enabled automatically if 
+`sources` [configuration](#configuration) variable is empty. 
+
+To verify active sources, run:
+
+```bash
+wikiman -S
+```
 
 #### Compiling a snapshot (database build scripts)
 

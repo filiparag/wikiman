@@ -58,6 +58,8 @@ make
 sudo make install
 ```
 
+Wikiman uses GNU `find`, so BSD users have to install `findutils` package.
+
 ### Installing additional sources
 
 Due to their large size, wikis don't come bundled with Wikiman.

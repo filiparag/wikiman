@@ -13,7 +13,7 @@ info() {
 
 	if available; then
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "+")"
-		count="$(find "$path" -type f | wc -l)"
+		count="$("$conf_find" "$path" -type f | wc -l)"
 		printf '%-10s %3s %8i  %s\n' "$name" "$state" "$count" "$path"
 	else
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "x")"
@@ -43,7 +43,7 @@ setup() {
 	}')"
 		
 	search_paths="$(
-		find "$path" -maxdepth 1 -mindepth 1 -type d -printf '%p\n' | \
+		"$conf_find" "$path" -maxdepth 1 -mindepth 1 -type d -printf '%p\n' | \
 		awk "/$langs/"
 	)"
 
@@ -69,7 +69,7 @@ list() {
 
 	setup || return 1
 
-	eval "find $paths -type f -name '*.html'" 2>/dev/null | \
+	eval "$conf_find $paths -type f -name '*.html'" 2>/dev/null | \
 	awk -F '/' \
 		"BEGIN {
 			IGNORECASE=1;
@@ -101,7 +101,7 @@ search() {
 	setup || return 1
 
 	results_title="$(
-		eval "find $paths -type f -name '*.html'" 2>/dev/null | \
+		eval "$conf_find $paths -type f -name '*.html'" 2>/dev/null | \
 		awk -F '/' \
 			"BEGIN {
 				IGNORECASE=1;

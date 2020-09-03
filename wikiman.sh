@@ -117,7 +117,7 @@ init() {
 	# Detect source modules
 
 	sources="$(
-		eval "find $sources_dir_usr $sources_dir -type f 2>/dev/null" | \
+		eval "$conf_find $sources_dir_usr $sources_dir -type f 2>/dev/null" | \
 		awk -F '/' \
 			"BEGIN {OFS=\"\t\"} {
 				path = \$0;
@@ -166,6 +166,7 @@ init() {
 	export conf_tui_preview
 	export conf_tui_keep_open
 	export conf_tui_html
+	export conf_find
 
 }
 
@@ -294,6 +295,10 @@ sources() {
 
 }
 
+# BSD compatibility: Use gfind instead of find
+conf_find='find'
+"$conf_find" -name . >/dev/null 2>/dev/null || conf_find='gfind'
+
 init
 
 while getopts l:s:H:f:pqhRSk o; do
@@ -323,12 +328,11 @@ done
 shift "$((OPTIND - 1))"
 
 # Dependency check
-
-dependencies="man fzf rg awk w3m $conf_fuzzy_finder"
+dependencies="man rg awk $conf_tui_html $conf_fuzzy_finder $conf_find"
 
 for dep in $dependencies; do
 	which "$dep" >/dev/null 2>/dev/null || {
-		echo "error: missing dependency: cannot find $dep executable!" 1>&2
+		echo "error: missing dependency: cannot find '$dep' executable" 1>&2
 		exit 127
 	}
 done

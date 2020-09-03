@@ -6,7 +6,7 @@ SOURCES = '${UPSTREAM}/releases/download/'
 BUILD=./bin
 
 
-make: ${NAME}.sh ${NAME}.1.man ${NAME}.conf LICENSE README.md sources/
+make: ${NAME}.sh ${NAME}.1.man ${NAME}.conf LICENSE README.md sources/ widgets/
 
 	@mkdir -p ${BUILD}/usr/share/${NAME} \
 		${BUILD}/usr/share/licenses/${NAME} \
@@ -16,12 +16,13 @@ make: ${NAME}.sh ${NAME}.1.man ${NAME}.conf LICENSE README.md sources/
 		${BUILD}/etc
 	@install -Dm755 ./${NAME}.sh $(BUILD)/usr/bin/${NAME}
 	@cp -fr ./sources ${BUILD}/usr/share/${NAME}
+	@cp -fr ./widgets ${BUILD}/usr/share/${NAME}
 	@install -Dm644 ./LICENSE ${BUILD}/usr/share/licenses/${NAME} 
 	@install -Dm644 ./README.md ${BUILD}/usr/share/doc/wikiman 
 	@install -Dm644 ./${NAME}.conf ${BUILD}/etc
 	@tar czf ${BUILD}/usr/share/man/man1/${NAME}.1.gz ./${NAME}.1.man
 
-install: ${BUILD}/etc/${NAME}.conf ${BUILD}/usr/bin/${NAME} ${BUILD}/usr/share/licenses/${NAME}/LICENSE ${BUILD}/usr/share/man/man1/${NAME}.1.gz ${BUILD}/usr/share/doc/${NAME}/README.md
+install: ${BUILD}/usr/share/${NAME} ${BUILD}/etc/${NAME}.conf ${BUILD}/usr/bin/${NAME} ${BUILD}/usr/share/licenses/${NAME}/LICENSE ${BUILD}/usr/share/man/man1/${NAME}.1.gz ${BUILD}/usr/share/doc/${NAME}/README.md
 
 	@mkdir -p $(prefix)/
 	@cp -fr ${BUILD}/* $(prefix)/

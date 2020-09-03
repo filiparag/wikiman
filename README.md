@@ -54,7 +54,7 @@ git clone 'https://github.com/filiparag/wikiman'
 cd ./wikiman
 
 # Switch to latest stable release (optional)
-git checkout $(git tag | sort | sort -n -t'.' -k2 | tail -n1)
+git checkout $(git describe --tags | cut -d'-' -f1)
 
 make
 sudo make install
@@ -139,8 +139,28 @@ If no keywords are provided, show all pages.
 
 - `-S` list available sources and exit
 
+- `-W` print widget code for specified shell and exit
+
 - `-h` display this help and exit
 
+### Shell keybind plugins
+
+Wikiman can be launched using a shell key binding (default: `Ctrl+F`).
+Current command line buffer will be used as a search query.
+
+Add appropriate line from below to your `.bashrc`-like 
+configuration file to make the key binding permanent.
+
+```bash
+# bash
+source <(wikiman -W bash)
+
+# fish
+wikiman -W fish | source
+
+# zsh
+source <(wikiman -W zsh)
+```
 
 ## Configuration
 

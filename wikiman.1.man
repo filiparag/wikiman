@@ -1,5 +1,5 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "3 September 2020" "wikiman 2.10" "wikiman manual"
+.TH "wikiman" 1 "4 September 2020" "wikiman 2.11" "wikiman manual"
 
 .SH NAME
 .B wikiman
@@ -13,6 +13,9 @@
 .br
 .B wikiman
 -S
+.br
+.B wikiman
+-W <shell>
 .br
 .B wikiman
 -h
@@ -85,6 +88,11 @@ print raw output
 .B -S
 .br
 list available sources and exit
+
+.HP
+.B -W
+.br
+print widget code for specified shell and exit
 
 .HP
 .B -h

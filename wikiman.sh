@@ -127,9 +127,13 @@ init() {
 		)"
 	fi
 
+	# Widgets
+
+	widgets_dir='/usr/share/wikiman/widgets'
+
 	# Sources
 
-	sources_dir="/usr/share/wikiman/sources"
+	sources_dir='/usr/share/wikiman/sources'
 	sources_dir_usr="$config_dir/sources"
 
 	# Detect source modules
@@ -299,6 +303,8 @@ Options:
 
   -S  list available sources and exit
 
+  -W  print widget code for specified shell and exit
+
   -h  display this help and exit
 "
 
@@ -319,9 +325,22 @@ sources() {
 
 }
 
+widget() {
+
+	widget_src="$("$conf_find" "$widgets_dir" -name "widget.$1")"
+
+	if [ "$widget_src" != '' ]; then
+		cat "$widget_src"
+	else
+		echo "error: widget for '$1' does not exist" 1>&2
+		exit 128
+	fi
+
+}
+
 init
 
-while getopts l:s:H:f:pqhRSkc o; do
+while getopts l:s:H:f:W:pqhRSkc o; do
   case $o in
 	(p) conf_tui_preview='false';;
 	(H) conf_tui_html="$OPTARG";;
@@ -339,6 +358,8 @@ while getopts l:s:H:f:pqhRSkc o; do
 	(q) conf_quick_search='true';;
 	(R) conf_raw_output='true';;
 	(c) conf_tui_source_column='true';;
+	(W) widget "$OPTARG";
+		exit;;
 	(S) sources;
 		exit;;
 	(h) help;

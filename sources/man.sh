@@ -70,7 +70,11 @@ list() {
 
 				gsub(/\.\w+$/,\"\",title);
 
-				print title \" (\" section \")\", section, \"$name\", \$0;
+				lang=\"en\"
+				if (\$(NF-2)!=\"man\")
+					lang=\$(NF-2);
+
+				print title \" (\" section \")\", lang, \"$name\", \$0;
 			};"
 	done
 

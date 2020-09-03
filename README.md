@@ -153,13 +153,13 @@ configuration file to make the key binding permanent.
 
 ```bash
 # bash
-source <(wikiman -W bash)
+source /usr/share/wikiman/widgets/widget.bash
 
 # fish
-wikiman -W fish | source
+source /usr/share/wikiman/widgets/widget.fish
 
 # zsh
-source <(wikiman -W zsh)
+source /usr/share/wikiman/widgets/widget.zsh
 ```
 
 ## Configuration

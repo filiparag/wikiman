@@ -27,19 +27,50 @@ setup() {
 	results_title=''
 	results_text=''
 
-	if ! available; then
-		echo "warning: Arch Wiki does not exist" 1>&2
-		return 1
-	fi
+	# if ! available; then
+	# 	echo "warning: Arch Wiki does not exist" 1>&2
+	# 	return 1
+	# fi
 
-	for lang in $conf_wiki_lang; do
-		if [ -d "$path/$lang" ]; then
-			paths="$paths $path/$lang"
+	# for lang in $conf_wiki_lang; do
+	# 	if [ -d "$path/$lang" ]; then
+	# 		paths="$paths $path/$lang"
+	# 	else
+	# 		echo "warning: Arch Wiki documentation for '$lang' does not exist" 1>&2
+	# 	fi
+	# done
+	
+	# if [ "$(echo "$paths" | wc -w | sed 's| ||g')" = '0' ]; then
+	# 	return 1
+	# fi
+
+	# nf="$(echo "$path" | "$conf_awk" -F '/' '{print NF+2}')"
+
+	langs="$(echo "$conf_wiki_lang" | awk -F ' ' '{
+		for(i=1;i<=NF;i++) {
+			lang=tolower($i);
+			gsub(/[-_].*$/,"",lang);
+			locale=toupper($i);
+			gsub(/^.*[-_]/,"",locale);
+			printf("%s%s%s",lang,(length($i)==2)?"*":locale,(i==NF)?"":"|");
+		}
+	}')"
+		
+	search_paths="$(
+		"$conf_find" "$path" -maxdepth 1 -mindepth 1 -type d -printf '%p\n' | \
+		awk "/$langs/"
+	)"
+
+	for rg_l in $(echo "$langs" | sed 's|*|.*|g; s|\||\n|g'); do
+		p="$(echo "$search_paths" | awk "/$rg_l/ {printf(\"%s \",\$0)}")"
+		if [ "$p" != '' ]; then
+			paths="$paths $p"
 		else
-			echo "warning: Arch Wiki documentation for '$lang' does not exist" 1>&2
+			l="$(echo "$rg_l" | sed 's|_\.\*||g')"
+			echo "warning: Arch Wiki for '$l' does not exist" 1>&2
 		fi
 	done
-	
+
 	if [ "$(echo "$paths" | wc -w | sed 's| ||g')" = '0' ]; then
 		return 1
 	fi

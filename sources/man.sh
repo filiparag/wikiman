@@ -56,7 +56,7 @@ list() {
 			)"
 		fi
 		eval "$conf_find $man_search_dirs -maxdepth 1 -type f" | \
-		awk -F'/' \
+		"$conf_awk" -F'/' \
 			"BEGIN {
 				IGNORECASE=1;
 				OFS=\"\t\"
@@ -70,7 +70,7 @@ list() {
 
 				gsub(/\.\w+$/,\"\",title);
 
-				print title, section, \"$name\", \$0;
+				print title \" (\" section \")\", section, \"$name\", \$0;
 			};"
 	done
 
@@ -94,7 +94,7 @@ search() {
 		fi
 		res="$(
 			eval "$conf_find $man_search_dirs -maxdepth 1 -type f" | \
-			awk -F'/' \
+			"$conf_awk" -F'/' \
 				"BEGIN {
 					IGNORECASE=1;
 					count=0;
@@ -123,7 +123,7 @@ search() {
 	# Sort name results
 
 	results_name="$(
-		echo "$results_name" | awk -F '\t' \
+		echo "$results_name" | "$conf_awk" -F '\t' \
 			"BEGIN {
 				IGNORECASE=1;
 				count=0;
@@ -178,7 +178,7 @@ search() {
 			fi
 			res="$(
 				eval "apropos -M $man_search_dirs $query" 2>/dev/null | \
-				awk "{ 
+				"$conf_awk" "{ 
 					gsub(/ *\(|\)/,\"\",\$2);
 					printf(\"%s (%s)\t$lang\t$name\n\",\$1,\$2);
 				}; END { print \"\n\"};"
@@ -192,7 +192,7 @@ search() {
 
 	# Remove duplicates
 
-	printf '%s\n%s' "$results_name" "$results_desc" | awk '!seen[$1$2$3]++ && NF>0'
+	printf '%s\n%s' "$results_name" "$results_desc" | "$conf_awk" "!seen[\$1\$2\$3]++ && NF>0"
 
 }
 

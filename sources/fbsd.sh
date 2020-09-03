@@ -102,7 +102,7 @@ search() {
 
 	results_title="$(
 		eval "$conf_find $paths -type f -name '*.html'" 2>/dev/null | \
-		awk -F '/' \
+		"$conf_awk" -F '/' \
 			"BEGIN {
 				IGNORECASE=1;
 				count=0;
@@ -169,7 +169,7 @@ search() {
 
 		results_text="$(
 			eval "rg -U -S -c '$rg_query' $paths" | \
-			awk -F '/' \
+			"$conf_awk" -F '/' \
 				"BEGIN {
 					IGNORECASE=1;
 					count=0;
@@ -227,7 +227,7 @@ search() {
 
 	fi
 
-	printf '%s\n%s\n' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
+	printf '%s\n%s\n' "$results_title" "$results_text" | "$conf_awk" "!seen[\$0] && NF>0 {print} {++seen[\$0]};"
 
 }
 

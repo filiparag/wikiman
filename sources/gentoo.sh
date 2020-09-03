@@ -33,8 +33,11 @@ setup() {
 	fi
 
 	rg_ignore="/^(File|Talk|Handbook Talk|Template|Template talk|Project|Project talk|Help|Help talk|User|User talk|Translations|Translations talk|Special|Special talk|Foundation|Foundation talk):/"
-	langs="/$(echo "$conf_wiki_lang" | awk '{ l=tolower($0); gsub(/ +/,"|",l); gsub(/(^\|)|(\|$)/,"",l); gsub("_","-",l); print l}')/"
-	nf="$(echo "$path" | awk -F '/' '{print NF+1}')"
+	langs="/$(
+		echo "$conf_wiki_lang" | \
+		"$conf_awk" "{ l=tolower(\$0); gsub(/ +/,\"|\",l); gsub(/(^\|)|(\|$)/,\"\",l); gsub(\"_\",\"-\",l); print l}"
+	)/"
+	nf="$(echo "$path" | "$conf_awk" -F '/' "{print NF+1}")"
 
 }
 
@@ -42,7 +45,7 @@ list() {
 
 	setup || return 1
 
-	eval "$conf_find $path -type f -name '*.html'" | awk -F '/' \
+	eval "$conf_find $path -type f -name '*.html'" | "$conf_awk" -F '/' \
 			"BEGIN {
 				IGNORECASE=1;
 				OFS=\"\t\";
@@ -82,7 +85,7 @@ search() {
 	setup || return 1
 
 	results_title="$(
-		eval "$conf_find $path -type f -name '*.html'" | awk -F '/' \
+		eval "$conf_find $path -type f -name '*.html'" | "$conf_awk" -F '/' \
 			"BEGIN {
 				IGNORECASE=1;
 				count=0;
@@ -160,7 +163,7 @@ search() {
 
 		results_text="$(
 			eval "rg -U -S -c '$rg_query' $path" | \
-			awk -F'/' \
+			"$conf_awk" -F'/' \
 				"BEGIN {
 					IGNORECASE=1;
 					count=0;
@@ -228,7 +231,7 @@ search() {
 
 	fi
 
-	printf '%s\n%s\n' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
+	printf '%s\n%s\n' "$results_title" "$results_text" | "$conf_awk" "!seen[\$0] && NF>0 {print} {++seen[\$0]};"
 
 }
 

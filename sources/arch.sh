@@ -44,7 +44,7 @@ setup() {
 		return 1
 	fi
 
-	nf="$(echo "$path" | awk -F '/' '{print NF+2}')"
+	nf="$(echo "$path" | "$conf_awk" -F '/' '{print NF+2}')"
 
 }
 
@@ -53,7 +53,7 @@ list() {
 	setup || return 1
 
 	eval "$conf_find $paths -type f -name '*.html'" | \
-	awk -F'/' \
+	"$conf_awk" -F'/' \
 		"BEGIN {
 			IGNORECASE=1;
 			OFS=\"\t\";
@@ -90,7 +90,7 @@ search() {
 
 	results_title="$(
 		eval "$conf_find $paths -type f -name '*.html'" | \
-		awk -F'/' \
+		"$conf_awk" -F'/' \
 			"BEGIN {
 				IGNORECASE=1;
 				count=0;
@@ -163,7 +163,7 @@ search() {
 
 		results_text="$(
 			eval "rg -U -S -c '$rg_query' $paths" | \
-			awk -F'/' \
+			"$conf_awk" -F'/' \
 				"BEGIN {
 					count = 0;
 					OFS=\"\t\";
@@ -224,7 +224,7 @@ search() {
 
 	fi
 
-	printf '%s\n%s\n' "$results_title" "$results_text" | awk '!seen[$0] && NF>0 {print} {++seen[$0]};'
+	printf '%s\n%s\n' "$results_title" "$results_text" | "$conf_awk" "!seen[\$0] && NF>0 {print} {++seen[\$0]};"
 
 }
 

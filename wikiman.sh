@@ -1,7 +1,17 @@
 #!/bin/sh
 
+# BSD compatibility: Use GNU find and awk
+
+conf_find='find'
+"$conf_find" -name . >/dev/null 2>/dev/null || \
+	conf_find='gfind'
+
+conf_awk='awk'
+[ "$(echo 'test_string' | "$conf_awk" '/\w/' 2>/dev/null)" = 'test_string' ] || \
+	conf_awk='gawk'
+
 tui_preview() {
-	command="$(echo "$@" | awk -F '\t' \
+	command="$(echo "$@" | "$conf_awk" -F '\t' \
 		"{
 			if (\$3==\"man\") {
 				if (NF==4) {
@@ -43,69 +53,69 @@ init() {
 		echo "warning: configuration file missing, using defaults" 1>&2
 	else
 		conf_sources="$(
-			awk -F '=' '/^[ ,\t]*sources/ {
-				gsub(","," ",$2);
-				gsub(/#.*/,"",$2);
-				gsub(/ +/," ",$2);
-				gsub(" ","",$2);
-				value = $2;
-			}; END { print value }' "$config_file" "$config_file_usr"
+			"$conf_awk" -F '=' "/^[ ,\t]*sources/ {
+				gsub(\",\",\" \",\$2);
+				gsub(/#.*/,\"\",\$2);
+				gsub(/ +/,\" \",\$2);
+				gsub(\" \",\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
 		conf_fuzzy_finder="$(
-			awk -F '=' '/^[ ,\t]*fuzzy_finder/ {
-				gsub(/#.*/,"",$2);
-				gsub(/[ \t]+/,"",$2);
-				value = $2;
-			}; END { print value }' "$config_file" "$config_file_usr"
+			"$conf_awk" -F '=' "/^[ ,\t]*fuzzy_finder/ {
+				gsub(/#.*/,\"\",\$2);
+				gsub(/[ \t]+/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
 		conf_quick_search="$(
-			awk -F '=' '/^[ ,\t]*quick_search/ {
-				gsub(/#.*/,"",$2);
-				gsub(/[ \t]+/,"",$2);
-				value = $2;
-			}; END { print value }' "$config_file" "$config_file_usr"
+			"$conf_awk" -F '=' "/^[ ,\t]*quick_search/ {
+				gsub(/#.*/,\"\",\$2);
+				gsub(/[ \t]+/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
 		conf_raw_output="$(
-			awk -F '=' '/^[ ,\t]*raw_output/ {
-				gsub(/#.*/,"",$2);
-				gsub(/[ \t]+/,"",$2);
-				value = $2;
-			}; END { print value }' "$config_file" "$config_file_usr"
+			"$conf_awk" -F '=' "/^[ ,\t]*raw_output/ {
+				gsub(/#.*/,\"\",\$2);
+				gsub(/[ \t]+/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
 		conf_man_lang="$(
-			awk -F '=' '/^[ ,\t]*man_lang/ {
-				gsub(","," ",$2);
-				gsub(/#.*/,"",$2);
-				value = $2;
-			}; END { print value }' "$config_file" "$config_file_usr"
+			"$conf_awk" -F '=' "/^[ ,\t]*man_lang/ {
+				gsub(\",\",\" \",\$2);
+				gsub(/#.*/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
 		conf_wiki_lang="$(
-			awk -F '=' '/^[ ,\t]*wiki_lang/ {
-				gsub(","," ",$2);
-				gsub(/#.*/,"",$2);
-				value = $2;
-			}; END { print value }' "$config_file" "$config_file_usr"
+			"$conf_awk" -F '=' "/^[ ,\t]*wiki_lang/ {
+				gsub(\",\",\" \",\$2);
+				gsub(/#.*/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
 		conf_tui_preview="$(
-			awk -F '=' '/^[ ,\t]*tui_preview/ {
-				gsub(/#.*/,"",$2);
-				gsub(/[ \t]+/,"",$2);
-				value = $2;
-			}; END { print value }' "$config_file" "$config_file_usr"
+			"$conf_awk" -F '=' "/^[ ,\t]*tui_preview/ {
+				gsub(/#.*/,\"\",\$2);
+				gsub(/[ \t]+/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
 		conf_tui_keep_open="$(
-			awk -F '=' '/^[ ,\t]*tui_keep_open/ {
-				gsub(/#.*/,"",$2);
-				gsub(/[ \t]+/,"",$2);
-				value = $2;
-			}; END { print value }' "$config_file" "$config_file_usr"
+			"$conf_awk" -F '=' "/^[ ,\t]*tui_keep_open/ {
+				gsub(/#.*/,\"\",\$2);
+				gsub(/[ \t]+/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
 		conf_tui_html="$(
-			awk -F '=' '/^[ ,\t]*tui_html/ {
-				gsub(/#.*/,"",$2);
-				gsub(/[ \t]+/,"",$2);
-				value = $2;
-			}; END { print value }' "$config_file" "$config_file_usr"
+			"$conf_awk" -F '=' "/^[ ,\t]*tui_html/ {
+				gsub(/#.*/,\"\",\$2);
+				gsub(/[ \t]+/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
 	fi
 
@@ -118,7 +128,7 @@ init() {
 
 	sources="$(
 		eval "$conf_find $sources_dir_usr $sources_dir -type f 2>/dev/null" | \
-		awk -F '/' \
+		"$conf_awk" -F '/' \
 			"BEGIN {OFS=\"\t\"} {
 				path = \$0;
 				name = \$NF;
@@ -135,11 +145,11 @@ init() {
 		exit 3
 	fi
 
-	modules="$(echo "$sources" | awk -F '\t' '{print $1}')"
+	modules="$(echo "$sources" | "$conf_awk" -F '\t' "{print \$1}")"
 	available_sources=""
 
 	for mod in $modules; do
-		module_path="$(echo "$sources" | awk -F '\t' "\$1==\"$mod\" {print \$2}")"
+		module_path="$(echo "$sources" | "$conf_awk" -F '\t' "\$1==\"$mod\" {print \$2}")"
 		if "$module_path" available; then
 			available_sources="$available_sources $(basename "$module_path" | cut -d'.' -f1)"
 		fi
@@ -167,6 +177,7 @@ init() {
 	export conf_tui_keep_open
 	export conf_tui_html
 	export conf_find
+	export conf_awk
 
 }
 
@@ -174,18 +185,15 @@ combine_results() {
 
 	all_results="$(
 		printf '%s' "$all_results" | \
-		awk -F '\t' \
-			'BEGIN {
-				OFS="\t"
+		"$conf_awk" -F '\t' \
+			"BEGIN {
+				OFS=\"\t\"
 				count = 0;
 			};
 			NF>0 {
-				source = $3;
+				source = \$3;
 				srcc[source]++;
-				# print source, srcc[source], $0;
-				
-				src[source,srcc[source]] = $0;
-				
+				src[source,srcc[source]] = \$0;
 				count++;
 			};
 			END {
@@ -201,7 +209,7 @@ combine_results() {
 							i++;
 						}
 					}
-			};'
+			};"
 	)"
 
 }
@@ -229,7 +237,7 @@ picker_tui() {
 
 	command="$(
 		echo "$choice" | \
-			awk -F '\t' "{
+			"$conf_awk" -F '\t' "{
 				if (\$3==\"man\") {
 					if (NF==4) {
 						printf(\"man -l %s\",\$4);
@@ -282,22 +290,18 @@ Options:
 
 sources() {
 
-	modules="$(echo "$sources" | awk -F '\t' '{print $1}')"
+	modules="$(echo "$sources" | "$conf_awk" -F '\t' '{print $1}')"
 
 	if [ "$modules" != '' ]; then
 		printf '%-10s %5s %6s  %s\n' 'NAME' 'STATE' 'PAGES' 'PATH'
 	fi
 
 	for mod in $modules; do
-		module_path="$(echo "$sources" | awk -F '\t' "\$1==\"$mod\" {print \$2}")"
+		module_path="$(echo "$sources" | "$conf_awk" -F '\t' "\$1==\"$mod\" {print \$2}")"
 		"$module_path" info
 	done
 
 }
-
-# BSD compatibility: Use gfind instead of find
-conf_find='find'
-"$conf_find" -name . >/dev/null 2>/dev/null || conf_find='gfind'
 
 init
 
@@ -328,7 +332,7 @@ done
 shift "$((OPTIND - 1))"
 
 # Dependency check
-dependencies="man rg awk $conf_tui_html $conf_fuzzy_finder $conf_find"
+dependencies="man rg $conf_awk $conf_tui_html $conf_fuzzy_finder $conf_find"
 
 for dep in $dependencies; do
 	which "$dep" >/dev/null 2>/dev/null || {
@@ -362,7 +366,7 @@ fi
 
 for src in $conf_sources; do
 
-	module_path="$(echo "$sources" | awk -F '\t' "\$1==\"$src\" {print \$2}")"
+	module_path="$(echo "$sources" | "$conf_awk" -F '\t' "\$1==\"$src\" {print \$2}")"
 
 	if [ -z "$module_path" ]; then
 		echo "error: source '$src' does not exist" 1>&2

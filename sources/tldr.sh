@@ -13,7 +13,7 @@ info() {
 
 	if available; then
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "+")"
-		count="$("$conf_find" "$path" -type f | wc -l)"
+		count="$("$conf_find" "$path" -type f | wc -l | sed 's| ||g')"
 		printf '%-10s %3s %8i  %s\n' "$name" "$state" "$count" "$path"
 	else
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "x")"
@@ -57,7 +57,7 @@ setup() {
 		fi
 	done
 
-	if [ "$(echo "$paths" | wc -w)" = '0' ]; then
+	if [ "$(echo "$paths" | wc -w | sed 's| ||g')" = '0' ]; then
 		return 1
 	fi
 

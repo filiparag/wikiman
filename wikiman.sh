@@ -15,7 +15,7 @@ tui_preview() {
 		"{
 			if (\$3==\"man\") {
 				if (NF==4) {
-					printf(\"man -l %s\",\$4);
+					printf(\"man %s\",\$4);
 				} else {
 					sec=\$1
 					gsub(/.*\(/,\"\",sec);
@@ -220,8 +220,8 @@ picker_tui() {
 		preview="--preview 'WIKIMAN_TUI_PREVIEW=1 wikiman {}'"
 	fi
 
-	if [ "$(echo "$conf_man_lang" | wc -w)" = '1' ] && \
-		[ "$(echo "$conf_wiki_lang" | wc -w)" = '1' ]; then
+	if [ "$(echo "$conf_man_lang" | wc -w | sed 's| ||g')" = '1' ] && \
+		[ "$(echo "$conf_wiki_lang" | wc -w | sed 's| ||g')" = '1' ]; then
 		columns='1'
 	else
 		columns='2,1'
@@ -240,7 +240,7 @@ picker_tui() {
 			"$conf_awk" -F '\t' "{
 				if (\$3==\"man\") {
 					if (NF==4) {
-						printf(\"man -l %s\",\$4);
+						printf(\"man %s\",\$4);
 					} else {
 						sec=\$1
 						gsub(/.*\(/,\"\",sec);
@@ -290,7 +290,7 @@ Options:
 
 sources() {
 
-	modules="$(echo "$sources" | "$conf_awk" -F '\t' '{print $1}')"
+	modules="$(echo "$sources" | "$conf_awk" -F '\t' "{print \$1}")"
 
 	if [ "$modules" != '' ]; then
 		printf '%-10s %5s %6s  %s\n' 'NAME' 'STATE' 'PAGES' 'PATH'

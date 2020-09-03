@@ -13,7 +13,7 @@ info() {
 
 	if available; then
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "+")"
-		count="$("$conf_find" "$path" -type f | wc -l)"
+		count="$("$conf_find" "$path" -type f | wc -l | sed 's| ||g')"
 		printf '%-10s %3s %8i  %s\n' "$name" "$state" "$count" "$path"
 	else
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "x")"
@@ -40,7 +40,7 @@ get_man_path() {
 		eval "$conf_find $man_default_paths -maxdepth 0 -printf '%p '" 2>/dev/null
 	)"
 
-	[ "$(echo "$man_search_paths" | wc -w)" -gt 0 ]
+	[ "$(echo "$man_search_paths" | wc -w | sed 's| ||g')" -gt 0 ]
 
 }
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env dash
 #!/bin/sh
 
 tui_preview() {
@@ -180,28 +179,27 @@ combine_results() {
 				count = 0;
 			};
 			NF>0 {
-				if (length(sc[$3])==0)
-					sc[$3] = 0;
-
-				sources[$3,sc[$3],0] = $1;
-				sources[$3,sc[$3],1] = $2;
-				sources[$3,sc[$3],2] = $4;
-
-				sc[$3]++;
+				source = $3;
+				srcc[source]++;
+				# print source, srcc[source], $0;
+				
+				src[source,srcc[source]] = $0;
+				
 				count++;
 			};
 			END {
-				for (s in sc)
-					sc2[s] = sc[s];
-				i=0;
-				while (i<count-1)
-					for (s in sc)
-						if (sc[s]>0) {
-							si = sc2[s]-sc[s];
-							print sources[s,si,0], sources[s,si,1], s, sources[s,si,2];
-							sc[s]--;
+				for (s in srcc)
+					srco[s] = srcc[s];
+				i = 0;
+				while (i<count)
+					for (s in srcc) {
+						if (srcc[s]>0) {
+							ind = srco[s]-srcc[s]+1;
+							print src[s,ind];
+							srcc[s]--;
 							i++;
 						}
+					}
 			};'
 	)"
 

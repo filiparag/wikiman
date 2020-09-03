@@ -184,7 +184,7 @@ search() {
 				}; END { print \"\n\"};"
 			)"
 			results_desc="$(
-				printf '%s\n%s' "$results_desc" "$res"
+				printf '%s\n%s\n' "$results_desc" "$res"
 			)"
 		done
 
@@ -192,12 +192,7 @@ search() {
 
 	# Remove duplicates
 
-	results="$(
-		printf '%s\n%s' "$results_name" "$results_desc" | \
-		awk '!seen[$1$2$3] && NF>0 {print} {++seen[$1$2$3]};'
-	)"
-
-	printf '%s\n' "$results"
+	printf '%s\n%s' "$results_name" "$results_desc" | awk '!seen[$1$2$3]++ && NF>0'
 
 }
 

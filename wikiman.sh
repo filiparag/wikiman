@@ -110,6 +110,13 @@ init() {
 				value = \$2;
 			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
+		conf_tui_source_column="$(
+			"$conf_awk" -F '=' "/^[ ,\t]*tui_source_column/ {
+				gsub(/#.*/,\"\",\$2);
+				gsub(/[ \t]+/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
+		)"
 		conf_tui_html="$(
 			"$conf_awk" -F '=' "/^[ ,\t]*tui_html/ {
 				gsub(/#.*/,\"\",\$2);
@@ -165,6 +172,7 @@ init() {
 	conf_wiki_lang="${conf_wiki_lang:-en}"
 	conf_tui_preview="${conf_tui_preview:-true}"
 	conf_tui_keep_open="${conf_tui_keep_open:-false}"
+	conf_tui_source_column="${conf_tui_source_column:-false}"
 	conf_tui_html="${conf_tui_html:-w3m}"
 
 	export conf_sources
@@ -175,6 +183,7 @@ init() {
 	export conf_wiki_lang
 	export conf_tui_preview
 	export conf_tui_keep_open
+	export conf_tui_source_column
 	export conf_tui_html
 	export conf_find
 	export conf_awk
@@ -220,11 +229,15 @@ picker_tui() {
 		preview="--preview 'WIKIMAN_TUI_PREVIEW=1 wikiman {}'"
 	fi
 
+	if [ "$conf_tui_source_column" = 'true' ]; then
+		source_column='3,'
+	fi
+
 	if [ "$(echo "$conf_man_lang" | wc -w | sed 's| ||g')" = '1' ] && \
 		[ "$(echo "$conf_wiki_lang" | wc -w | sed 's| ||g')" = '1' ]; then
-		columns='1'
+		columns="${source_column}1"
 	else
-		columns='2,1'
+		columns="${source_column},2,1"
 	fi
 
 	choice="$(
@@ -277,6 +290,8 @@ Options:
 
   -k  keep open after viewing a result
 
+  -c  show source column
+
   -H  viewer for HTML pages
 
   -R  print raw output
@@ -305,7 +320,7 @@ sources() {
 
 init
 
-while getopts l:s:H:f:pqhRSk o; do
+while getopts l:s:H:f:pqhRSkc o; do
   case $o in
 	(p) conf_tui_preview='false';;
 	(H) conf_tui_html="$OPTARG";;
@@ -322,6 +337,7 @@ while getopts l:s:H:f:pqhRSk o; do
 	(f) conf_fuzzy_finder="$OPTARG";;
 	(q) conf_quick_search='true';;
 	(R) conf_raw_output='true';;
+	(c) conf_tui_source_column='true';;
 	(S) sources;
 		exit;;
 	(h) help;

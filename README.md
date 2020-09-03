@@ -58,7 +58,7 @@ make
 sudo make install
 ```
 
-Wikiman uses GNU `find`, so BSD users have to install `findutils` package.
+Wikiman uses GNU `find` and `awk`, so BSD users have to install `findutils` and `gawk`.
 
 ### Installing additional sources
 
@@ -127,6 +127,8 @@ If no keywords are provided, show all pages.
 
 - `-k` keep open after viewing a result
 
+- `-c` show source column
+
 - `-H` viewer for HTML pages
 
     Default: *w3m*
@@ -152,6 +154,9 @@ Example configuration file:
 # Sources (if empty, use all available)
 sources = man, arch
 
+# Fuzzy finder
+fuzzy_finder = sk
+
 # Quick search mode (only by title)
 quick_search = true
 
@@ -170,11 +175,11 @@ tui_preview = false
 # Keep open after viewing a result
 tui_keep_open = true
 
+# Show source column
+tui_source_column = true
+
 # Viewer for HTML pages
 tui_html = xdg-open
-
-# Fuzzy finder
-fuzzy_finder = fzf
 ```
 
 To list available languages, run these commands:

@@ -77,6 +77,7 @@ show source column
 .B -H
 .br
 viewer for HTML pages
+.br
 default: w3m
 
 .HP

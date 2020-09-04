@@ -1,6 +1,6 @@
 Name:           wikiman
-Version:        2.11.1
-Release:        1%{?dist}
+Version:        BUILDER_PKGVER
+Release:        BUILDER_PKGREL%{?dist}
 Summary:        Offline interactive documentation search
 BuildArch:      noarch
 License:        MIT
@@ -9,7 +9,8 @@ Source0:        %{version}.tar.gz
 Obsoletes:      %{name} <= %{version}-%{release}
 Provides:       %{name} = %{version}-%{release}
 BuildRequires:  make
-Requires:       which man fzf ripgrep gawk w3m
+Requires:       which man fzf ripgrep gawk w3m findutils
+AutoReq:        no
 
 %description
 Offline search engine for manual pages, Arch Wiki, Gentoo Wiki and other documentation.
@@ -25,13 +26,13 @@ make prefix=%{buildroot} install
 %doc README.md
 %license LICENSE
 /usr/bin/%{name}
-/usr/share/wikiman/sources/man.sh
-/usr/share/wikiman/sources/arch.sh
-/usr/share/wikiman/sources/gentoo.sh
-/usr/share/wikiman/sources/fbsd.sh
-/usr/share/wikiman/sources/tldr.sh
-/usr/share/wikiman/widgets/widget.bash
-/usr/share/wikiman/widgets/widget.fish
-/usr/share/wikiman/widgets/widget.zsh
+/usr/share/%{name}/sources/man.sh
+/usr/share/%{name}/sources/arch.sh
+/usr/share/%{name}/sources/gentoo.sh
+/usr/share/%{name}/sources/fbsd.sh
+/usr/share/%{name}/sources/tldr.sh
+/usr/share/%{name}/widgets/widget.bash
+/usr/share/%{name}/widgets/widget.fish
+/usr/share/%{name}/widgets/widget.zsh
 /usr/share/man/man1/%{name}.1.gz
 %config(noreplace) /etc/%{name}.conf

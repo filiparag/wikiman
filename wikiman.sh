@@ -3,7 +3,7 @@
 # BSD compatibility: Use GNU find and awk
 
 conf_find='find'
-"$conf_find" -name . >/dev/null 2>/dev/null || \
+"$conf_find" /dev -name null >/dev/null 2>/dev/null || \
 	conf_find='gfind'
 
 conf_awk='awk'

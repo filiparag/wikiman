@@ -1,7 +1,10 @@
-Package: wikiman
-Version: 2.11
-Maintainer: Filip Parag <filip@parag.rs>
-Description: Offline search engine for manual pages, Arch Wiki, Gentoo Wiki and other documentation.
-Homepage: https://github.com/filiparag/wikiman
-Architecture: all
-Depends: man, fzf, ripgrep, gawk, w3m
+Package:        wikiman
+Version:        BUILDER_PKGVER
+Maintainer:     Filip Parag <filip@parag.rs>
+Description:    Offline search engine for manual pages, Arch Wiki, Gentoo Wiki and other documentation.
+Section:        utils
+Vcs-Browser:    https://github.com/filiparag/wikiman
+Vcs-Git:        git://github.com/filiparag/wikiman.git
+Homepage:       https://github.com/filiparag/wikiman
+Architecture:   all
+Depends:        man, fzf, ripgrep, gawk, w3m

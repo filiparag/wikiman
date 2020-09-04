@@ -1,0 +1,5 @@
+*
+!.gitignore
+!docker-compose.yml
+!.env
+!aur

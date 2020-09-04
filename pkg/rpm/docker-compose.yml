@@ -6,16 +6,16 @@ services:
     volumes:
       - '.:/pkg'
     command: bash -c "
-      echo Building wikiman-${RELEASE}... &&
+      echo Building wikiman-${PKGVER}-${PKGREL} for Fedora... &&
       echo 'max_parallel_downloads=10' >> /etc/dnf/dnf.conf &&
       dnf install -y rpm-build make wget &&
       mkdir -p ~/rpmbuild/SOURCES &&
       mkdir -p ~/rpmbuild/SPECS &&
-      wget https://github.com/filiparag/wikiman/archive/${RELEASE}.tar.gz -P ~/rpmbuild/SOURCES &&
+      wget https://github.com/filiparag/wikiman/archive/${PKGVER}.tar.gz -P ~/rpmbuild/SOURCES &&
       sed 's|BUILDER_PKGVER|${PKGVER}|g; s|BUILDER_PKGREL|${PKGREL}|g' /pkg/.spec > ~/rpmbuild/SPECS/wikiman.spec &&
       rpmbuild -bb ~/rpmbuild/SPECS/wikiman.spec &&
-      mv ~/rpmbuild/RPMS/noarch/wikiman-${PKGVER}-{PKGREL}.fc32.noarch.rpm /pkg &&
-      chown ${UID}:${UID} /pkg/wikiman-${PKGVER}-{PKGREL}.fc32.noarch.rpm &&
+      mv ~/rpmbuild/RPMS/noarch/wikiman-${PKGVER}-${PKGREL}.fc32.noarch.rpm /pkg &&
+      chown ${UID}:${UID} /pkg/wikiman-${PKGVER}-${PKGREL}.fc32.noarch.rpm &&
       echo Build completed successfully!
       "
     # command: tail -F /dev/null

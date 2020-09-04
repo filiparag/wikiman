@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  builder:
+    image: archlinux:latest
+    volumes:
+      - '.:/pkg'
+    command: >
+      bash -c "
+      echo Building wikiman-${PKGVER}-${PKGREL} for Arch Linux... &&
+      pacman -Sy --noconfirm git make binutils fakeroot &&
+      git clone https://aur.archlinux.org/wikiman.git &&
+      useradd -u ${UID} builder &&
+      chown builder:builder ./wikiman &&
+      cd ./wikiman &&
+      su builder -c 'makepkg -d' &&
+      mv wikiman-${PKGVER}-${PKGREL}-any.pkg.tar.xz /pkg &&
+      chown ${UID}:${UID} /pkg/wikiman-${PKGVER}-${PKGREL}-any.pkg.tar.xz &&
+      echo Build completed successfully!
+      "
+    # command: tail -F /dev/null

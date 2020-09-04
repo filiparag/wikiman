@@ -1,3 +1,3 @@
-[submodule "pkg/aur"]
-	path = 	pkg/aur
+[submodule "aur"]
+	path = 	pkg/arch/aur
 	url = 	ssh://aur.archlinux.org/wikiman.git

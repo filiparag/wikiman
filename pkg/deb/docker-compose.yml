@@ -6,7 +6,7 @@ services:
     volumes:
       - '.:/pkg'
     command: bash -c "
-      echo Building wikiman-${PKGVER}... &&
+      echo Building wikiman-${PKGVER}-${PKGREL} for Debian... 
       apt update &&
       apt -y install wget make &&
       wget https://github.com/filiparag/wikiman/archive/${PKGVER}.tar.gz &&

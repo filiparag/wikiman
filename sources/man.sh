@@ -1,11 +1,20 @@
 #!/bin/sh
 
 name='man'
-path='/usr/share/man'
+path="$(manpath | tr ':' ' ')"
 
 available() {
 
 	[ -d "$path" ]
+	command="$(
+		echo "$path" | "$conf_awk" -F ' ' \
+		"{
+			for(i=1;i<=NF;i++)
+				out = out ((i>1)?\" || \":\"\") \"[ -d '\" \$i \"' ]\";
+		}; END { print out; }"
+	)"
+
+	eval "$command"
 
 }
 
@@ -13,7 +22,7 @@ info() {
 
 	if available; then
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "+")"
-		count="$("$conf_find" "$path" -type f | wc -l | sed 's| ||g')"
+		count="$(eval "$conf_find $path -type f" | wc -l | sed 's| ||g')"
 		printf '%-10s %3s %8i  %s\n' "$name" "$state" "$count" "$path"
 	else
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "x")"

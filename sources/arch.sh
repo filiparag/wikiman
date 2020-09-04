@@ -1,7 +1,7 @@
 #!/bin/sh
 
 name='arch'
-path='/usr/share/doc/arch-wiki/html'
+path="$conf_sys_usr/share/doc/arch-wiki/html"
 
 available() {
 

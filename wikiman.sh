@@ -38,10 +38,29 @@ fi
 
 init() {
 
+	# BSD compatibility: Installation prefix
+
+	case $(dirname "$0") in
+		'/usr/bin')
+			conf_sys_usr='/usr';
+			conf_sys_etc='/etc';;
+		'/usr/local/bin')
+			conf_sys_usr='/usr/local';
+			conf_sys_etc='/usr/local/etc';;
+		*)
+			echo 'error: unsupported installation path' 1>&2;
+			exit 5;;
+	esac
+
+	export conf_find
+	export conf_awk
+	export conf_sys_usr
+	export conf_sys_etc
+
 	# Configuration variables
 
 	config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
-	config_file="/etc/wikiman.conf"
+	config_file="$conf_sys_etc/wikiman.conf"
 	config_file_usr="$config_dir/wikiman.conf"
 
 	[ -f "$config_file" ] && [ -r "$config_file" ] || \
@@ -129,11 +148,11 @@ init() {
 
 	# Widgets
 
-	widgets_dir='/usr/share/wikiman/widgets'
+	widgets_dir="$conf_sys_usr/share/wikiman/widgets"
 
 	# Sources
 
-	sources_dir='/usr/share/wikiman/sources'
+	sources_dir="$conf_sys_usr/share/wikiman/sources"
 	sources_dir_usr="$config_dir/sources"
 
 	# Detect source modules
@@ -190,8 +209,6 @@ init() {
 	export conf_tui_keep_open
 	export conf_tui_source_column
 	export conf_tui_html
-	export conf_find
-	export conf_awk
 
 }
 

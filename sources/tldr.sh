@@ -1,7 +1,7 @@
 #!/bin/sh
 
 name='tldr'
-path='/usr/share/doc/tldr-pages'
+path="$conf_sys_usr/share/doc/tldr-pages"
 
 available() {
 

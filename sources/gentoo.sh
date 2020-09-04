@@ -1,7 +1,7 @@
 #!/bin/sh
 
 name='gentoo'
-path='/usr/share/doc/gentoo-wiki/wiki'
+path="$conf_sys_usr/share/doc/gentoo-wiki/wiki"
 
 available() {
 

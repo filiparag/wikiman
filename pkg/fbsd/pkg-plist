@@ -1,0 +1,12 @@
+bin/wikiman
+etc/wikiman.conf
+man/man1/wikiman.1.gz
+share/doc/wikiman/README.md
+share/wikiman/sources/arch.sh
+share/wikiman/sources/fbsd.sh
+share/wikiman/sources/gentoo.sh
+share/wikiman/sources/man.sh
+share/wikiman/sources/tldr.sh
+share/wikiman/widgets/widget.bash
+share/wikiman/widgets/widget.fish
+share/wikiman/widgets/widget.zsh

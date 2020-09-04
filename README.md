@@ -143,7 +143,7 @@ If no keywords are provided, show all pages.
 
 - `-h` display this help and exit
 
-### Shell keybind plugins
+### Shell keybind widgets
 
 Wikiman can be launched using a shell key binding (default: `Ctrl+F`).
 Current command line buffer will be used as a search query.

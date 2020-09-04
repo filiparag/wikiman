@@ -4,21 +4,20 @@ services:
   builder:
     image: ubuntu:latest
     volumes:
-      - '.:/pkg'
-    command: bash -c "
-      echo Building wikiman-${PKGVER}-${PKGREL} for Debian... 
-      apt update &&
-      apt -y install wget make &&
-      wget https://github.com/filiparag/wikiman/archive/${PKGVER}.tar.gz &&
-      tar zxf ${PKGVER}.tar.gz &&
-      cd wikiman-${PKGVER} &&
-      make all &&
-      mkdir -p ./pkgbuild/DEBIAN &&
-      cp /pkg/conffiles ./pkgbuild/DEBIAN &&
-      sed 's|BUILDER_PKGVER|${PKGVER}-${PKGREL}|g' /pkg/control > ./pkgbuild/DEBIAN/control &&
-      dpkg -b ./pkgbuild ./wikiman-${PKGVER}-${PKGREL}_any.deb &&
-      mv ./wikiman-${PKGVER}-${PKGREL}_any.deb /pkg &&
-      chown ${UID}:${UID} /pkg/wikiman-${PKGVER}-${PKGREL}_any.deb &&
-      echo Build completed successfully!
+      - ../release:/release:rw
+      - .:/pkg:ro
+      - ../..:/src:ro
+    command: >
+      bash -c "
+        echo Building wikiman-${PKGVER}-${PKGREL} for Ubuntu... &&
+        apt update &&
+        apt -y install make &&
+        cp -arp /src ~/wikiman &&
+        cd ~/wikiman &&
+        make all &&
+        mkdir -p ./pkgbuild/DEBIAN &&
+        cp /pkg/conffiles ./pkgbuild/DEBIAN &&
+        sed 's|BUILDER_PKGVER|${PKGVER}-${PKGREL}|g' /pkg/control > ./pkgbuild/DEBIAN/control &&
+        dpkg -b ./pkgbuild /release/wikiman-${PKGVER}-${PKGREL}_any.deb &&
+        echo Build completed successfully!
       "
-    # command: tail -F /dev/null

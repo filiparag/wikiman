@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  builder:
+    image: fedora:latest
+    volumes:
+      - '.:/pkg'
+    command: bash -c "
+      echo Building wikiman-${RELEASE}... &&
+      dnf install -y rpm-build make wget &&
+      mkdir -p ~/rpmbuild/SOURCES &&
+      wget https://github.com/filiparag/wikiman/archive/${RELEASE}.tar.gz -P ~/rpmbuild/SOURCES &&
+      cd /pkg &&
+      rpmbuild -bb .spec &&
+      mv ~/rpmbuild/RPMS/noarch/*.rpm /pkg &&
+      chown ${UID}:${UID} /pkg/*.rpm &&
+      echo Build completed successfully!
+      "

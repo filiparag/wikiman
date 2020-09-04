@@ -1,3 +1,5 @@
 *
 !.spec
 !.gitignore
+!docker-compose.yml
+!.env

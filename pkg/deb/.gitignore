@@ -1,3 +1,5 @@
 *
 !.gitignore
-!wikiman/DEBIAN/control
+!control
+!docker-compose.yml
+!.env

@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  builder:
+    image: ubuntu:latest
+    volumes:
+      - '.:/pkg'
+    command: bash -c "
+      echo Building wikiman-${RELEASE}... &&
+      apt update &&
+      apt -y install wget make &&
+      wget https://github.com/filiparag/wikiman/archive/${RELEASE}.tar.gz &&
+      tar zxf ${RELEASE}.tar.gz &&
+      cd wikiman-${RELEASE} &&
+      make all &&
+      mkdir -p ./pkgbuild/DEBIAN &&
+      cp /pkg/control ./pkgbuild/DEBIAN &&
+      dpkg -b ./pkgbuild ./wikiman-${RELEASE}-1_any.deb &&
+      mv ./wikiman-${RELEASE}-1_any.deb /pkg &&
+      chown ${UID}:${UID} /pkg/wikiman-${RELEASE}-1_any.deb &&
+      echo Build completed successfully!
+      "

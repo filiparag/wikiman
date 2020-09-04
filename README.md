@@ -45,6 +45,14 @@ Download latest *.rpm* package from [Releases](https://github.com/filiparag/wiki
 sudo dnf install wikiman-*.rpm
 ```
 
+### FreeBSD
+
+Download latest *.txz* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
+
+```bash
+doas pkg install wikiman-*.txz
+```
+
 ### Manual installation for Linux and BSD
 
 Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`

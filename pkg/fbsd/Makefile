@@ -32,7 +32,7 @@ do-install:
 			 ${STAGEDIR}${MANPREFIX}/man/man1
 
 	${INSTALL_SCRIPT} ${WRKSRC}/wikiman.sh ${STAGEDIR}${PREFIX}/bin/wikiman
-	(cd ${WRKSRC}/sources && ${COPYTREE_SHARE} . ${STAGEDIR}${PREFIX}/share/wikiman/sources)
+	(cd ${WRKSRC}/sources && ${COPYTREE_BIN} . ${STAGEDIR}${PREFIX}/share/wikiman/sources)
 	
 	gzip ${WRKSRC}/wikiman.1.man
 	${INSTALL_MAN} ${WRKSRC}/wikiman.1.man.gz ${STAGEDIR}${MANPREFIX}/man/man1/wikiman.1.gz
@@ -50,6 +50,6 @@ do-install-CONFIG-on:
 do-install-WIDGETS-on:
 
 	${MKDIR} ${STAGEDIR}${PREFIX}/share/wikiman/widgets
-	(cd ${WRKSRC}/widgets && ${COPYTREE_SHARE} . ${STAGEDIR}${PREFIX}/share/wikiman/widgets)
+	(cd ${WRKSRC}/widgets && ${COPYTREE_BIN} . ${STAGEDIR}${PREFIX}/share/wikiman/widgets)
 
 .include <bsd.port.mk>

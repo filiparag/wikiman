@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=		wikiman
-DISTVERSION=	2.11.2
+DISTVERSION=	2.11.3
 PORTREVISION=	1
 CATEGORIES=		misc
 
@@ -21,10 +21,11 @@ USE_GITHUB=		yes
 GH_ACCOUNT=		filiparag
 GH_TAG=			
 
-OPTIONS_DEFINE=	DOCS CONFIG WIDGETS
-OPTIONS_DEFAULT=DOCS CONFIG
+OPTIONS_DEFINE=	DOCS CONFIG WDGTS COMPLT
+OPTIONS_DEFAULT=DOCS CONFIG WDGTS COMPLT
 CONFIG_DESC=	Global configuration file
-WIDGETS_DESC=	Shell keybind widgets
+WDGTS_DESC=		Shell keybind widgets
+COMPLT_DESC=	Shell completions for fish and zsh
 
 do-install:
 
@@ -47,9 +48,15 @@ do-install-CONFIG-on:
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc
 	${INSTALL_DATA} ${WRKSRC}/wikiman.conf ${STAGEDIR}${PREFIX}/etc
 
-do-install-WIDGETS-on:
+do-install-WDGTS-on:
 
 	${MKDIR} ${STAGEDIR}${PREFIX}/share/wikiman/widgets
 	(cd ${WRKSRC}/widgets && ${COPYTREE_BIN} . ${STAGEDIR}${PREFIX}/share/wikiman/widgets)
+
+do-install-COMPLT-on:
+
+	${MKDIR} ${STAGEDIR}${PREFIX}/share/fish/completions ${STAGEDIR}${PREFIX}/share/zsh/site-functions
+	${INSTALL_DATA} ${WRKSRC}/completions/completions.fish ${STAGEDIR}${PREFIX}/share/fish/completions/wikiman.fish
+	${INSTALL_DATA} ${WRKSRC}/completions/completions.zsh ${STAGEDIR}${PREFIX}/share/zsh/site-functions/_wikiman
 
 .include <bsd.port.mk>

@@ -10,3 +10,5 @@ share/wikiman/sources/tldr.sh
 share/wikiman/widgets/widget.bash
 share/wikiman/widgets/widget.fish
 share/wikiman/widgets/widget.zsh
+share/fish/completions/wikiman.fish
+share/zsh/site-functions/_wikiman

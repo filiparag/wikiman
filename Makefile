@@ -6,10 +6,14 @@ RELEASE=	1
 UPSTREAM=	https://github.com/filiparag/wikiman
 SOURCES= 	${UPSTREAM}/releases/download/
 
-WORKDIR:= 	$(shell dirname ${MAKEFILE_LIST})
 BUILDDIR:=	${WORKDIR}/pkgbuild
 SOURCESDIR:=${WORKDIR}/srcbuild
 PLISTFILE:=	${WORKDIR}/pkg-plist
+
+MKFILEREL!=	echo ${.MAKE.MAKEFILES} | sed 's/.* //'
+MKFILEABS!=	readlink -f ${MKFILEREL} 2>/dev/null
+MKFILEABS+= $(shell readlink -f ${MAKEFILE_LIST})
+WORKDIR!=	dirname ${MKFILEABS} 2>/dev/null
 
 usr?=		usr
 etc?=		etc

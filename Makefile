@@ -1,5 +1,3 @@
-.POSIX:
-
 NAME=		wikiman
 VERSION=	2.11
 RELEASE=	1
@@ -19,33 +17,52 @@ usr?=		usr
 etc?=		etc
 man?=		usr/share
 
-all: ${WORKDIR}/${NAME}.sh ${WORKDIR}/${NAME}.1.man ${WORKDIR}/${NAME}.conf ${WORKDIR}/LICENSE ${WORKDIR}/README.md ${WORKDIR}/sources/ ${WORKDIR}/widgets/
+all: core widgets completions config docs
 
-	@mkdir -p 	${BUILDDIR}/${usr}/share/${NAME} \
+core:
+
+	@mkdir -p	${BUILDDIR}/${usr}/bin \
+	 			${BUILDDIR}/${usr}/share/${NAME} \
 				${BUILDDIR}/${usr}/share/licenses/${NAME} \
-				${BUILDDIR}/${usr}/share/doc/${NAME} \
-				${BUILDDIR}/${man}/man/man1 \
-				${BUILDDIR}/${usr}/bin \
-				${BUILDDIR}/${etc}
-	@install 	-Dm755 	${WORKDIR}/${NAME}.sh 	$(BUILDDIR)/${usr}/bin/${NAME}
+				${BUILDDIR}/${man}/man/man1
+	@install 	-Dm755 	${WORKDIR}/${NAME}.sh 	${BUILDDIR}/${usr}/bin/${NAME}
 	@cp 		-fr 	${WORKDIR}/sources 		${BUILDDIR}/${usr}/share/${NAME}
-	@cp 		-fr 	${WORKDIR}/widgets 		${BUILDDIR}/${usr}/share/${NAME}
-	@install 	-Dm644 	${WORKDIR}/${NAME}.conf ${BUILDDIR}/${etc}
-	@install 	-Dm644 	${WORKDIR}/LICENSE 		${BUILDDIR}/${usr}/share/licenses/${NAME} 
-	@install 	-Dm644 	${WORKDIR}/README.md 	${BUILDDIR}/${usr}/share/doc/wikiman 
+	@install 	-Dm644 	${WORKDIR}/LICENSE 		${BUILDDIR}/${usr}/share/licenses/${NAME}
 	@gzip 		-k		${WORKDIR}/${NAME}.1.man
 	@mv 		${WORKDIR}/${NAME}.1.man.gz		${BUILDDIR}/${man}/man/man1/${NAME}.1.gz
+
+widgets: core
+
+	@mkdir -p 	${BUILDDIR}/${usr}/share/${NAME}
+	@cp 		-fr 	${WORKDIR}/widgets 		${BUILDDIR}/${usr}/share/${NAME}
+
+completions: core
+
+	@mkdir -p 	${BUILDDIR}/${usr}/share/fish/completions \
+				${BUILDDIR}/${usr}/share/zsh/site-functions
+	@install 	-Dm644 	${WORKDIR}/completions/completions.fish	${BUILDDIR}/${usr}/share/fish/completions/${NAME}.fish
+	@install 	-Dm644 	${WORKDIR}/completions/completions.zsh	${BUILDDIR}/${usr}/share/fish/completions/_${NAME}
+
+config:
+
+	@mkdir -p 	${BUILDDIR}/${etc}
+	@install 	-Dm644 	${WORKDIR}/${NAME}.conf ${BUILDDIR}/${etc}
+
+docs:
+
+	@mkdir -p 	${BUILDDIR}/${usr}/share/doc/${NAME}
+	@install 	-Dm644 	${WORKDIR}/README.md 	${BUILDDIR}/${usr}/share/doc/wikiman
 
 reinstall: install
 install: all
 
-	@mkdir -p $(prefix)/
-	@cp -fr ${BUILDDIR}/* $(prefix)/
+	@mkdir -p 	$(prefix)/
+	@cp -fr 	${BUILDDIR}/* $(prefix)/
 	
-plist: all ${BUILDDIR}
+plist: all
 
-	@find ${BUILDDIR} -type f > ${PLISTFILE}
-	@sed -i 's|${BUILDDIR}/||' ${PLISTFILE}
+	@find 		${BUILDDIR} -type f > ${PLISTFILE}
+	@sed -i 	's|${BUILDDIR}/||' ${PLISTFILE}
 
 dist: package
 package: all
@@ -70,35 +87,56 @@ uninstall:
 			$(prefix)/${usr}/share/licenses/${NAME} \
 			$(prefix)/${usr}/share/doc/${NAME}
 
-source-install: ${SOURCESDIR}/${usr}/share/doc
+.PHONY: help
+help:
 
-	@mkdir -p $(prefix)/
-	@cp -rf ${SOURCESDIR}/* $(prefix)/
+	@sed -n '/^[-a-z]\+:/p;' ${MKFILEABS}
 
-source-arch:
+source:
 
-	@mkdir -p ${SOURCESDIR}/tmp ${SOURCESDIR}/${usr}/share/doc
-	@curl -L '${SOURCES}/2.9/arch-wiki_20200903.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
-	@tar xf ${SOURCESDIR}/tmp/arch.tar.xz -C ${SOURCESDIR}
-	@rm -f ${SOURCESDIR}/tmp/arch.tar.xz
+	@mkdir -p 	${SOURCESDIR}/${usr}/share/doc \
+				${SOURCESDIR}/tmp
 
-source-gentoo:
+source-all: source-arch source-gentoo source-fbsd source-tldr
 
-	@mkdir -p ${SOURCESDIR}/tmp ${SOURCESDIR}/${usr}/share/doc
-	@curl -L '${SOURCES}/2.7/gentoo-wiki_20200831-1.tar.xz' -o ${SOURCESDIR}/tmp/gentoo.tar.xz
-	@tar xf ${SOURCESDIR}/tmp/gentoo.tar.xz -C ${SOURCESDIR}
-	@rm -f ${SOURCESDIR}/tmp/gentoo.tar.xz
+source-reinstall: source-install
+source-install: source
+
+	@mkdir -p 	$(prefix)/${usr}/share/doc
+	@cp -rf 	${SOURCESDIR}/${usr}/share/doc/* $(prefix)/${usr}/share/doc
+
+source-clean:
+
+	@rm -rf 	${SOURCESDIR}
+
+source-deinstall: source-uninstall
+source-uninstall:
+
+	@rm -rf		$(prefix)/${usr}/share/doc/arch-wiki/html \
+				$(prefix)/${usr}/share/doc/gentoo-wiki \
+				$(prefix)/${usr}/share/doc/freebsd-docs \
+				$(prefix)/${usr}/share/doc/tldr-pages
+
+source-arch: source
+
+	@curl -L 	'${SOURCES}/2.9/arch-wiki_20200903.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
+	@tar xf 	${SOURCESDIR}/tmp/arch.tar.xz -C ${SOURCESDIR}
+	@rm -f 		${SOURCESDIR}/tmp/arch.tar.xz
+
+source-gentoo: source
+
+	@curl -L 	'${SOURCES}/2.7/gentoo-wiki_20200831-1.tar.xz' -o ${SOURCESDIR}/tmp/gentoo.tar.xz
+	@tar xf 	${SOURCESDIR}/tmp/gentoo.tar.xz -C ${SOURCESDIR}
+	@rm -f 		${SOURCESDIR}/tmp/gentoo.tar.xz
 	
-source-fbsd:
+source-fbsd: source
 
-	@mkdir -p ${SOURCESDIR}/tmp ${SOURCESDIR}/${usr}/share/doc
-	@curl -L '${SOURCES}/2.9/freebsd-docs_20200903.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
-	@tar xf ${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
-	@rm -f ${SOURCESDIR}/tmp/fbsd.tar.xz
+	@curl -L 	'${SOURCES}/2.9/freebsd-docs_20200903.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
+	@tar xf 	${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
+	@rm -f 		${SOURCESDIR}/tmp/fbsd.tar.xz
 
-source-tldr:
+source-tldr: source
 
-	@mkdir -p ${SOURCESDIR}/tmp ${SOURCESDIR}/${usr}/share/doc
-	@curl -L '${SOURCES}/2.9/tldr-pages_20200903.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
-	@tar xf ${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
-	@rm -f ${SOURCESDIR}/tmp/fbsd.tar.xz
+	@curl -L 	'${SOURCES}/2.9/tldr-pages_20200903.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
+	@tar xf 	${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
+	@rm -f 		${SOURCESDIR}/tmp/fbsd.tar.xz

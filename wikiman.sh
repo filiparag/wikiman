@@ -356,7 +356,7 @@ sources() {
 
 widget() {
 
-	widget_src="$("$conf_find" "$widgets_dir" -name "widget.$1")"
+	widget_src="$("$conf_find" "$widgets_dir" -name "widget.$1" 2>/dev/null)"
 
 	if [ "$widget_src" != '' ]; then
 		cat "$widget_src"

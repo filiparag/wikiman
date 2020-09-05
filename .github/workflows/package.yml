@@ -18,51 +18,43 @@ jobs:
     - name: Prepare system
       id: prepare
       run: |
-        pacman -Sy --noconfirm make binutils fakeroot nodejs npm curl
-        rm -rf ~/build ~/release
-        mkdir -p ~/release ~/build
+        pacman -Syu --noconfirm make binutils fakeroot nodejs npm curl
 
     - name: Prepare source package
       id: package
       run: |
-        mkdir -p ~/wikiman-${GITHUB_REF#refs/*/}
-        cp -r * ~/wikiman-${GITHUB_REF#refs/*/}
-        cd ~
-        tar czf "${GITHUB_REF#refs/*/}.tar.gz" wikiman-${GITHUB_REF#refs/*/}
-        hashsum="$(sha256sum "${GITHUB_REF#refs/*/}.tar.gz" | cut -d' ' -f1)"
-        mv "${GITHUB_REF#refs/*/}.tar.gz" ~/build
-        echo "pkgver=${GITHUB_REF#refs/*/}" > ~/build/PKGBUILD
-        echo "pkgrel=1" >> ~/build/PKGBUILD
-        echo "sha256sums=('$hashsum')" >> ~/build/PKGBUILD
-        echo "source=("${GITHUB_REF#refs/*/}.tar.gz")" >> ~/build/PKGBUILD
-        curl 'https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=wikiman' -so ~/build/PKGBUILD.original
+        curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
+        echo "pkgver=${GITHUB_REF#refs/*/}" > PKGBUILD
+        echo "pkgrel=1" >> PKGBUILD
+        echo "sha256sums=('$hashsum')" >> PKGBUILD
+        echo "source=("${GITHUB_REF#refs/*/}.tar.gz")" >> PKGBUILD
+        curl 'https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=wikiman' -so PKGBUILD.original
         sed '/^pkgver=/d; /^pkgrel=/d; /^source=/d; /^sha256sums=/d' -i ~/build/PKGBUILD.original
-        cat ~/build/PKGBUILD.original >> ~/build/PKGBUILD
+        cat PKGBUILD.original >> PKGBUILD
 
     - name: Build package
       id: build
       run: |    
         useradd builder
-        chown -R builder:builder ~/build
-        cd ~/build
+        chown -R builder:builder .
         su builder -c 'makepkg --printsrcinfo > .SRCINFO'
         su builder -c 'makepkg -d'
-        mv ./wikiman-*.pkg.* ~/release
+        mv ./wikiman-*.pkg.* wikiman-${GITHUB_REF#refs/*/}-1-any.pkg.tar.xz
 
     - name: Test installation
       id: test
       run: |
-        pacman -U --noconfirm ~/release/wikiman-*.pkg*
+        pacman -U --noconfirm wikiman-${GITHUB_REF#refs/*/}-1-any.pkg.tar.xz
 
     - name: Upload package to release
       id: upload
       uses: svenstaro/upload-release-action@2.1.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ~/release/wikiman-*
+        file: wikiman-${GITHUB_REF#refs/*/}-1-any.pkg.tar.xz
         tag: ${{ github.ref }}
         overwrite: true
-        file_glob: true
+        file_glob: false
 
   ubuntu:
     name: Ubuntu
@@ -78,39 +70,42 @@ jobs:
         apt update
         apt -y install make nodejs
         dpkg-reconfigure --frontend noninteractive tzdata
-        rm -rf ~/release
-        mkdir -p ~/release
+
+    - name: Prepare source package
+      id: package
+      run: |
+        curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
+        tar zxf ${GITHUB_REF#refs/*/}.tar.gz
 
     - name: Compile package
       id: compile
       run: |
-        make all
-        mkdir -p ./pkgbuild/DEBIAN
-        cp ./pkg/deb/conffiles ./pkgbuild/DEBIAN
-        sed "s|BUILDER_PKGVER|${GITHUB_REF#refs/*/}|g" ./pkg/deb/control > ./pkgbuild/DEBIAN/control
+        make -f wikiman-${GITHUB_REF#refs/*/}/Makefile
+        mkdir -p wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
+        cp wikiman-${GITHUB_REF#refs/*/}/pkg/deb/conffiles wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
+        sed "s|BUILDER_PKGVER|${GITHUB_REF#refs/*/}|g" wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN/control
 
     - name: Build package
       id: build
       run: |
-        dpkg -b ./pkgbuild "wikiman-${GITHUB_REF#refs/*/}-1_any.deb"
-        make clean
-        mv "wikiman-${GITHUB_REF#refs/*/}-1_any.deb" ~/release
+        dpkg -b wikiman-${GITHUB_REF#refs/*/}/pkgbuild "wikiman-${GITHUB_REF#refs/*/}-1_any.deb"
+        "wikiman-${GITHUB_REF#refs/*/}-1_any.deb"
 
     - name: Test installation
       id: test
       run: |
         apt -y install man fzf ripgrep gawk w3m
-        dpkg -i ~/release/wikiman-*.deb
+        dpkg -i wikiman-${GITHUB_REF#refs/*/}.deb
 
     - name: Upload package to release
       id: upload
       uses: svenstaro/upload-release-action@2.1.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ~/release/wikiman-*
+        file: wikiman-${GITHUB_REF#refs/*/}-1_any.deb
         tag: ${{ github.ref }}
         overwrite: true
-        file_glob: true
+        file_glob: false
 
   fedora:
     name: Fedora
@@ -122,19 +117,13 @@ jobs:
       id: prepare
       run: |
         dnf install -y rpm-build make nodejs
-        rm -rf ~/rpmbuild ~/release
         mkdir -p ~/rpmbuild/SOURCES
         mkdir -p ~/rpmbuild/SPECS
-        mkdir -p ~/release
     
     - name: Prepare source package
       id: package
       run: |
-        cp ./pkg/rpm/.spec ~/rpmbuild/SPECS/wikiman.spec
-        mkdir -p ~/wikiman-${GITHUB_REF#refs/*/}
-        cp -r * ~/wikiman-${GITHUB_REF#refs/*/}
-        cd ~
-        tar czf "${GITHUB_REF#refs/*/}.tar.gz" wikiman-${GITHUB_REF#refs/*/}
+        curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
         mv "${GITHUB_REF#refs/*/}.tar.gz" ~/rpmbuild/SOURCES
 
     - name: Build package
@@ -143,19 +132,19 @@ jobs:
         export PKGVER="${GITHUB_REF#refs/*/}"
         export PKGREL="1"
         rpmbuild -bb ~/rpmbuild/SPECS/wikiman.spec
-        mv ~/rpmbuild/RPMS/noarch/wikiman-*.rpm ~/release
+        mv ~/rpmbuild/RPMS/noarch/wikiman-*.rpm wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm
 
     - name: Test installation
       id: test
       run: |
-        dnf install -y ~/release/wikiman-*.rpm
+        dnf install -y wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm
 
     - name: Upload package to release
       id: upload
       uses: svenstaro/upload-release-action@2.1.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ~/release/wikiman-*
+        file: wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm
         tag: ${{ github.ref }}
         overwrite: true
-        file_glob: true
+        file_glob: false

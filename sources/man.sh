@@ -51,19 +51,24 @@ get_man_path() {
 
 	[ "$(echo "$man_search_paths" | wc -w | sed 's| ||g')" -gt 0 ]
 
+	# echo "$man_search_paths" >&2
+	# exit
+
 }
 
 list() {
 
 	for lang in $conf_man_lang; do
+
 		if ! get_man_path; then
 			echo "warning: man pages for '$lang' do not exist" 1>&2
 			continue
 		else
 			man_search_dirs="$(
-				eval "$conf_find $man_search_paths -maxdepth 1 -name 'man*' -printf '%p '"
+				eval "$conf_find $man_search_paths -maxdepth 1 -regextype sed -regex '.*man[0-9]\+$' -printf '%p '"
 			)"
 		fi
+
 		eval "$conf_find $man_search_dirs -maxdepth 1 -type f" | \
 		"$conf_awk" -F'/' \
 			"BEGIN {

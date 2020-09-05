@@ -3,12 +3,15 @@
 # BSD compatibility: Use GNU find and awk
 
 conf_find='find'
-"$conf_find" /dev -name null >/dev/null 2>/dev/null || \
+"$conf_find" --help >/dev/null 2>/dev/null || \
 	conf_find='gfind'
 
 conf_awk='awk'
-[ "$(echo 'test_string' | "$conf_awk" '/\w/' 2>/dev/null)" = 'test_string' ] || \
+"$conf_awk" --help >/dev/null 2>/dev/null || \
 	conf_awk='gawk'
+
+export conf_find
+export conf_awk
 
 tui_preview() {
 	command="$(echo "$@" | "$conf_awk" -F '\t' \
@@ -40,7 +43,7 @@ init() {
 
 	# BSD compatibility: Installation prefix
 
-	case $(dirname "$0") in
+	case "$(dirname "$0")" in
 		'/usr/bin')
 			conf_sys_usr='/usr';
 			conf_sys_etc='/etc';;
@@ -48,12 +51,21 @@ init() {
 			conf_sys_usr='/usr/local';
 			conf_sys_etc='/usr/local/etc';;
 		*)
-			echo 'error: unsupported installation path' 1>&2;
-			exit 5;;
+			case "$(dirname "$(which wikiman)")" in 
+				'/usr/bin')
+					echo 'warning: unsupported installation path, using fallback for Linux' 1>&2;
+					conf_sys_usr='/usr';
+					conf_sys_etc='/etc';;
+				'/usr/local/bin')
+					echo 'warning: unsupported installation path, using fallback for BSD' 1>&2;
+					conf_sys_usr='/usr/local';
+					conf_sys_etc='/usr/local/etc';;
+				*)
+					echo 'error: unsupported installation path - failed to establish fallback' 1>&2;
+					exit 5;;
+			esac;;
 	esac
 
-	export conf_find
-	export conf_awk
 	export conf_sys_usr
 	export conf_sys_etc
 

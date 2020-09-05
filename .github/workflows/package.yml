@@ -29,7 +29,7 @@ jobs:
         echo "sha256sums=('$hashsum')" >> PKGBUILD
         echo "source=("${GITHUB_REF#refs/*/}.tar.gz")" >> PKGBUILD
         curl 'https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=wikiman' -so PKGBUILD.original
-        sed '/^pkgver=/d; /^pkgrel=/d; /^source=/d; /^sha256sums=/d' -i ~/build/PKGBUILD.original
+        sed '/^pkgver=/d; /^pkgrel=/d; /^source=/d; /^sha256sums=/d' -i PKGBUILD.original
         cat PKGBUILD.original >> PKGBUILD
 
     - name: Build package
@@ -68,7 +68,7 @@ jobs:
         export DEBIAN_FRONTEND=noninteractive
         ln -fs /usr/share/zoneinfo/Europe/Belgrade /etc/localtime
         apt update
-        apt -y install make nodejs
+        apt -y install make nodejs curl
         dpkg-reconfigure --frontend noninteractive tzdata
 
     - name: Prepare source package
@@ -83,19 +83,19 @@ jobs:
         make -f wikiman-${GITHUB_REF#refs/*/}/Makefile
         mkdir -p wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
         cp wikiman-${GITHUB_REF#refs/*/}/pkg/deb/conffiles wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
+        cp wikiman-${GITHUB_REF#refs/*/}/pkg/deb/control wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
         sed "s|BUILDER_PKGVER|${GITHUB_REF#refs/*/}|g" wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN/control
 
     - name: Build package
       id: build
       run: |
-        dpkg -b wikiman-${GITHUB_REF#refs/*/}/pkgbuild "wikiman-${GITHUB_REF#refs/*/}-1_any.deb"
-        "wikiman-${GITHUB_REF#refs/*/}-1_any.deb"
+        dpkg -b wikiman-${GITHUB_REF#refs/*/}/pkgbuild wikiman-${GITHUB_REF#refs/*/}-1_any.deb
 
     - name: Test installation
       id: test
       run: |
         apt -y install man fzf ripgrep gawk w3m
-        dpkg -i wikiman-${GITHUB_REF#refs/*/}.deb
+        dpkg -i wikiman-${GITHUB_REF#refs/*/}-1_any.deb
 
     - name: Upload package to release
       id: upload
@@ -116,7 +116,7 @@ jobs:
     - name: Prepare system
       id: prepare
       run: |
-        dnf install -y rpm-build make nodejs
+        dnf install -y rpm-build make nodejs curl
         mkdir -p ~/rpmbuild/SOURCES
         mkdir -p ~/rpmbuild/SPECS
     
@@ -124,6 +124,8 @@ jobs:
       id: package
       run: |
         curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
+        tar zxf ${GITHUB_REF#refs/*/}.tar.gz
+        cp wikiman-${GITHUB_REF#refs/*/}/pkg/rpm/.spec ~/rpmbuild/SPECS/wikiman.spec
         mv "${GITHUB_REF#refs/*/}.tar.gz" ~/rpmbuild/SOURCES
 
     - name: Build package

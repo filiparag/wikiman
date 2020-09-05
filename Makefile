@@ -19,7 +19,7 @@ usr?=		usr
 etc?=		etc
 man?=		usr/share
 
-all: ${NAME}.sh ${NAME}.1.man ${NAME}.conf LICENSE README.md sources/ widgets/
+all: ${WORKDIR}/${NAME}.sh ${WORKDIR}/${NAME}.1.man ${WORKDIR}/${NAME}.conf ${WORKDIR}/LICENSE ${WORKDIR}/README.md ${WORKDIR}/sources/ ${WORKDIR}/widgets/
 
 	@mkdir -p 	${BUILDDIR}/${usr}/share/${NAME} \
 				${BUILDDIR}/${usr}/share/licenses/${NAME} \
@@ -27,13 +27,14 @@ all: ${NAME}.sh ${NAME}.1.man ${NAME}.conf LICENSE README.md sources/ widgets/
 				${BUILDDIR}/${man}/man/man1 \
 				${BUILDDIR}/${usr}/bin \
 				${BUILDDIR}/${etc}
-	@install 	-Dm755 	./${NAME}.sh 	$(BUILDDIR)/${usr}/bin/${NAME}
-	@cp 		-fr 	./sources 		${BUILDDIR}/${usr}/share/${NAME}
-	@cp 		-fr 	./widgets 		${BUILDDIR}/${usr}/share/${NAME}
-	@install 	-Dm644 	./${NAME}.conf 	${BUILDDIR}/${etc}
-	@install 	-Dm644 	./LICENSE 		${BUILDDIR}/${usr}/share/licenses/${NAME} 
-	@install 	-Dm644 	./README.md 	${BUILDDIR}/${usr}/share/doc/wikiman 
-	@tar 		-czf 	${BUILDDIR}/${man}/man/man1/${NAME}.1.gz ./${NAME}.1.man
+	@install 	-Dm755 	${WORKDIR}/${NAME}.sh 	$(BUILDDIR)/${usr}/bin/${NAME}
+	@cp 		-fr 	${WORKDIR}/sources 		${BUILDDIR}/${usr}/share/${NAME}
+	@cp 		-fr 	${WORKDIR}/widgets 		${BUILDDIR}/${usr}/share/${NAME}
+	@install 	-Dm644 	${WORKDIR}/${NAME}.conf ${BUILDDIR}/${etc}
+	@install 	-Dm644 	${WORKDIR}/LICENSE 		${BUILDDIR}/${usr}/share/licenses/${NAME} 
+	@install 	-Dm644 	${WORKDIR}/README.md 	${BUILDDIR}/${usr}/share/doc/wikiman 
+	@gzip 		-k		${WORKDIR}/${NAME}.1.man
+	@mv 		${WORKDIR}/${NAME}.1.man.gz		${BUILDDIR}/${man}/man/man1/${NAME}.1.gz
 
 reinstall: install
 install: all

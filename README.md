@@ -23,9 +23,13 @@ yay -Syu wikiman
 # Optional: Enable Arch Wiki
 yay -Syu arch-wiki-docs
 ```
-
 If you are running Manjaro, package `arch-wiki-docs` is not in official repositories.
 Follow [these](#installing-additional-sources) instructions to download it.
+
+Or download latest *.pkg.tar.zst* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
+```bash
+sudo pacman -U wikiman-*.pkg.tar.zst
+```
 
 ### Ubuntu / Debian
 
@@ -52,6 +56,8 @@ Download latest *.txz* package from [Releases](https://github.com/filiparag/wiki
 ```bash
 doas pkg install wikiman-*.txz
 ```
+
+Or build [the port](https://github.com/filiparag/wikiman/tree/master/pkg/fbsd) yourself.
 
 ### Manual installation for Linux and BSD
 

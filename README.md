@@ -33,7 +33,7 @@ Download latest *.deb* package from [Releases](https://github.com/filiparag/wiki
 
 ```bash
 sudo apt update
-sudo apt install man fzf ripgrep gawk w3m
+sudo apt install man fzf ripgrep gawk w3m which
 sudo dpkg -i wikiman-*.deb
 ```
 

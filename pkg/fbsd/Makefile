@@ -3,8 +3,8 @@
 
 PORTNAME=		wikiman
 DISTVERSION=	2.11.3
-PORTREVISION=	1
-CATEGORIES=		misc
+PORTREVISION=	2
+CATEGORIES=		textproc
 
 MAINTAINER=		filip@parag.rs
 COMMENT=		Offline interactive documentation search
@@ -12,17 +12,14 @@ COMMENT=		Offline interactive documentation search
 LICENSE=		MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-LIB_DEPENDS=	
-RUN_DEPENDS=	gfind:misc/findutils gawk:lang/gawk
-
-USES=			
+RUN_DEPENDS=	findutils>4:misc/findutils gawk>5:lang/gawk ripgrep>12:textproc/ripgrep fzf>0.2:textproc/fzf w3m>0.5:www/w3m
 
 USE_GITHUB=		yes
 GH_ACCOUNT=		filiparag
-GH_TAG=			
 
 OPTIONS_DEFINE=	DOCS CONFIG WDGTS COMPLT
 OPTIONS_DEFAULT=DOCS CONFIG WDGTS COMPLT
+OPTIONS_SUB=	yes
 CONFIG_DESC=	Global configuration file
 WDGTS_DESC=		Shell keybind widgets
 COMPLT_DESC=	Shell completions for fish and zsh
@@ -34,8 +31,8 @@ do-install:
 
 	${INSTALL_SCRIPT} ${WRKSRC}/wikiman.sh ${STAGEDIR}${PREFIX}/bin/wikiman
 	(cd ${WRKSRC}/sources && ${COPYTREE_BIN} . ${STAGEDIR}${PREFIX}/share/wikiman/sources)
-	
-	gzip ${WRKSRC}/wikiman.1.man
+
+	${GZIP_CMD} ${WRKSRC}/wikiman.1.man
 	${INSTALL_MAN} ${WRKSRC}/wikiman.1.man.gz ${STAGEDIR}${MANPREFIX}/man/man1/wikiman.1.gz
 
 do-install-DOCS-on:

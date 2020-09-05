@@ -46,17 +46,14 @@ jobs:
       id: test
       run: |
         pacman -U --noconfirm wikiman-${GITHUB_REF#refs/*/}-1-any.pkg.tar.xz
-        mv wikiman-${GITHUB_REF#refs/*/}-1-any.pkg.tar.xz /github/home/wikiman-latest-any.pkg.tar.xz
+        mv wikiman-${GITHUB_REF#refs/*/}-1-any.pkg.tar.xz wikiman-latest-any.pkg.tar.xz
 
-    - name: Upload package to release
-      id: upload
-      uses: svenstaro/upload-release-action@2.1.0
+    - name: Upload package
+      id: stash
+      uses: actions/upload-artifact@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: wikiman-latest-any.pkg.tar.xz
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: false
+        name: wikiman-arch-package
+        path: wikiman-latest-any.pkg.tar.xz
 
   ubuntu:
     name: Ubuntu
@@ -98,17 +95,14 @@ jobs:
       run: |
         apt -y install man fzf ripgrep gawk w3m coreutils
         dpkg -i wikiman-${GITHUB_REF#refs/*/}-1_any.deb
-        mv wikiman-${GITHUB_REF#refs/*/}-1_any.deb /github/home/wikiman-latest_any.deb
+        mv wikiman-${GITHUB_REF#refs/*/}-1_any.deb wikiman-latest_any.deb
 
-    - name: Upload package to release
-      id: upload
-      uses: svenstaro/upload-release-action@2.1.0
+    - name: Upload package
+      id: stash
+      uses: actions/upload-artifact@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: wikiman-latest_any.deb
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: false
+        name: wikiman-debian-package
+        path: wikiman-latest_any.deb
 
   fedora:
     name: Fedora
@@ -145,12 +139,9 @@ jobs:
         dnf install -y wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm
         mv wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm /github/home/wikiman-latest.noarch.rpm
 
-    - name: Upload package to release
-      id: upload
-      uses: svenstaro/upload-release-action@2.1.0
+    - name: Upload package
+      id: stash
+      uses: actions/upload-artifact@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: wikiman-latest.noarch.rpm
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: false
+        name: wikiman-rpm-package
+        path: wikiman-latest.noarch.rpm

@@ -7,4 +7,4 @@ Vcs-Browser:    https://github.com/filiparag/wikiman
 Vcs-Git:        git://github.com/filiparag/wikiman.git
 Homepage:       https://github.com/filiparag/wikiman
 Architecture:   all
-Depends:        man, fzf, ripgrep, gawk, w3m, which
+Depends:        man, fzf, ripgrep, gawk, w3m, coreutils

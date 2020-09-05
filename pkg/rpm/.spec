@@ -1,6 +1,9 @@
+%define pkgver %(printenv PKGVER)
+%define pkgrel %(printenv PKGREL)
+
 Name:           wikiman
-Version:        BUILDER_PKGVER
-Release:        BUILDER_PKGREL%{?dist}
+Version:        %{pkgver}
+Release:        %{pkgrel}%{?dist}
 Summary:        Offline interactive documentation search
 BuildArch:      noarch
 License:        MIT

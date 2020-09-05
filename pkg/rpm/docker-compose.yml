@@ -18,7 +18,8 @@ services:
         cd ~/wikiman &&
         make package &&
         tar czf ~/rpmbuild/SOURCES/${PKGVER}.tar.gz ./pkgbuild &&
-        sed 's|BUILDER_PKGVER|${PKGVER}|g; s|BUILDER_PKGREL|${PKGREL}|g' /pkg/.spec > ~/rpmbuild/SPECS/wikiman.spec &&
+        export PKGVER="${PKGVER}" &&
+        export PKGREL="${PKGREL}" &&
         rpmbuild -bb ~/rpmbuild/SPECS/wikiman.spec &&
         mv ~/rpmbuild/RPMS/noarch/wikiman-${PKGVER}-${PKGREL}.fc32.noarch.rpm /release &&
         chown ${UID}:${UID} /release/wikiman-${PKGVER}-${PKGREL}.fc32.noarch.rpm &&

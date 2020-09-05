@@ -40,20 +40,19 @@ jobs:
         chown -R builder:builder .
         su builder -c 'makepkg --printsrcinfo > .SRCINFO'
         su builder -c 'makepkg -d'
-        mv ./wikiman-*.pkg.* wikiman-${GITHUB_REF#refs/*/}-1-any.pkg.tar.xz
+        mv ./wikiman-*.pkg.* wikiman-latest-any.pkg.tar.zst
 
     - name: Test installation
       id: test
       run: |
-        pacman -U --noconfirm wikiman-${GITHUB_REF#refs/*/}-1-any.pkg.tar.xz
-        mv wikiman-${GITHUB_REF#refs/*/}-1-any.pkg.tar.xz wikiman-latest-any.pkg.tar.xz
+        pacman -U --noconfirm wikiman-latest-any.pkg.tar.zst
 
     - name: Upload package
-      id: stash
+      id: upload_artifact
       uses: actions/upload-artifact@v2
       with:
-        name: wikiman-latest-any.pkg.tar.xz
-        path: wikiman-latest-any.pkg.tar.xz
+        name: package-arch
+        path: wikiman-latest-any.pkg.tar.zst
 
   ubuntu:
     name: Ubuntu
@@ -88,20 +87,19 @@ jobs:
     - name: Build package
       id: build
       run: |
-        dpkg -b wikiman-${GITHUB_REF#refs/*/}/pkgbuild wikiman-${GITHUB_REF#refs/*/}-1_any.deb
+        dpkg -b wikiman-${GITHUB_REF#refs/*/}/pkgbuild wikiman-latest_any.deb
 
     - name: Test installation
       id: test
       run: |
         apt -y install man fzf ripgrep gawk w3m coreutils
-        dpkg -i wikiman-${GITHUB_REF#refs/*/}-1_any.deb
-        mv wikiman-${GITHUB_REF#refs/*/}-1_any.deb wikiman-latest_any.deb
+        dpkg -i wikiman-latest_any.deb
 
     - name: Upload package
-      id: stash
+      id: upload_artifact
       uses: actions/upload-artifact@v2
       with:
-        name: wikiman-latest_any.deb
+        name: package-ubuntu
         path: wikiman-latest_any.deb
 
   fedora:
@@ -131,17 +129,84 @@ jobs:
         export PKGVER="${GITHUB_REF#refs/*/}"
         export PKGREL="1"
         rpmbuild -bb ~/rpmbuild/SPECS/wikiman.spec
-        mv ~/rpmbuild/RPMS/noarch/wikiman-*.rpm wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm
+        mv ~/rpmbuild/RPMS/noarch/wikiman-*.rpm wikiman-latest.noarch.rpm
 
     - name: Test installation
       id: test
       run: |
-        dnf install -y wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm
-        mv wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm wikiman-latest.noarch.rpm
+        dnf install -y wikiman-latest.noarch.rpm
 
     - name: Upload package
-      id: stash
+      id: upload_artifact
       uses: actions/upload-artifact@v2
       with:
-        name: wikiman-latest.noarch.rpm
+        name: package-fedora
         path: wikiman-latest.noarch.rpm
+
+  publish:
+    name: Upload Release Asset
+    runs-on: ubuntu-latest
+    needs: [ arch, ubuntu, fedora ]
+    steps:
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: v${{ github.ref }}
+          draft: true
+          prerelease: false
+
+      - name: Download Arch package
+        id: download_artifact_arch
+        uses: actions/download-artifact@v2
+        with:
+          name: package-arch
+
+      - name: Upload Arch Package
+        id: upload_arch
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./wikiman-latest-any.pkg.tar.zst
+          asset_name: wikiman-latest-any.pkg.tar.zst
+          asset_content_type: application/x-gzip
+
+      - name: Download Ubuntu package
+        id: download_artifact_deb
+        uses: actions/download-artifact@v2
+        with:
+          name: package-ubuntu
+
+      - name: Upload Ubuntu Package
+        id: upload_deb
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./wikiman-latest_any.deb
+          asset_name: wikiman-latest_any.deb
+          asset_content_type: application/x-gzip
+
+      - name: Download Fedora package
+        id: download_artifact_rpm
+        uses: actions/download-artifact@v2
+        with:
+          name: package-fedora
+
+      - name: Upload Fedora Package
+        id: upload_rpm
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./wikiman-latest.noarch.rpm
+          asset_name: wikiman-latest.noarch.rpm
+          asset_content_type: application/x-gzip

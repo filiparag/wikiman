@@ -52,7 +52,7 @@ jobs:
       id: stash
       uses: actions/upload-artifact@v2
       with:
-        name: wikiman-arch-package
+        name: wikiman-latest-any.pkg.tar.xz
         path: wikiman-latest-any.pkg.tar.xz
 
   ubuntu:
@@ -101,7 +101,7 @@ jobs:
       id: stash
       uses: actions/upload-artifact@v2
       with:
-        name: wikiman-debian-package
+        name: wikiman-latest_any.deb
         path: wikiman-latest_any.deb
 
   fedora:
@@ -137,11 +137,11 @@ jobs:
       id: test
       run: |
         dnf install -y wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm
-        mv wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm /github/home/wikiman-latest.noarch.rpm
+        mv wikiman-${GITHUB_REF#refs/*/}-1.noarch.rpm wikiman-latest.noarch.rpm
 
     - name: Upload package
       id: stash
       uses: actions/upload-artifact@v2
       with:
-        name: wikiman-rpm-package
+        name: wikiman-latest.noarch.rpm
         path: wikiman-latest.noarch.rpm

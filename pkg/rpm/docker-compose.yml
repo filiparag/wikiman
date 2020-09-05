@@ -10,16 +10,16 @@ services:
     command: >
       bash -c "
         echo Building wikiman-${PKGVER}-${PKGREL} for Fedora... &&
+        export PKGVER="${PKGVER}" &&
+        export PKGREL="${PKGREL}" &&
         echo 'max_parallel_downloads=10' >> /etc/dnf/dnf.conf &&
         dnf install -y rpm-build make &&
         mkdir -p ~/rpmbuild/SOURCES &&
         mkdir -p ~/rpmbuild/SPECS &&
-        cp -arp /src ~/wikiman &&
-        cd ~/wikiman &&
-        make package &&
-        tar czf ~/rpmbuild/SOURCES/${PKGVER}.tar.gz ./pkgbuild &&
-        export PKGVER="${PKGVER}" &&
-        export PKGREL="${PKGREL}" &&
+        cp /src/pkg/rpm/.spec ~/rpmbuild/SPECS/wikiman.spec &&
+        cp -arp /src ~/wikiman-${PKGVER} &&
+        cd ~
+        tar czf ~/rpmbuild/SOURCES/${PKGVER}.tar.gz ./wikiman-${PKGVER} &&
         rpmbuild -bb ~/rpmbuild/SPECS/wikiman.spec &&
         mv ~/rpmbuild/RPMS/noarch/wikiman-${PKGVER}-${PKGREL}.fc32.noarch.rpm /release &&
         chown ${UID}:${UID} /release/wikiman-${PKGVER}-${PKGREL}.fc32.noarch.rpm &&

@@ -41,7 +41,7 @@ completions: core
 	@mkdir -p 	${BUILDDIR}/${usr}/share/fish/completions \
 				${BUILDDIR}/${usr}/share/zsh/site-functions
 	@install 	-Dm644 	${WORKDIR}/completions/completions.fish	${BUILDDIR}/${usr}/share/fish/completions/${NAME}.fish
-	@install 	-Dm644 	${WORKDIR}/completions/completions.zsh	${BUILDDIR}/${usr}/share/fish/completions/_${NAME}
+	@install 	-Dm644 	${WORKDIR}/completions/completions.zsh	${BUILDDIR}/${usr}/share/zsh/site-functions/_${NAME}
 
 config:
 

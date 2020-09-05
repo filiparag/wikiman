@@ -19,6 +19,7 @@ jobs:
       id: prepare
       run: |
         pacman -Syu --noconfirm make binutils fakeroot nodejs npm curl
+        echo "COMPRESSZST=(zstd -c -T0 --ultra -20 -) PKGEXT='.pkg.tar.zst'" >> /etc/makepkg.conf
 
     - name: Prepare source package
       id: package
@@ -174,7 +175,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./wikiman-latest-any.pkg.tar.zst
-          asset_name: wikiman-latest-any.pkg.tar.zst
+          asset_name: wikiman-${GITHUB_REF##*/}-1-any.pkg.tar.zst
           asset_content_type: application/x-gzip
 
       - name: Download Ubuntu package
@@ -191,7 +192,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./wikiman-latest_any.deb
-          asset_name: wikiman-latest_any.deb
+          asset_name: wikiman-${GITHUB_REF##*/}-1_any.deb
           asset_content_type: application/x-gzip
 
       - name: Download Fedora package
@@ -208,5 +209,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./wikiman-latest.noarch.rpm
-          asset_name: wikiman-latest.noarch.rpm
+          asset_name: wikiman-${GITHUB_REF##*/}-1.noarch.rpm
           asset_content_type: application/x-gzip

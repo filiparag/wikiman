@@ -44,19 +44,26 @@ init() {
 	# BSD compatibility: Installation prefix
 
 	case "$(dirname "$0")" in
-		'/usr/bin')
+		"$HOME/bin"|"$HOME/.local/bin")
+			conf_sys_usr="$HOME/.local/share";
+			conf_sys_etc="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman";;
+		'/bin'|'/sbin'|'/usr/bin'|'/usr/sbin')
 			conf_sys_usr='/usr';
 			conf_sys_etc='/etc';;
-		'/usr/local/bin')
+		'/usr/local/bin'|'/usr/local/sbin')
 			conf_sys_usr='/usr/local';
 			conf_sys_etc='/usr/local/etc';;
 		*)
 			case "$(dirname "$(which wikiman)")" in 
-				'/usr/bin')
+				"$HOME/bin"|"$HOME/.local/bin")
+					echo 'warning: unsupported installation path, using fallback for user install' 1>&2;
+					conf_sys_usr="$HOME/.local/share";
+					conf_sys_etc="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman";;
+				'/bin'|'/sbin'|'/usr/bin'|'/usr/sbin')
 					echo 'warning: unsupported installation path, using fallback for Linux' 1>&2;
 					conf_sys_usr='/usr';
 					conf_sys_etc='/etc';;
-				'/usr/local/bin')
+				'/usr/local/bin'|'/usr/local/sbin')
 					echo 'warning: unsupported installation path, using fallback for BSD' 1>&2;
 					conf_sys_usr='/usr/local';
 					conf_sys_etc='/usr/local/etc';;

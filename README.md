@@ -160,6 +160,8 @@ If no keywords are provided, show all pages.
 
 - `-W` print widget code for specified shell and exit
 
+- `-v` print version and exit
+
 - `-h` display this help and exit
 
 ### Shell keybind widgets

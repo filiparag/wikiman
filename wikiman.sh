@@ -78,6 +78,8 @@ init() {
 
 	# Configuration variables
 
+	conf_version='2.11.4'
+
 	config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
 	config_file="$conf_sys_etc/wikiman.conf"
 	config_file_usr="$config_dir/wikiman.conf"
@@ -228,6 +230,7 @@ init() {
 	export conf_tui_keep_open
 	export conf_tui_source_column
 	export conf_tui_html
+	export conf_version
 
 }
 
@@ -341,6 +344,8 @@ Options:
 
   -W  print widget code for specified shell and exit
 
+  -v  print version and exit
+
   -h  display this help and exit
 "
 
@@ -376,32 +381,34 @@ widget() {
 
 init
 
-while getopts l:s:H:f:W:pqhRSkc o; do
-  case $o in
-	(p) conf_tui_preview='false';;
-	(H) conf_tui_html="$OPTARG";;
-	(k) conf_tui_keep_open='true';;
-	(l) conf_man_lang="$(
-			echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
-		)";
-		conf_wiki_lang="$(
-			echo "$OPTARG" | sed 's/,/ /g; s/_/-/g'
-		)";;
-	(s) conf_sources="$(
-			echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
-		)";;
-	(f) conf_fuzzy_finder="$OPTARG";;
-	(q) conf_quick_search='true';;
-	(R) conf_raw_output='true';;
-	(c) conf_tui_source_column='true';;
-	(W) widget "$OPTARG";
-		exit;;
-	(S) sources;
-		exit;;
-	(h) help;
-		exit;;
-    (*) exit 1;;
-  esac
+while getopts l:s:H:f:W:pqhRSkcv o; do
+	case $o in
+		(p) conf_tui_preview='false';;
+		(H) conf_tui_html="$OPTARG";;
+		(k) conf_tui_keep_open='true';;
+		(l) conf_man_lang="$(
+				echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
+			)";
+			conf_wiki_lang="$(
+				echo "$OPTARG" | sed 's/,/ /g; s/_/-/g'
+			)";;
+		(s) conf_sources="$(
+				echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
+			)";;
+		(f) conf_fuzzy_finder="$OPTARG";;
+		(q) conf_quick_search='true';;
+		(R) conf_raw_output='true';;
+		(c) conf_tui_source_column='true';;
+		(W) widget "$OPTARG";
+			exit;;
+		(S) sources;
+			exit;;
+		(v) echo "$conf_version";
+			exit;;
+		(h) help;
+			exit;;
+		(*) exit 1;;
+	esac
 done
 shift "$((OPTIND - 1))"
 
@@ -426,8 +433,6 @@ case $conf_fuzzy_finder in
 esac
 
 if [ $# = 0 ]; then
-	# echo 'error: empty search query' 1>&2
-	# exit 254
 	user_action='list'
 else
 	user_action='search'

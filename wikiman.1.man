@@ -1,5 +1,5 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "4 September 2020" "wikiman 2.11" "wikiman manual"
+.TH "wikiman" 1 "6 September 2020" "wikiman 2.11.4" "wikiman manual"
 
 .SH NAME
 .B wikiman
@@ -7,15 +7,20 @@
 
 .SH SYNOPSIS
 .B wikiman
-[-l languages] [-s sources] [-q] [-p] [-k] [-c]
+[-q] [-p] [-k] [-c]
 .br
-        [-f fuzzy finder] [-H html_viewer] [-R] <keyword>...
+        [-l <comma separated languages>] [-s <comma separated sources>]
+.br
+        [-f <fuzzy finder>] [-H <html viewer>] [-R] <keyword>...
 .br
 .B wikiman
 -S
 .br
 .B wikiman
 -W <shell>
+.br
+.B wikiman
+-v
 .br
 .B wikiman
 -h
@@ -34,6 +39,7 @@ and fuzzy filtering for search results.
 .SH OPTIONS
 .HP
 .B -l
+<comma separated languages>
 .br
 search language(s)
 .br
@@ -41,13 +47,15 @@ default: en
 
 .HP
 .B -s
+<comma separated sources>
 .br
-sources to use (if empty, use all available)
+sources to use
 .br
-default: (empty)
+default: (all available)
 
 .HP
 .B -f
+<fuzzy finder>
 .br
 fuzzy finder to use
 .br
@@ -75,6 +83,7 @@ show source column
 
 .HP
 .B -H
+<html viewer>
 .br
 viewer for HTML pages
 .br
@@ -92,8 +101,14 @@ list available sources and exit
 
 .HP
 .B -W
+<shell>
 .br
 print widget code for specified shell and exit
+
+.HP
+.B -v
+.br
+print version and exit
 
 .HP
 .B -h

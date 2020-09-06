@@ -6,7 +6,7 @@ This is achieved by utilizing full text search for wikis, partial name and descr
 and fuzzy filtering for search results.
 
 By default, Wikiman only searches system's manual pages.
-Follow [these](#installing-additional-sources) instructions to enable optional sources.
+Follow [these](#additional-documentation-sources) instructions to enable optional sources.
 
 
 ## Demonstration
@@ -16,7 +16,7 @@ Follow [these](#installing-additional-sources) instructions to enable optional s
 
 ## Installation
 
-### Arch Linux ([AUR](https://aur.archlinux.org/packages/wikiman/))
+### Arch Linux / Manjaro ([AUR](https://aur.archlinux.org/packages/wikiman/))
 ```bash
 yay -Syu wikiman
 
@@ -28,7 +28,7 @@ Follow [these](#installing-additional-sources) instructions to download it.
 
 Or download latest *.pkg.tar.zst* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 ```bash
-sudo pacman -U wikiman-*.pkg.tar.zst
+sudo pacman -U wikiman*.pkg.tar.zst
 ```
 
 ### Ubuntu / Debian
@@ -38,15 +38,19 @@ Download latest *.deb* package from [Releases](https://github.com/filiparag/wiki
 ```bash
 sudo apt update
 sudo apt install man fzf ripgrep gawk w3m coreutils
-sudo dpkg -i wikiman-*.deb
+sudo dpkg -i wikiman*.deb
 ```
 
-### Fedora
+### Fedora / openSUSE
 
 Download latest *.rpm* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
 ```bash
-sudo dnf install wikiman-*.rpm
+# Fedora
+sudo dnf install wikiman*.rpm
+
+# openSUSE (skip signature verification)
+sudo zypper in wikiman*.rpm
 ```
 
 ### FreeBSD
@@ -54,7 +58,7 @@ sudo dnf install wikiman-*.rpm
 Download latest *.txz* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
 ```bash
-doas pkg install wikiman-*.txz
+pkg install wikiman*.txz
 ```
 
 Or build [the port](https://github.com/filiparag/wikiman/tree/master/pkg/fbsd) yourself.
@@ -76,7 +80,8 @@ sudo make install
 
 Wikiman uses GNU `find` and `awk`, so BSD users have to install `findutils` and `gawk`.
 
-### Installing additional sources
+
+## Additional documentation sources
 
 Due to their large size, wikis don't come bundled with Wikiman.
 If you want to use them, you can download their snapshots using following commands.
@@ -111,7 +116,7 @@ To verify active sources, run:
 wikiman -S
 ```
 
-#### Compiling a snapshot (database build scripts)
+### Compiling a snapshot (database build scripts)
 
 In [`build/`](https://github.com/filiparag/wikiman/tree/master/build) directory there are scripts
 for manual snapshot compilation. These scripts can have external dependencies and are not 

@@ -8,6 +8,7 @@ _arguments -s \
 		'-q[enable quick search mod]' \
 		'-c[show source column]' \
 		'-k[keep open after viewing a result]' \
+		'-h[print version and exit]' \
 		'-W[print widget code for specified shell and exit]' \
 		'-l[search language(s)]:locale:->locales' \
 		'-s[sources to use]:source:->sources' \
@@ -18,9 +19,10 @@ case $state in
 	locales)
 		local -a _locales
 		locales=($(
+			test -d /usr/share/i18n/locales && \
 			ls /usr/share/i18n/locales |\
 			awk -F'_' '/^[a-z]{2}_[^@]{2}$/ && !seen[$1] {print $1; seen[$1]++}' |\
-			tr '\n' ' '
+			tr '\n' ' ' || echo 'en'
 		))
 		_describe 'locale' _locales
 		;;
@@ -30,7 +32,7 @@ case $state in
 			'arch:Arch Wiki'
 			'fbsd:FreeBSD Documentation'
 			'gentoo:Gentoo Wiki'
-			'man:manual pages'
+			'man:Manual pages'
 			'tldr:TLDR pages'
 		)
 		_describe 'source' _sources
@@ -46,8 +48,9 @@ case $state in
 	browsers)
 		local -a _browsers
 		_browsers=($(
+			test -f /usr/share/applications/mimeinfo.cache && \
 			grep 'html\|http' /usr/share/applications/mimeinfo.cache |\
-			cut -d'=' -f2 | tr ';' ' ' | cut -d'.' -f1 | sort | uniq
+			cut -d'=' -f2 | tr ';' ' ' | cut -d'.' -f1 | sort | uniq || echo ''
 		))
 
 		local -a txtbrw

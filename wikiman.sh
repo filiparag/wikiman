@@ -403,7 +403,7 @@ while getopts l:s:H:f:W:pqhRSkcv o; do
 			exit;;
 		(S) sources;
 			exit;;
-		(v) echo "$conf_version";
+		(v) echo "wikiman-$conf_version";
 			exit;;
 		(h) help;
 			exit;;

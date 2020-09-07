@@ -1,5 +1,5 @@
 NAME=		wikiman
-VERSION=	2.11
+VERSION=	2.11.4
 RELEASE=	1
 UPSTREAM=	https://github.com/filiparag/wikiman
 SOURCES= 	${UPSTREAM}/releases/download/
@@ -58,7 +58,7 @@ install: all
 
 	@mkdir -p 	$(prefix)/
 	@cp -fr 	${BUILDDIR}/* $(prefix)/
-	
+
 plist: all
 
 	@find 		${BUILDDIR} -type f > ${PLISTFILE}
@@ -86,6 +86,20 @@ uninstall:
 	@rm -rf $(prefix)/${usr}/share/${NAME} \
 			$(prefix)/${usr}/share/licenses/${NAME} \
 			$(prefix)/${usr}/share/doc/${NAME}
+
+local:
+
+	@test ! -d	${BUILDDIR}/usr/local
+
+	@mkdir -p	${BUILDDIR}/tmp ${BUILDDIR}/usr ${BUILDDIR}/etc
+	@mv			${BUILDDIR}/usr ${BUILDDIR}/etc ${BUILDDIR}/tmp
+	@mkdir -p	${BUILDDIR}/usr/local/usr ${BUILDDIR}/usr/local/etc
+	@mv			${BUILDDIR}/tmp/* ${BUILDDIR}/usr/local
+	@rm -rf		${BUILDDIR}/tmp ${BUILDDIR}/etc
+
+	@mkdir -p	${SOURCESDIR}/usr/local/share ${SOURCESDIR}/usr/share/doc
+	@mv			${SOURCESDIR}/usr/share/doc ${SOURCESDIR}/usr/local/share/doc
+	@rm -rf		${SOURCESDIR}/usr/share
 
 .PHONY: help
 help:
@@ -121,22 +135,22 @@ source-arch: source
 
 	@curl -L 	'${SOURCES}/2.9/arch-wiki_20200903.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
 	@tar xf 	${SOURCESDIR}/tmp/arch.tar.xz -C ${SOURCESDIR}
-	@rm -f 		${SOURCESDIR}/tmp/arch.tar.xz
+	@rm -rf 	${SOURCESDIR}/tmp
 
 source-gentoo: source
 
 	@curl -L 	'${SOURCES}/2.7/gentoo-wiki_20200831-1.tar.xz' -o ${SOURCESDIR}/tmp/gentoo.tar.xz
 	@tar xf 	${SOURCESDIR}/tmp/gentoo.tar.xz -C ${SOURCESDIR}
-	@rm -f 		${SOURCESDIR}/tmp/gentoo.tar.xz
+	@rm -rf 	${SOURCESDIR}/tmp
 	
 source-fbsd: source
 
 	@curl -L 	'${SOURCES}/2.9/freebsd-docs_20200903.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
 	@tar xf 	${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
-	@rm -f 		${SOURCESDIR}/tmp/fbsd.tar.xz
+	@rm -rf 	${SOURCESDIR}/tmp
 
 source-tldr: source
 
 	@curl -L 	'${SOURCES}/2.9/tldr-pages_20200903.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
 	@tar xf 	${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
-	@rm -f 		${SOURCESDIR}/tmp/fbsd.tar.xz
+	@rm -rf 	${SOURCESDIR}/tmp

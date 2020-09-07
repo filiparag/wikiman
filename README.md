@@ -68,13 +68,20 @@ Or build [the port](https://github.com/filiparag/wikiman/tree/master/pkg/fbsd) y
 Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`, `coreutils`
 
 ```bash
+# Clone from GitHub
 git clone 'https://github.com/filiparag/wikiman'
 cd ./wikiman
 
 # Switch to latest stable release (optional)
 git checkout $(git describe --tags | cut -d'-' -f1)
 
-make
+# Available targets: all, core, widgets, completions, config, docs
+make all
+
+# Only for BSD users: install to /usr/local instead of /usr
+make local
+
+# Install Wikiman
 sudo make install
 ```
 
@@ -101,8 +108,13 @@ Available optional sources are:
 # Download latest Makefile
 curl -L 'https://raw.githubusercontent.com/filiparag/wikiman/master/Makefile' -o 'wikiman-makefile'
 
-# Example: install Arch Wiki
+# Example for Linux: install Arch Wiki
 make -f ./wikiman-makefile source-arch
+sudo make -f ./wikiman-makefile source-install
+make -f ./wikiman-makefile clean
+
+# Example for BSD: install FreeBSD Documentation
+make -f ./wikiman-makefile source-fbsd local
 sudo make -f ./wikiman-makefile source-install
 make -f ./wikiman-makefile clean
 ```

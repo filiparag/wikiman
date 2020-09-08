@@ -250,6 +250,9 @@ find '/usr/share/doc/arch-wiki/html' -maxdepth 1 -type d -printf '%P '
 
 # FreeBSD Documentation
 find '/usr/share/doc/freebsd-docs' -maxdepth 1 -type d -printf '%P '
+
+# TLDR Pages
+find '/usr/share/doc/tldr-pages' -maxdepth 1 -type d -printf '%P '
 ```
 
 

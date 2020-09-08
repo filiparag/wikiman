@@ -1,5 +1,5 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "6 September 2020" "wikiman 2.11.4" "wikiman manual"
+.TH "wikiman" 1 "8 September 2020" "wikiman 2.12" "wikiman manual"
 
 .SH NAME
 .B wikiman
@@ -7,7 +7,7 @@
 
 .SH SYNOPSIS
 .B wikiman
-[-q] [-p] [-k] [-c]
+[-q] [-a] [-p] [-k] [-c]
 .br
         [-l <comma separated languages>] [-s <comma separated sources>]
 .br

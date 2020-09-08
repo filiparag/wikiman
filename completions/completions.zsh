@@ -57,7 +57,7 @@ case $state in
 		local -a txtbrw
 		txtbrw=('w3m' 'links' 'links2' 'elinks' 'lynx' 'browsh')
 		for browser in "${txtbrw[@]}"; do
-			which "$browser" 1>/dev/null 2>/dev/null && _browsers+=("$browser")
+			command -v "$browser" 1>/dev/null 2>/dev/null && _browsers+=("$browser")
 		done
 
 		_describe 'browser' _browsers

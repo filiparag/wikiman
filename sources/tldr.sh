@@ -106,6 +106,8 @@ search() {
 				IGNORECASE=1;
 				OFS=\"\t\"
 				count=0;
+				and_op = \"$conf_and_operator\" == \"true\";
+				split(\"$query\",kwds,\" \");
 			};
 			{
 				title = \"\";
@@ -123,17 +125,35 @@ search() {
 				path=\$0;
 
 				matched = title;
-				gsub(/$rg_query/,\"\",matched);
+				accuracy = 0;
 
-				lm = length(matched)
-				gsub(\" \",\"\",matched);
-				
-				if (length(matched)==0)
-					accuracy = length(title)*100;
-				else
-					accuracy = 100-lm*100/length(title);
+				if (and_op) {
+					kwdmatches = 0;
 
-				if (accuracy > 0 || book ~ /$rg_query/) {
+					for (k in kwds) {
+						subs = gsub(kwds[k],\"\",matched);
+						if (subs>0) {
+							kwdmatches++;
+							accuracy = accuracy + subs;
+						}
+					}
+
+					if (kwdmatches<length(kwds))
+						accuracy = 0;
+				} else {
+					gsub(/$greedy_query/,\"\",matched);
+
+					lm = length(matched)
+					gsub(\" \",\"\",matched);
+					gsub(\"_\",\"\",matched);
+					
+					if (length(matched)==0)
+						accuracy = length(title)*100;
+					else
+						accuracy = 100-lm*100/length(title);
+				}
+
+				if (accuracy > 0) {
 					matches[count,0] = accuracy;
 					matches[count,1] = title;
 					matches[count,2] = path;
@@ -166,7 +186,7 @@ search() {
 
 	if [ "$conf_quick_search" != 'true' ]; then
 
-		eval "$conf_find $paths -type f -name '*.html'" 2>/dev/null | \
+		eval "rg -U -i -c '$rg_query' $paths" | \
 		"$conf_awk" -F '/' \
 			"BEGIN {
 				IGNORECASE=1;
@@ -194,24 +214,11 @@ search() {
 				lang=\$$nf;
 				path=\$0;
 
-				matched = title;
-				gsub(/$rg_query/,\"\",matched);
-
-				lm = length(matched)
-				gsub(\" \",\"\",matched);
-				
-				if (length(matched)==0)
-					accuracy = length(title)*100;
-				else
-					accuracy = 100-lm*100/length(title);
-
-				if (accuracy > 0 || book ~ /$rg_query/) {
-					matches[count,0] = accuracy;
-					matches[count,1] = title;
-					matches[count,2] = path;
-					matches[count,3] = lang;
-					count++;
-				}
+				matches[count,0] = hits;
+				matches[count,1] = title;
+				matches[count,2] = path;
+				matches[count,3] = lang;
+				count++;
 			};
 			END {
 				for (i = 0; i < count; i++)
@@ -240,5 +247,6 @@ search() {
 	printf '%s\n%s\n' "$results_title" "$results_text" | "$conf_awk" "!seen[\$0] && NF>0 {print} {++seen[\$0]};"
 
 }
+
 
 eval "$1"

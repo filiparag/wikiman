@@ -148,13 +148,15 @@ If no keywords are provided, show all pages.
 
 - `-s` sources to use
  
-    Default: *man*
+    Default: (all available)
 
 - `-f` fuzzy finder to use
 
     Default: *fzf*
 
 - `-q` enable quick search mode
+
+- `-a` enable *AND* operator mode
 
 - `-p` disable quick result preview
 
@@ -219,7 +221,7 @@ quick_search = true
 raw_output = false
 
 # Manpages language(s)
-man_lang = en, pt, pt_BR
+man_lang = en, pt
 
 # Wiki language(s)
 wiki_lang = zh-CN

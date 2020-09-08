@@ -67,6 +67,11 @@ default: fzf
 enable quick search mode
 
 .HP
+.B -a
+.br
+enable AND operator mode
+
+.HP
 .B -p
 .br
 disable quick result preview
@@ -134,6 +139,9 @@ fuzzy_finder = fzf
 
 .SS Quick search mode
 quick_search = false
+
+.SS AND operator mode
+and_operator = false
 
 .SS Raw output
 raw_output = false

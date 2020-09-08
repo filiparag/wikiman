@@ -116,6 +116,13 @@ init() {
 				value = \$2;
 			}; END { print value }" "$config_file" "$config_file_usr"
 		)"
+		conf_and_operator="$(
+			"$conf_awk" -F '=' "/^[ ,\t]*and_operator/ {
+				gsub(/#.*/,\"\",\$2);
+				gsub(/[ \t]+/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
+		)"
 		conf_raw_output="$(
 			"$conf_awk" -F '=' "/^[ ,\t]*raw_output/ {
 				gsub(/#.*/,\"\",\$2);
@@ -212,6 +219,7 @@ init() {
 	conf_sources="${conf_sources:-$available_sources}"
 	conf_fuzzy_finder="${conf_fuzzy_finder:-fzf}"
 	conf_quick_search="${conf_quick_search:-false}"
+	conf_and_operator="${conf_and_operator:-false}"
 	conf_raw_output="${conf_raw_output:-false}"
 	conf_man_lang="${conf_man_lang:-en}"
 	conf_wiki_lang="${conf_wiki_lang:-en}"
@@ -223,6 +231,7 @@ init() {
 	export conf_sources
 	export conf_fuzzy_finder
 	export conf_quick_search
+	export conf_and_operator
 	export conf_raw_output
 	export conf_man_lang
 	export conf_wiki_lang
@@ -330,6 +339,8 @@ Options:
 
   -q  enable quick search mode
 
+  -a  enable AND operator mode
+
   -p  disable quick result preview
 
   -k  keep open after viewing a result
@@ -381,7 +392,7 @@ widget() {
 
 init
 
-while getopts l:s:H:f:W:pqhRSkcv o; do
+while getopts l:s:H:f:W:pqahRSkcv o; do
 	case $o in
 		(p) conf_tui_preview='false';;
 		(H) conf_tui_html="$OPTARG";;
@@ -397,6 +408,7 @@ while getopts l:s:H:f:W:pqhRSkcv o; do
 			)";;
 		(f) conf_fuzzy_finder="$OPTARG";;
 		(q) conf_quick_search='true';;
+		(a) conf_and_operator='true';;
 		(R) conf_raw_output='true';;
 		(c) conf_tui_source_column='true';;
 		(W) widget "$OPTARG";
@@ -438,7 +450,14 @@ else
 	user_action='search'
 	query="$*"
 	rg_query="$(echo "$*" | sed 's/ /\|/g')"
+	
 	greedy_query="\w*$(echo "$*" | sed 's/ /\\\w\*|\\w\*/g')\w*"
+
+
+	if [ "$conf_and_operator" = 'true' ]; then
+		rg_query="$(echo "$*" | "$conf_awk" -F ' ' "{for(i=1;i<=NF;i++)printf(\"(?P<p%i>.*%s.*)\",i,\$i)}")"
+	fi
+
 	export query
 	export rg_query
 	export greedy_query

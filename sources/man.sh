@@ -51,9 +51,6 @@ get_man_path() {
 
 	[ "$(echo "$man_search_paths" | wc -w | sed 's| ||g')" -gt 0 ]
 
-	# echo "$man_search_paths" >&2
-	# exit
-
 }
 
 list() {
@@ -116,8 +113,10 @@ search() {
 				"BEGIN {
 					IGNORECASE=1;
 					count=0;
+					and_op = \"$conf_and_operator\" == \"true\";
+					split(\"$query\",kwds,\" \");
 				};
-				\$NF ~ /$rg_query/ {
+				{
 					title = \$NF;
 					gsub(/\.\w+$/,\"\",title);
 
@@ -127,10 +126,28 @@ search() {
 					gsub(/\.\w+$/,\"\",title);
 
 					matched = title;
-					gsub(/$rg_query/,\"\",matched);
-					accuracy = 100-length(matched)*100/length(title);
+					accuracy = 0;
 
-					printf(\"%f\t%s\t%s\t$lang\t%s\n\", accuracy, title, section, \$0);
+					if (and_op) {
+						kwdmatches = 0;
+
+						for (k in kwds) {
+							subs = gsub(kwds[k],\"\",matched);
+							if (subs>0) {
+								kwdmatches++;
+								accuracy = accuracy + subs;
+							}
+						}
+
+						if (kwdmatches<length(kwds))
+							accuracy = 0;
+					} else {
+						gsub(/$rg_query/,\"\",matched);
+						accuracy = 100-length(matched)*100/length(title);
+					}
+
+					if (accuracy>0)
+						printf(\"%f\t%s\t%s\t$lang\t%s\n\", accuracy, title, section, \$0);
 				};"
 		)"
 		results_name="$(

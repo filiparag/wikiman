@@ -106,6 +106,8 @@ search() {
 			"BEGIN {
 				IGNORECASE=1;
 				count=0;
+				and_op = \"$conf_and_operator\" == \"true\";
+				split(\"$query\",kwds,\" \");
 			};
 			{
 				title = \"\";
@@ -120,20 +122,37 @@ search() {
 				lang=\$$nf;
 				path=\$0;
 
-				matched = title;
-				gsub(/$greedy_query/,\"\",matched);
-
-				lm = length(matched)
-				gsub(\" \",\"\",matched);
-				
-				if (length(matched)==0)
-					accuracy = length(title)*100;
-				else
-					accuracy = 100-lm*100/length(title);
-
 				book = \$($nf+1) \"/\" \$($nf+2);
+				matched = title;
+				accuracy = 0;
 
-				if (accuracy > 0 || book ~ /$rg_query/) {
+				if (and_op) {
+					kwdmatches = 0;
+
+					for (k in kwds) {
+						subs = gsub(kwds[k],\"\",matched);
+						if (subs>0) {
+							kwdmatches++;
+							accuracy = accuracy + subs;
+						}
+					}
+
+					if (kwdmatches<length(kwds))
+						accuracy = 0;
+				} else {
+					gsub(/$greedy_query/,\"\",matched);
+
+					lm = length(matched)
+					gsub(\" \",\"\",matched);
+					gsub(\"_\",\"\",matched);
+					
+					if (length(matched)==0)
+						accuracy = length(title)*100;
+					else
+						accuracy = 100-lm*100/length(title);
+				}
+
+				if ((and_op && accuracy>0) || (!and_op && (accuracy > 0 || book ~ /$rg_query/))) {
 					title = sprintf(\"%s (%s)\",title,book);
 					matches[count,0] = accuracy;
 					matches[count,1] = title;
@@ -168,7 +187,7 @@ search() {
 	if [ "$conf_quick_search" != 'true' ]; then
 
 		results_text="$(
-			eval "rg -U -S -c '$rg_query' $paths" | \
+			eval "rg -U -i -c '$rg_query' $paths" | \
 			"$conf_awk" -F '/' \
 				"BEGIN {
 					IGNORECASE=1;

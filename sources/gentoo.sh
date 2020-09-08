@@ -89,6 +89,8 @@ search() {
 			"BEGIN {
 				IGNORECASE=1;
 				count=0;
+				and_op = \"$conf_and_operator\" == \"true\";
+				split(\"$query\",kwds,\" \");
 			};
 			{
 				lang = \"en\"
@@ -117,15 +119,33 @@ search() {
 				if (lang ~ $langs && title !~ $rg_ignore) {
 
 					matched = title;
-					gsub(/$greedy_query/,\"\",matched);
+					accuracy = 0;
 
-					lm = length(matched)
-					gsub(\" \",\"\",matched);
-					
-					if (length(matched)==0)
-						accuracy = length(title)*100;
-					else
-						accuracy = 100-lm*100/length(title);
+					if (and_op) {
+						kwdmatches = 0;
+
+						for (k in kwds) {
+							subs = gsub(kwds[k],\"\",matched);
+							if (subs>0) {
+								kwdmatches++;
+								accuracy = accuracy + subs;
+							}
+						}
+
+						if (kwdmatches<length(kwds))
+							accuracy = 0;
+					} else {
+						gsub(/$greedy_query/,\"\",matched);
+
+						lm = length(matched)
+						gsub(\" \",\"\",matched);
+						gsub(\"_\",\"\",matched);
+						
+						if (length(matched)==0)
+							accuracy = length(title)*100;
+						else
+							accuracy = 100-lm*100/length(title);
+					}
 
 					if (accuracy>0) {
 						matches[count,0] = accuracy;
@@ -162,7 +182,7 @@ search() {
 	if [ "$conf_quick_search" != 'true' ]; then
 
 		results_text="$(
-			eval "rg -U -S -c '$rg_query' $path" | \
+			eval "rg -U -i -c '$rg_query' $path" | \
 			"$conf_awk" -F'/' \
 				"BEGIN {
 					IGNORECASE=1;

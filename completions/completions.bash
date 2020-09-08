@@ -6,7 +6,7 @@ function _wikiman_completions()
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-l -s -f -q -p -k -c -H -R -S -W -v -h"
+    opts="-l -s -f -q -a -p -k -c -H -R -S -W -v -h"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=($(compgen -W "${opts}" -- ${cur}))

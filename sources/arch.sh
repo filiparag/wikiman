@@ -27,25 +27,6 @@ setup() {
 	results_title=''
 	results_text=''
 
-	# if ! available; then
-	# 	echo "warning: Arch Wiki does not exist" 1>&2
-	# 	return 1
-	# fi
-
-	# for lang in $conf_wiki_lang; do
-	# 	if [ -d "$path/$lang" ]; then
-	# 		paths="$paths $path/$lang"
-	# 	else
-	# 		echo "warning: Arch Wiki documentation for '$lang' does not exist" 1>&2
-	# 	fi
-	# done
-	
-	# if [ "$(echo "$paths" | wc -w | sed 's| ||g')" = '0' ]; then
-	# 	return 1
-	# fi
-
-	# nf="$(echo "$path" | "$conf_awk" -F '/' '{print NF+2}')"
-
 	langs="$(echo "$conf_wiki_lang" | awk -F ' ' '{
 		for(i=1;i<=NF;i++) {
 			lang=tolower($i);
@@ -126,6 +107,8 @@ search() {
 				IGNORECASE=1;
 				count=0;
 				OFS=\"\t\";
+				and_op = \"$conf_and_operator\" == \"true\";
+				split(\"$query\",kwds,\" \");
 			};
 			{
 				if (NF-$nf) {
@@ -148,15 +131,33 @@ search() {
 				}
 
 				matched = title;
-				gsub(/$greedy_query/,\"\",matched);
+				accuracy = 0;
 
-				lm = length(matched)
-				gsub(\" \",\"\",matched);
-				
-				if (length(matched)==0)
-					accuracy = length(title)*100;
-				else
-					accuracy = 100-lm*100/length(title);
+				if (and_op) {
+					kwdmatches = 0;
+
+					for (k in kwds) {
+						subs = gsub(kwds[k],\"\",matched);
+						if (subs>0) {
+							kwdmatches++;
+							accuracy = accuracy + subs;
+						}
+					}
+
+					if (kwdmatches<length(kwds))
+						accuracy = 0;
+				} else {
+					gsub(/$greedy_query/,\"\",matched);
+
+					lm = length(matched)
+					gsub(\" \",\"\",matched);
+					gsub(\"_\",\"\",matched);
+					
+					if (length(matched)==0)
+						accuracy = length(title)*100;
+					else
+						accuracy = 100-lm*100/length(title);
+				}
 
 				if (accuracy>0) {
 					matches[count,0] = accuracy;
@@ -193,7 +194,7 @@ search() {
 	if [ "$conf_quick_search" != 'true' ]; then
 
 		results_text="$(
-			eval "rg -U -S -c '$rg_query' $paths" | \
+			eval "rg -U -i -c '$rg_query' $paths" | \
 			"$conf_awk" -F'/' \
 				"BEGIN {
 					count = 0;

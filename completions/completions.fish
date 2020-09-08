@@ -8,6 +8,7 @@ function __fish_complete_wikiman
 	complete -c wikiman -s S -x -d 'list available sources and exit'
 	complete -c wikiman -s p -x -d 'disable quick result preview'
 	complete -c wikiman -s q -x -d 'enable quick search mode'
+	complete -c wikiman -s a -x -d 'enable AND operator mode'
 	complete -c wikiman -s c -x -d 'show source column'
 	complete -c wikiman -s k -x -d 'keep open after viewing a result'
 	complete -c wikiman -s v -x -d 'print version and exit'

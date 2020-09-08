@@ -213,9 +213,34 @@ search() {
 			fi
 			res="$(
 				eval "apropos -M $man_search_dirs $query" 2>/dev/null | \
-				"$conf_awk" "{ 
+				"$conf_awk" "BEGIN {
+					IGNORECASE=1;
+					and_op = \"$conf_and_operator\" == \"true\";
+					split(\"$query\",kwds,\" \");
+				}; {
+					accuracy = !and_op;
+					if (and_op) {
+						kwdmatches = 0;
+						description = \"\";
+
+						for (i=4;i<=NF;i++)
+							description = description \$i;
+
+						for (k in kwds) {
+							subs = gsub(kwds[k],\"\",description);
+							if (subs>0) {
+								kwdmatches++;
+								accuracy = accuracy + subs;
+							}
+						}
+
+						if (kwdmatches<length(kwds))
+							accuracy = 0;
+
+					}
 					gsub(/ *\(|\)/,\"\",\$2);
-					printf(\"%s (%s)\t$lang\t$name\n\",\$1,\$2);
+					if (accuracy>0)
+						printf(\"%s (%s)\t$lang\t$name\n\",\$1,\$2);
 				}; END { print \"\n\"};"
 			)"
 			results_desc="$(

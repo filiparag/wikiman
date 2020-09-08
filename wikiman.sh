@@ -54,7 +54,7 @@ init() {
 			conf_sys_usr='/usr/local';
 			conf_sys_etc='/usr/local/etc';;
 		*)
-			case "$(dirname "$(which wikiman)")" in 
+			case "$(dirname "$(command -v wikiman)")" in
 				"$HOME/bin"|"$HOME/.local/bin")
 					echo 'warning: unsupported installation path, using fallback for user install' 1>&2;
 					conf_sys_usr="$HOME/.local/share";
@@ -429,7 +429,7 @@ shift "$((OPTIND - 1))"
 dependencies="man rg w3m $conf_awk $conf_tui_html $conf_fuzzy_finder $conf_find"
 
 for dep in $dependencies; do
-	which "$dep" >/dev/null 2>/dev/null || {
+	command -v "$dep" >/dev/null 2>/dev/null || {
 		echo "error: missing dependency: cannot find '$dep' executable" 1>&2
 		exit 127
 	}
@@ -450,7 +450,6 @@ else
 	user_action='search'
 	query="$*"
 	rg_query="$(echo "$*" | sed 's/ /\|/g')"
-	
 	greedy_query="\w*$(echo "$*" | sed 's/ /\\\w\*|\\w\*/g')\w*"
 
 
@@ -471,7 +470,7 @@ for src in $conf_sources; do
 		echo "error: source '$src' does not exist" 1>&2
 		exit 2
 	fi
-	
+
 	results="$($module_path $user_action)"
 
 	all_results="$(

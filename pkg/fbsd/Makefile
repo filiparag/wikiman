@@ -49,9 +49,12 @@ do-install-WDGTS-on:
 	(cd ${WRKSRC}/widgets && ${COPYTREE_BIN} . ${STAGEDIR}${PREFIX}/share/wikiman/widgets)
 
 do-install-COMPLT-on:
-	${MKDIR} ${STAGEDIR}${PREFIX}/share/fish/completions \
+	${MKDIR} ${STAGEDIR}${PREFIX}/etc/bash_completion.d \
+		 ${STAGEDIR}${PREFIX}/share/fish/completions \
 		 ${STAGEDIR}${PREFIX}/share/zsh/site-functions
 
+	${INSTALL_DATA} ${WRKSRC}/completions/completions.bash \
+			${STAGEDIR}${PREFIX}/etc/bash_completion.d/wikiman-completion.bash
 	${INSTALL_DATA} ${WRKSRC}/completions/completions.fish \
 			${STAGEDIR}${PREFIX}/share/fish/completions/wikiman.fish
 	${INSTALL_DATA} ${WRKSRC}/completions/completions.zsh \

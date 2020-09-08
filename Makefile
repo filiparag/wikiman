@@ -34,8 +34,10 @@ widgets: core
 
 completions: core
 
-	@mkdir -p 	${BUILDDIR}/usr/share/fish/completions \
+	@mkdir -p 	${BUILDDIR}/etc/bash_completion.d \
+				${BUILDDIR}/usr/share/fish/completions \
 				${BUILDDIR}/usr/share/zsh/site-functions
+	@install 	-Dm644 	${WORKDIR}/completions/completions.bash	${BUILDDIR}/etc/bash_completion.d/${NAME}-completion.bash
 	@install 	-Dm644 	${WORKDIR}/completions/completions.fish	${BUILDDIR}/usr/share/fish/completions/${NAME}.fish
 	@install 	-Dm644 	${WORKDIR}/completions/completions.zsh	${BUILDDIR}/usr/share/zsh/site-functions/_${NAME}
 
@@ -47,7 +49,7 @@ config:
 docs:
 
 	@mkdir -p 	${BUILDDIR}/usr/share/doc/${NAME}
-	@install 	-Dm644 	${WORKDIR}/README.md 	${BUILDDIR}/usr/share/doc/wikiman
+	@install 	-Dm644 	${WORKDIR}/README.md 	${BUILDDIR}/usr/share/doc/${NAME}
 
 reinstall: install
 install: all
@@ -78,14 +80,20 @@ uninstall:
 
 	@rm -f	$(prefix)/etc/${NAME}.conf \
 			$(prefix)/usr/bin/${NAME} \
-			$(prefix)/usr/share/man/man1/${NAME}.1.gz
+			$(prefix)/usr/share/man/man1/${NAME}.1.gz \
+			$(prefix)/etc/bash_completion.d/${NAME}-completion.bash \
+			$(prefix)/usr/share/fish/completions/${NAME}.fish \
+			$(prefix)/usr/share/zsh/site-functions/_${NAME}
 	@rm -rf $(prefix)/usr/share/${NAME} \
 			$(prefix)/usr/share/licenses/${NAME} \
 			$(prefix)/usr/share/doc/${NAME}
 
 	@rm -f	$(prefix)/usr/local/etc/${NAME}.conf \
 			$(prefix)/usr/local/bin/${NAME} \
-			$(prefix)/usr/local/share/man/man1/${NAME}.1.gz
+			$(prefix)/usr/local/share/man/man1/${NAME}.1.gz \
+			$(prefix)/etc/bash_completion.d/${NAME}-completion.bash \
+			$(prefix)/usr/share/fish/completions/${NAME}.fish \
+			$(prefix)/usr/share/zsh/site-functions/_${NAME}
 	@rm -rf $(prefix)/usr/local/share/${NAME} \
 			$(prefix)/usr/local/share/licenses/${NAME} \
 			$(prefix)/usr/local/share/doc/${NAME}

@@ -28,12 +28,19 @@ setup() {
 	results_text=''
 
 	langs="$(echo "$conf_wiki_lang" | awk -F ' ' '{
-		for(i=1;i<=NF;i++) {
-			lang=tolower($i);
-			gsub(/[-_].*$/,"",lang);
-			locale=toupper($i);
-			gsub(/^.*[-_]/,"",locale);
-			printf("%s%s%s",lang,(length($i)==2)?"*":locale,(i==NF)?"":"|");
+		for (i = 1; i <= NF; i++) {
+			lang = $i;
+			gsub(/[_-].*$/,"",lang);
+			lang = tolower(lang);
+			loc = $i;
+			locale = gsub(/^.*[_-]/,"",loc);
+			loc = toupper(loc);
+			if (locale)
+				printf("%s-%s%s", lang, loc, (i == NF) ? "" : "|");
+			else {
+				printf("%s|", lang);
+				printf("%s*%s", lang, (i == NF) ? "" : "|");
+			}
 		}
 	}')"
 		

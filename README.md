@@ -54,13 +54,19 @@ sudo zypper in wikiman*.rpm
 
 ### FreeBSD
 
-Download latest *.txz* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
+Install [textproc/wikiman](https://www.freshports.org/textproc/wikiman) from the Ports Collection:
+
+```bash
+portsnap auto
+cd /usr/ports/textproc/wikiman
+make install
+```
+
+Or download latest *.txz* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
 ```bash
 pkg install wikiman*.txz
 ```
-
-Or build [the port](https://github.com/filiparag/wikiman/tree/master/pkg/fbsd) yourself.
 
 ### Manual installation for Linux and BSD
 

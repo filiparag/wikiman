@@ -3,7 +3,6 @@
 
 PORTNAME=	wikiman
 DISTVERSION=	2.12.1
-PORTREVISION=	1
 CATEGORIES=	textproc
 
 MAINTAINER=	filip@parag.rs
@@ -12,52 +11,57 @@ COMMENT=	Offline interactive documentation search
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-RUN_DEPENDS=	findutils>4:misc/findutils gawk>5:lang/gawk \
-		ripgrep>12:textproc/ripgrep fzf>0.2:textproc/fzf \
+RUN_DEPENDS=	findutils>4:misc/findutils \
+		fzf>0.2:textproc/fzf \
+		gawk>5:lang/gawk \
+		ripgrep>12:textproc/ripgrep \
 		w3m>0.5:www/w3m
 
-USE_GITHUB=	YES
+USE_GITHUB=	yes
 GH_ACCOUNT=	filiparag
 
-OPTIONS_DEFINE=	DOCS CONFIG WDGTS COMPLT
-OPTIONS_DEFAULT=DOCS CONFIG WDGTS COMPLT
-OPTIONS_SUB=	YES
-CONFIG_DESC=	Global configuration file
-WDGTS_DESC=	Shell keybind widgets
-COMPLT_DESC=	Shell completions for fish and zsh
+NO_ARCH=	yes
+
+OPTIONS_DEFINE=		BASH CONFIG DOCS FISH WDGTS ZSH
+OPTIONS_DEFAULT=	BASH CONFIG DOCS FISH WDGTS ZSH
+OPTIONS_SUB=		yes
+CONFIG_DESC=		Global configuration file
+WDGTS_DESC=		Shell keybind widgets
+BASH_PLIST_FILES=	etc/bash_completion.d/wikiman-completion.bash
+FISH_PLIST_FILES=	share/fish/completions/wikiman.fish
+ZSH_PLIST_FILES=	share/zsh/site-functions/_wikiman
 
 do-install:
-	${MKDIR} ${STAGEDIR}${BINDIR} ${STAGEDIR}${PREFIX}/share/wikiman/sources \
-		 ${STAGEDIR}${MANPREFIX}/man/man1
-
 	${INSTALL_SCRIPT} ${WRKSRC}/wikiman.sh ${STAGEDIR}${PREFIX}/bin/wikiman
-	(cd ${WRKSRC}/sources && ${COPYTREE_BIN} . ${STAGEDIR}${PREFIX}/share/wikiman/sources)
 
-	${GZIP_CMD} ${WRKSRC}/wikiman.1.man
-	${INSTALL_MAN} ${WRKSRC}/wikiman.1.man.gz ${STAGEDIR}${MANPREFIX}/man/man1/wikiman.1.gz
+	@${MKDIR} ${STAGEDIR}${DATADIR}/sources
+	(cd ${WRKSRC}/sources && ${COPYTREE_BIN} . ${STAGEDIR}${DATADIR}/sources)
 
-do-install-DOCS-on:
-	${MKDIR} ${STAGEDIR}${DOCSDIR}
-	${INSTALL_DATA} ${WRKSRC}/README.md ${STAGEDIR}${DOCSDIR}
+	${INSTALL_MAN} ${WRKSRC}/wikiman.1.man ${STAGEDIR}${MANPREFIX}/share/man/man1/wikiman.1
+
+do-install-BASH-on:
+	@${MKDIR} ${STAGEDIR}${PREFIX}/etc/bash_completion.d
+	${INSTALL_DATA} ${WRKSRC}/completions/completions.bash \
+		${STAGEDIR}${PREFIX}/etc/bash_completion.d/wikiman-completion.bash
 
 do-install-CONFIG-on:
-	${MKDIR} ${STAGEDIR}${PREFIX}/etc
-	${INSTALL_DATA} ${WRKSRC}/wikiman.conf ${STAGEDIR}${PREFIX}/etc
+	@${MKDIR} ${STAGEDIR}${PREFIX}/etc
+	${INSTALL_DATA} ${WRKSRC}/wikiman.conf ${STAGEDIR}${PREFIX}/etc/wikiman.conf.sample
+
+do-install-DOCS-on:
+	@${MKDIR} ${STAGEDIR}${DOCSDIR}
+	${INSTALL_DATA} ${WRKSRC}/README.md ${STAGEDIR}${DOCSDIR}
+
+do-install-FISH-on:
+	@${MKDIR} ${STAGEDIR}${PREFIX}/share/fish/completions
+	${INSTALL_DATA} ${WRKSRC}/completions/completions.fish ${STAGEDIR}${PREFIX}/share/fish/completions/wikiman.fish
 
 do-install-WDGTS-on:
-	${MKDIR} ${STAGEDIR}${PREFIX}/share/wikiman/widgets
-	(cd ${WRKSRC}/widgets && ${COPYTREE_BIN} . ${STAGEDIR}${PREFIX}/share/wikiman/widgets)
+	@${MKDIR} ${STAGEDIR}${DATADIR}/widgets
+	(cd ${WRKSRC}/widgets && ${COPYTREE_BIN} . ${STAGEDIR}${DATADIR}/widgets)
 
-do-install-COMPLT-on:
-	${MKDIR} ${STAGEDIR}${PREFIX}/etc/bash_completion.d \
-		 ${STAGEDIR}${PREFIX}/share/fish/completions \
-		 ${STAGEDIR}${PREFIX}/share/zsh/site-functions
-
-	${INSTALL_DATA} ${WRKSRC}/completions/completions.bash \
-			${STAGEDIR}${PREFIX}/etc/bash_completion.d/wikiman-completion.bash
-	${INSTALL_DATA} ${WRKSRC}/completions/completions.fish \
-			${STAGEDIR}${PREFIX}/share/fish/completions/wikiman.fish
-	${INSTALL_DATA} ${WRKSRC}/completions/completions.zsh \
-			${STAGEDIR}${PREFIX}/share/zsh/site-functions/_wikiman
+do-install-ZSH-on:
+	@${MKDIR} ${STAGEDIR}${PREFIX}/share/zsh/site-functions
+	${INSTALL_DATA} ${WRKSRC}/completions/completions.zsh ${STAGEDIR}${PREFIX}/share/zsh/site-functions/_wikiman
 
 .include <bsd.port.mk>

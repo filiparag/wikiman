@@ -116,12 +116,12 @@ curl -L 'https://raw.githubusercontent.com/filiparag/wikiman/master/Makefile' -o
 # Example for Linux: install Arch Wiki
 make -f ./wikiman-makefile source-arch
 sudo make -f ./wikiman-makefile source-install
-make -f ./wikiman-makefile clean
+sudo make -f ./wikiman-makefile clean
 
 # Example for BSD: install FreeBSD Documentation
-make -f ./wikiman-makefile source-fbsd local
+make -f ./wikiman-makefile source-fbsd
 sudo make -f ./wikiman-makefile source-install
-make -f ./wikiman-makefile clean
+sudo make -f ./wikiman-makefile clean
 ```
 
 After installation, they should be enabled automatically if 

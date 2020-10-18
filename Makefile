@@ -128,7 +128,8 @@ source-reinstall: source-install
 source-install: source
 
 	@mkdir -p 	$(prefix)/usr/share/doc
-	@cp -rf 	${SOURCESDIR}/usr/share/doc/* $(prefix)/usr/share/doc
+	@cp -rf 	${SOURCESDIR}/usr/share/doc $(prefix)/usr/share/doc
+	@cp -rf 	${SOURCESDIR}/usr/local/share/doc $(prefix)/usr/share/doc
 
 source-clean:
 

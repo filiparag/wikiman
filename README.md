@@ -119,7 +119,7 @@ sudo make -f ./wikiman-makefile source-install
 sudo make -f ./wikiman-makefile clean
 
 # Example for BSD: install FreeBSD Documentation
-make -f ./wikiman-makefile source-fbsd
+make -f ./wikiman-makefile source-fbsd local
 sudo make -f ./wikiman-makefile source-install
 sudo make -f ./wikiman-makefile clean
 ```

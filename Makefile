@@ -125,11 +125,15 @@ source:
 source-all: source-arch source-gentoo source-fbsd source-tldr
 
 source-reinstall: source-install
-source-install: source
+source-install:
 
-	@mkdir -p 	$(prefix)/usr/share/doc
-	@cp -rf 	${SOURCESDIR}/usr/share/doc $(prefix)/usr/share/doc
-	@cp -rf 	${SOURCESDIR}/usr/local/share/doc $(prefix)/usr/share/doc
+	@[ -d ${SOURCESDIR}/usr/share/doc ] && \
+				mkdir -p $(prefix)/usr/share/doc && \
+				cp -rf 	 ${SOURCESDIR}/usr/share/doc $(prefix)/usr/share || true
+
+	@[ -d ${SOURCESDIR}/usr/local/share/doc ] && \
+				mkdir -p $(prefix)/usr/local/share/doc && \
+				cp -rf 	 ${SOURCESDIR}/usr/local/share/doc $(prefix)/usr/local/share || true
 
 source-clean:
 

@@ -2,6 +2,8 @@
 
 # Targeted for Arch Linux
 
+yay -S discount --noconfirm
+
 mkdir -p ./tldr
 cd ./tldr
 

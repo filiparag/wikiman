@@ -1,5 +1,5 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "8 September 2020" "wikiman 2.12" "wikiman manual"
+.TH "wikiman" 1 "7 January 2021" "wikiman 2.12.2" "wikiman manual"
 
 .SH NAME
 .B wikiman

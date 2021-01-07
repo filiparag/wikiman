@@ -2,6 +2,8 @@
 
 # Targeted for Arch Linux
 
+yay -S pup --needed --noconfirm
+
 mkdir -p ./gentoo
 
 cd ./gentoo

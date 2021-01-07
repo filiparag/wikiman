@@ -1,5 +1,5 @@
 NAME=		wikiman
-VERSION=	2.11.4
+VERSION=	2.12.2
 RELEASE=	1
 UPSTREAM=	https://github.com/filiparag/wikiman
 SOURCES= 	${UPSTREAM}/releases/download/
@@ -154,7 +154,7 @@ source-uninstall:
 
 source-arch: source
 
-	@curl -L 	'${SOURCES}/2.9/arch-wiki_20200903.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
+	@curl -L 	'${SOURCES}/2.12.2/arch-wiki_20210107.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
 	@tar xf 	${SOURCESDIR}/tmp/arch.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp
 
@@ -166,12 +166,12 @@ source-gentoo: source
 	
 source-fbsd: source
 
-	@curl -L 	'${SOURCES}/2.9/freebsd-docs_20200903.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
+	@curl -L 	'${SOURCES}/2.12.2/freebsd-docs_20210107.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
 	@tar xf 	${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp
 
 source-tldr: source
 
-	@curl -L 	'${SOURCES}/2.9/tldr-pages_20200903.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
-	@tar xf 	${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
+	@curl -L 	'${SOURCES}/2.12.2/tldr-pages_20210107.tar.xz' -o ${SOURCESDIR}/tmp/tldr.tar.xz
+	@tar xf 	${SOURCESDIR}/tmp/tldr.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp

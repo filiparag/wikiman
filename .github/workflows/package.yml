@@ -3,153 +3,148 @@ name: Packager
 on:
   push:
     tags:
-      - '*.*'
-      - '*.*.*'
+      - "*.*"
+      - "*.*.*"
 
 jobs:
-
   arch:
     name: Arch Linux
     runs-on: ubuntu-latest
     container: archlinux:latest
 
     steps:
-    - uses: actions/checkout@v2.3.2
-    - name: Prepare system
-      id: prepare
-      run: |
-        pacman -Syu --noconfirm make binutils fakeroot nodejs npm curl
-        echo "COMPRESSZST=(zstd -c -T0 --ultra -20 -) PKGEXT='.pkg.tar.zst'" >> /etc/makepkg.conf
+      - uses: actions/checkout@v2.3.2
+      - name: Prepare system
+        id: prepare
+        run: |
+          pacman -Syu --noconfirm make binutils fakeroot nodejs npm curl
+          echo "COMPRESSZST=(zstd -c -T0 --ultra -20 -) PKGEXT='.pkg.tar.zst'" >> /etc/makepkg.conf
 
-    - name: Prepare source package
-      id: package
-      run: |
-        curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
-        echo "pkgver=${GITHUB_REF#refs/*/}" > PKGBUILD
-        echo "pkgrel=1" >> PKGBUILD
-        hashsum="$(sha256sum "${GITHUB_REF#refs/*/}.tar.gz" | cut -d' ' -f1)"
-        echo "sha256sums=('$hashsum')" >> PKGBUILD
-        echo "source=("${GITHUB_REF#refs/*/}.tar.gz")" >> PKGBUILD
-        curl 'https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=wikiman' -so PKGBUILD.original
-        sed '/^pkgver=/d; /^pkgrel=/d; /^source=/d; /^sha256sums=/d' -i PKGBUILD.original
-        cat PKGBUILD.original >> PKGBUILD
+      - name: Prepare source package
+        id: package
+        run: |
+          curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
+          echo "pkgver=${GITHUB_REF#refs/*/}" > PKGBUILD
+          echo "pkgrel=1" >> PKGBUILD
+          hashsum="$(sha256sum "${GITHUB_REF#refs/*/}.tar.gz" | cut -d' ' -f1)"
+          echo "sha256sums=('$hashsum')" >> PKGBUILD
+          echo "source=("${GITHUB_REF#refs/*/}.tar.gz")" >> PKGBUILD
+          curl 'https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=wikiman' -so PKGBUILD.original
+          sed '/^pkgver=/d; /^pkgrel=/d; /^source=/d; /^sha256sums=/d' -i PKGBUILD.original
+          cat PKGBUILD.original >> PKGBUILD
 
-    - name: Build package
-      id: build
-      run: |    
-        useradd builder
-        chown -R builder:builder .
-        su builder -c 'makepkg --printsrcinfo > .SRCINFO'
-        su builder -c 'makepkg -d'
-        mv ./wikiman-*.pkg.* wikiman-latest-any.pkg.tar.zst
+      - name: Build package
+        id: build
+        run: |
+          useradd builder
+          chown -R builder:builder .
+          su builder -c 'makepkg --printsrcinfo > .SRCINFO'
+          su builder -c 'makepkg -d'
+          mv ./wikiman-*.pkg.* wikiman-latest-any.pkg.tar.zst
 
-    - name: Test installation
-      id: test
-      run: |
-        pacman -U --noconfirm wikiman-latest-any.pkg.tar.zst
+      - name: Test installation
+        id: test
+        run: |
+          pacman -U --noconfirm wikiman-latest-any.pkg.tar.zst
 
-    - name: Upload package
-      id: upload_artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: package-arch
-        path: wikiman-latest-any.pkg.tar.zst
+      - name: Upload package
+        id: upload_artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: package-arch
+          path: wikiman-latest-any.pkg.tar.zst
 
   ubuntu:
     name: Ubuntu
     runs-on: ubuntu-latest
     container: ubuntu:latest
     steps:
+      - name: Prepare system
+        id: prepare
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          ln -fs /usr/share/zoneinfo/Europe/Belgrade /etc/localtime
+          apt update
+          apt -y install make nodejs curl
+          dpkg-reconfigure --frontend noninteractive tzdata
 
-    - name: Prepare system
-      id: prepare
-      run: |
-        export DEBIAN_FRONTEND=noninteractive
-        ln -fs /usr/share/zoneinfo/Europe/Belgrade /etc/localtime
-        apt update
-        apt -y install make nodejs curl
-        dpkg-reconfigure --frontend noninteractive tzdata
+      - name: Prepare source package
+        id: package
+        run: |
+          curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
+          tar zxf ${GITHUB_REF#refs/*/}.tar.gz
 
-    - name: Prepare source package
-      id: package
-      run: |
-        curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
-        tar zxf ${GITHUB_REF#refs/*/}.tar.gz
+      - name: Compile package
+        id: compile
+        run: |
+          make -f wikiman-${GITHUB_REF#refs/*/}/Makefile
+          mkdir -p wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
+          cp wikiman-${GITHUB_REF#refs/*/}/pkg/deb/conffiles wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
+          cp wikiman-${GITHUB_REF#refs/*/}/pkg/deb/control wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
+          sed "s|BUILDER_PKGVER|${GITHUB_REF#refs/*/}|g" -i wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN/control
 
-    - name: Compile package
-      id: compile
-      run: |
-        make -f wikiman-${GITHUB_REF#refs/*/}/Makefile
-        mkdir -p wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
-        cp wikiman-${GITHUB_REF#refs/*/}/pkg/deb/conffiles wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
-        cp wikiman-${GITHUB_REF#refs/*/}/pkg/deb/control wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
-        sed "s|BUILDER_PKGVER|${GITHUB_REF#refs/*/}|g" -i wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN/control
+      - name: Build package
+        id: build
+        run: |
+          dpkg -b wikiman-${GITHUB_REF#refs/*/}/pkgbuild wikiman-latest_any.deb
 
-    - name: Build package
-      id: build
-      run: |
-        dpkg -b wikiman-${GITHUB_REF#refs/*/}/pkgbuild wikiman-latest_any.deb
+      - name: Test installation
+        id: test
+        run: |
+          apt -y install ./wikiman-latest_any.deb
 
-    - name: Test installation
-      id: test
-      run: |
-        apt -y install man fzf ripgrep gawk w3m coreutils
-        dpkg -i wikiman-latest_any.deb
-
-    - name: Upload package
-      id: upload_artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: package-ubuntu
-        path: wikiman-latest_any.deb
+      - name: Upload package
+        id: upload_artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: package-ubuntu
+          path: wikiman-latest_any.deb
 
   fedora:
     name: Fedora
     runs-on: ubuntu-latest
     container: fedora:latest
     steps:
+      - name: Prepare system
+        id: prepare
+        run: |
+          dnf install -y rpm-build make nodejs curl
+          mkdir -p ~/rpmbuild/SOURCES
+          mkdir -p ~/rpmbuild/SPECS
 
-    - name: Prepare system
-      id: prepare
-      run: |
-        dnf install -y rpm-build make nodejs curl
-        mkdir -p ~/rpmbuild/SOURCES
-        mkdir -p ~/rpmbuild/SPECS
-    
-    - name: Prepare source package
-      id: package
-      run: |
-        curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
-        tar zxf ${GITHUB_REF#refs/*/}.tar.gz
-        cp wikiman-${GITHUB_REF#refs/*/}/pkg/rpm/.spec ~/rpmbuild/SPECS/wikiman.spec
-        mv ${GITHUB_REF#refs/*/}.tar.gz ~/rpmbuild/SOURCES
+      - name: Prepare source package
+        id: package
+        run: |
+          curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
+          tar zxf ${GITHUB_REF#refs/*/}.tar.gz
+          cp wikiman-${GITHUB_REF#refs/*/}/pkg/rpm/.spec ~/rpmbuild/SPECS/wikiman.spec
+          mv ${GITHUB_REF#refs/*/}.tar.gz ~/rpmbuild/SOURCES
 
-    - name: Build package
-      id: build
-      run: |
-        export PKGVER="${GITHUB_REF#refs/*/}"
-        export PKGREL="1"
-        rpmbuild -bb ~/rpmbuild/SPECS/wikiman.spec
-        mv ~/rpmbuild/RPMS/noarch/wikiman-*.rpm wikiman-latest.noarch.rpm
+      - name: Build package
+        id: build
+        run: |
+          export PKGVER="${GITHUB_REF#refs/*/}"
+          export PKGREL="1"
+          rpmbuild -bb ~/rpmbuild/SPECS/wikiman.spec
+          mv ~/rpmbuild/RPMS/noarch/wikiman-*.rpm wikiman-latest.noarch.rpm
 
-    - name: Test installation
-      id: test
-      run: |
-        dnf install -y wikiman-latest.noarch.rpm
+      - name: Test installation
+        id: test
+        run: |
+          dnf install -y wikiman-latest.noarch.rpm
 
-    - name: Upload package
-      id: upload_artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: package-fedora
-        path: wikiman-latest.noarch.rpm
+      - name: Upload package
+        id: upload_artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: package-fedora
+          path: wikiman-latest.noarch.rpm
 
   publish:
     name: Upload Release Asset
     runs-on: ubuntu-latest
-    needs: [ arch, ubuntu, fedora ]
+    needs: [arch, ubuntu, fedora]
     steps:
-
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1

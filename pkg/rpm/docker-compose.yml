@@ -21,7 +21,7 @@ services:
         cd ~
         tar czf ~/rpmbuild/SOURCES/${PKGVER}.tar.gz ./wikiman-${PKGVER} &&
         rpmbuild -bb ~/rpmbuild/SPECS/wikiman.spec &&
-        mv ~/rpmbuild/RPMS/noarch/wikiman-${PKGVER}-${PKGREL}.fc32.noarch.rpm /release &&
-        chown ${UID}:${UID} /release/wikiman-${PKGVER}-${PKGREL}.fc32.noarch.rpm &&
+        mv ~/rpmbuild/RPMS/noarch/wikiman-${PKGVER}-${PKGREL}.* /release/wikiman-${PKGVER}-${PKGREL}.noarch.rpm &&
+        chown ${UID}:${UID} /release/wikiman-${PKGVER}-${PKGREL}.noarch.rpm &&
         echo Build completed successfully!
       "

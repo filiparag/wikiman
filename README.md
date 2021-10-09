@@ -95,19 +95,15 @@ Wikiman uses GNU `find` and `awk`, so BSD users have to install `findutils` and 
 
 ## Additional documentation sources
 
-Due to their large size, wikis don't come bundled with Wikiman.
-If you want to use them, you can download their snapshots using following commands.
-
-User source modules are located in `~/.config/wikiman/sources/`,
-and system-wide sources are in `/usr/share/wikiman/sources/`.
-If there is a name collision, user modules have priority over system-wide sources.
-
-Available optional sources are:
+Currently available optional sources are:
 
 - Arch Wiki (`arch`)
 - Gentoo Wiki (`gentoo`)
 - FreeBSD Documentation (`fbsd`)
 - TLDR Pages (`tldr`)
+
+Due to their large size, wikis don't come bundled with Wikiman.
+If you want to use them, you can download their latest snapshots using following commands.
 
 ```bash
 # Download latest Makefile

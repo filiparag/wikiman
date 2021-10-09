@@ -154,24 +154,28 @@ source-uninstall:
 
 source-arch: source
 
-	@curl -L 	'${SOURCES}/2.12.2/arch-wiki_20210107.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
+	@curl -L 	'${SOURCES}/2.13/arch-wiki_20211009.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
+	@sha1sum 	${SOURCESDIR}/tmp/arch.tar.xz | grep -q '7b5c90b90e159f81dfc7c7e1373a4f6715810dc3'
 	@tar xf 	${SOURCESDIR}/tmp/arch.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp
 
 source-gentoo: source
 
 	@curl -L 	'${SOURCES}/2.7/gentoo-wiki_20200831-1.tar.xz' -o ${SOURCESDIR}/tmp/gentoo.tar.xz
+	@sha1sum 	${SOURCESDIR}/tmp/gentoo.tar.xz | grep -q '5abbba5ca440865a766bbb939a3cbb5194096dfb'
 	@tar xf 	${SOURCESDIR}/tmp/gentoo.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp
 	
 source-fbsd: source
 
-	@curl -L 	'${SOURCES}/2.12.2/freebsd-docs_20210107.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
+	@curl -L 	'${SOURCES}/2.13/freebsd-docs_20211009.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
+	@sha1sum 	${SOURCESDIR}/tmp/fbsd.tar.xz | grep -q '96c00949613fd21f107d3bf8f1df59ebd61cc40a'
 	@tar xf 	${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp
 
 source-tldr: source
 
-	@curl -L 	'${SOURCES}/2.12.2/tldr-pages_20210107.tar.xz' -o ${SOURCESDIR}/tmp/tldr.tar.xz
+	@curl -L 	'${SOURCES}/2.13/tldr-pages_20211009.tar.xz' -o ${SOURCESDIR}/tmp/tldr.tar.xz
+	@sha1sum 	${SOURCESDIR}/tmp/tldr.tar.xz | grep -q 'ea7a8dd21ca79079762e3b3c25ad048df0e800a8'
 	@tar xf 	${SOURCESDIR}/tmp/tldr.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp

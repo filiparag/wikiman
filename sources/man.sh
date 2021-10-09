@@ -161,39 +161,11 @@ search() {
 		echo "$results_name" | "$conf_awk" -F '\t' \
 			"BEGIN {
 				IGNORECASE=1;
-				count=0;
 			};
 			NF>0 {
-				matches[count,0] = \$1+0;
-				matches[count,1] = \$2;
-				matches[count,2] = \$3;
-				matches[count,3] = \$4;
-				matches[count,4] = \$5;
-				count++;
-			};
-			END {
-				for (i = 0; i < count; i++)
-					for (j = i; j < count; j++)
-						if (matches[i,0] < matches[j,0]) {
-							a = matches[i,0];
-							t = matches[i,1];
-							s = matches[i,2];
-							l = matches[i,3];
-							p = matches[i,4];
-							matches[i,0] = matches[j,0];
-							matches[i,1] = matches[j,1];
-							matches[i,2] = matches[j,2];
-							matches[i,3] = matches[j,3];
-							matches[i,4] = matches[j,4];
-							matches[j,0] = a;
-							matches[j,1] = t;
-							matches[j,2] = s;
-							matches[j,3] = l;
-							matches[j,4] = p;
-						};
-				for (i = 0; i < count; i++)
-					printf(\"%s (%s)\t%s\t$name\t%s\n\",matches[i,1],matches[i,2],matches[i,3],matches[i,4]);
-			};"
+				printf(\"%s\t%s (%s)\t%s\t$name\t%s\n\",\$1+0,\$2,\$3,\$4,\$5);
+			};" | \
+		"$conf_sort" -rV -k1 | cut -d'	' -f2-
 	)"
 
 	# Search by description

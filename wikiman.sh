@@ -10,8 +10,13 @@ conf_awk='awk'
 "$conf_awk" --help >/dev/null 2>/dev/null || \
 	conf_awk='gawk'
 
+conf_sort='sort'
+echo | "$conf_sort" -V >/dev/null 2>/dev/null || \
+	conf_sort='gsort'
+
 export conf_find
 export conf_awk
+export conf_sort
 
 tui_preview() {
 	command="$(echo "$@" | "$conf_awk" -F '\t' \

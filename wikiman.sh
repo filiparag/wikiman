@@ -27,7 +27,8 @@ tui_preview() {
 					printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
 				}
 			} else {
-				printf(\"w3m '%s'\n\",\$NF);
+				gsub(\"\\\"\",\"\\\\\\\"\",\$NF);
+				printf(\"w3m \\\"%s\\\"\n\",\$NF);
 			}
 		};"
 	)"
@@ -315,7 +316,8 @@ picker_tui() {
 						printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
 					}
 				} else {
-					printf(\"$conf_tui_html '%s'\n\",\$NF);
+					gsub(\"\\\"\",\"\\\\\\\"\",\$NF);
+					printf(\"$conf_tui_html \\\"%s\\\"\n\",\$NF);
 				}
 			};"
 	)"
@@ -476,7 +478,6 @@ for src in $conf_sources; do
 	)"
 
 done
-
 
 all_results="$(
 	echo "$parallel_jobs" | parallel

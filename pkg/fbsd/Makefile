@@ -15,7 +15,8 @@ RUN_DEPENDS=	findutils>4:misc/findutils \
 		fzf>0.2:textproc/fzf \
 		gawk>5:lang/gawk \
 		ripgrep>12:textproc/ripgrep \
-		w3m>0.5:www/w3m
+		w3m>0.5:www/w3m \
+		parallel>0:sysutils/parallel
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	filiparag

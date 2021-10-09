@@ -70,7 +70,7 @@ pkg install wikiman*.txz
 
 ### Manual installation for Linux and BSD
 
-Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`, `coreutils`
+Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`, `coreutils`, `parallel`
 
 ```bash
 # Clone from GitHub

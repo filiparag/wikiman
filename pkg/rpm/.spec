@@ -12,7 +12,7 @@ Source0:        %{version}.tar.gz
 Obsoletes:      %{name} <= %{version}-%{release}
 Provides:       %{name} = %{version}-%{release}
 BuildRequires:  make
-Requires:       man fzf ripgrep gawk w3m findutils sed grep
+Requires:       man fzf ripgrep gawk w3m findutils sed grep parallel
 AutoReq:        no
 
 %description

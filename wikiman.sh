@@ -78,7 +78,7 @@ init() {
 
 	# Configuration variables
 
-	conf_version='2.12.2'
+	conf_version='2.13.0'
 
 	config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
 	config_file="$conf_sys_etc/wikiman.conf"
@@ -471,13 +471,16 @@ for src in $conf_sources; do
 		exit 2
 	fi
 
-	results="$($module_path $user_action)"
-
-	all_results="$(
-		printf '%s\n%s' "$all_results" "$results"
+	parallel_jobs="$(
+		printf '%s\n%s' "$parallel_jobs" "$module_path $user_action"
 	)"
 
 done
+
+
+all_results="$(
+	echo "$parallel_jobs" | parallel
+)"
 
 combine_results
 

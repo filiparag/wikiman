@@ -90,12 +90,12 @@ init() {
 	config_file="$conf_sys_etc/wikiman.conf"
 	config_file_usr="$config_dir/wikiman.conf"
 
-	[ -f "$config_file" ] && [ -r "$config_file" ] || \
+	[ -f "$config_file" -a -r "$config_file" ] || \
 		config_file=''
-	[ -f "$config_file_usr" ] && [ -r "$config_file_usr" ] || \
+	[ -f "$config_file_usr" -a -r "$config_file_usr" ] || \
 		config_file_usr=''
 
-	if [ -z "$config_file" ] && [ -z "$config_file_usr" ]; then
+	if [ -z "$config_file" -a -z "$config_file_usr" ]; then
 		echo "warning: configuration file missing, using defaults" 1>&2
 	else
 		conf_sources="$(
@@ -292,8 +292,8 @@ picker_tui() {
 		source_column='3,'
 	fi
 
-	if [ "$(echo "$conf_man_lang" | wc -w | sed 's| ||g')" = '1' ] && \
-		[ "$(echo "$conf_wiki_lang" | wc -w | sed 's| ||g')" = '1' ]; then
+	if [ "$(echo "$conf_man_lang" | wc -w)" = '1' -a \
+			"$(echo "$conf_wiki_lang" | wc -w)" = '1' ]; then
 		columns="${source_column}1"
 	else
 		columns="${source_column}2,1"
@@ -405,13 +405,13 @@ while getopts l:s:H:f:W:pqahRSkcv o; do
 		(H) conf_tui_html="$OPTARG";;
 		(k) conf_tui_keep_open='true';;
 		(l) conf_man_lang="$(
-				echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
+				echo "$OPTARG" | tr ',-' ' _'
 			)";
 			conf_wiki_lang="$(
-				echo "$OPTARG" | sed 's/,/ /g; s/_/-/g'
+				echo "$OPTARG" | tr ',_' ' -'
 			)";;
 		(s) conf_sources="$(
-				echo "$OPTARG" | sed 's/,/ /g; s/-/_/g'
+				echo "$OPTARG" | tr ',-' ' _'
 			)";;
 		(f) conf_fuzzy_finder="$OPTARG";;
 		(q) conf_quick_search='true';;

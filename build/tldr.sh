@@ -2,7 +2,7 @@
 
 # Targeted for Arch Linux
 
-yay -S discount --noconfirm
+paru -S discount --noconfirm
 
 mkdir -p ./tldr
 cd ./tldr

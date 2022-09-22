@@ -8,7 +8,7 @@ cd ./arch
 
 dir="$(pwd)"
 
-yay -S python-simplemediawiki --noconfirm
+paru -S python-simplemediawiki --noconfirm
 
 pip install --user cssselect
 

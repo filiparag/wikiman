@@ -1,5 +1,5 @@
 NAME=		wikiman
-VERSION=	2.12.2
+VERSION=	2.13.1
 RELEASE=	1
 UPSTREAM=	https://github.com/filiparag/wikiman
 SOURCES= 	${UPSTREAM}/releases/download/
@@ -154,8 +154,8 @@ source-uninstall:
 
 source-arch: source
 
-	@curl -L 	'${SOURCES}/2.13/arch-wiki_20211009.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
-	@sha1sum 	${SOURCESDIR}/tmp/arch.tar.xz | grep -q '7b5c90b90e159f81dfc7c7e1373a4f6715810dc3'
+	@curl -L 	'${SOURCES}/2.13.1/arch-wiki_20220922.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
+	@sha1sum 	${SOURCESDIR}/tmp/arch.tar.xz | grep -q '42efd791f7df39a1d4ad3434518e278152f5a00d'
 	@tar xf 	${SOURCESDIR}/tmp/arch.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp
 
@@ -175,7 +175,7 @@ source-fbsd: source
 
 source-tldr: source
 
-	@curl -L 	'${SOURCES}/2.13/tldr-pages_20211009.tar.xz' -o ${SOURCESDIR}/tmp/tldr.tar.xz
-	@sha1sum 	${SOURCESDIR}/tmp/tldr.tar.xz | grep -q 'ea7a8dd21ca79079762e3b3c25ad048df0e800a8'
+	@curl -L 	'${SOURCES}/2.13.1/tldr-pages_20220922.tar.xz' -o ${SOURCESDIR}/tmp/tldr.tar.xz
+	@sha1sum 	${SOURCESDIR}/tmp/tldr.tar.xz | grep -q '6b3a0452e3bdbbc27e37198eb2602ce7e887e2f5'
 	@tar xf 	${SOURCESDIR}/tmp/tldr.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp

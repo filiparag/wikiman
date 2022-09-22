@@ -65,7 +65,7 @@ jobs:
           export DEBIAN_FRONTEND=noninteractive
           ln -fs /usr/share/zoneinfo/Europe/Belgrade /etc/localtime
           apt update
-          apt -y install make nodejs curl
+          apt -y install make nodejs curl tzdata
           dpkg-reconfigure --frontend noninteractive tzdata
 
       - name: Prepare source package

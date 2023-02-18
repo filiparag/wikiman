@@ -302,7 +302,7 @@ picker_tui() {
 	choice="$(
 		echo "$all_results" | \
 		eval "$conf_fuzzy_finder --with-nth $columns --delimiter '\t' \
-			$preview --reverse --prompt 'wikiman > '"
+			$preview --reverse --preview-window=65%:wrap:border-sharp: --prompt 'wikiman > '"
 	)"
 
 	[ $? -ne 0 ] && return 1

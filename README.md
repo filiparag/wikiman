@@ -18,7 +18,7 @@ Follow [these](#additional-documentation-sources) instructions to enable optiona
 
 ### Arch Linux
 
-**Wikiman** is available in the [community repository](https://archlinux.org/packages/community/any/wikiman/) and can be installed via [pacman](https://wiki.archlinux.org/title/Pacman):
+Install from Arch Linux's [community](https://archlinux.org/packages/community/any/wikiman/) repository:
 
 ```bash
 pacman -S wikiman

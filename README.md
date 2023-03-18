@@ -27,26 +27,10 @@ pacman -S wikiman
 pacman -S arch-wiki-docs
 ```
 
-Or you can download the latest *.pkg.tar.zst* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
-
-```bash
+If you are running Manjaro or another Arch-based distribution, download the latest *.pkg.tar.zst* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab, and follow [these](https://github.com/filiparag/wikiman#installing-additional-sources) instructions to add Arch Wiki as a source.
+```sh
 sudo pacman -U wikiman*.pkg.tar.zst
 ```
-
-### Manjaro
-
-Similar intructions with [Arch Linux](#arch-linux) apply.
-
-```bash
-yay -Syu wikiman
-
-# Optional: Enable Arch Wiki
-yay -Syu arch-wiki-docs
-```
-
-On Manjaro, the package `arch-wiki-docs` is not in official repositories.
-
-Follow [these](#installing-additional-sources) instructions to download it.
 
 ### Ubuntu / Debian
 

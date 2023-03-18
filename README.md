@@ -16,18 +16,19 @@ Follow [these](#additional-documentation-sources) instructions to enable optiona
 
 ## Installation
 
-### Arch Linux / Manjaro ([AUR](https://aur.archlinux.org/packages/wikiman/))
+### Arch Linux
+
+Install from Arch Linux's [community](https://archlinux.org/packages/community/any/wikiman/) repository:
+
 ```bash
-yay -Syu wikiman
+pacman -S wikiman
 
 # Optional: Enable Arch Wiki
-yay -Syu arch-wiki-docs
+pacman -S arch-wiki-docs
 ```
-If you are running Manjaro, package `arch-wiki-docs` is not in official repositories.
-Follow [these](#installing-additional-sources) instructions to download it.
 
-Or download latest *.pkg.tar.zst* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
-```bash
+If you are running Manjaro or another Arch-based distribution, download the latest *.pkg.tar.zst* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab, and follow [these](https://github.com/filiparag/wikiman#installing-additional-sources) instructions to add Arch Wiki as a source.
+```sh
 sudo pacman -U wikiman*.pkg.tar.zst
 ```
 

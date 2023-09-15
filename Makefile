@@ -1,5 +1,5 @@
 NAME=		wikiman
-VERSION=	2.13.1
+VERSION=	2.13.2
 RELEASE=	1
 UPSTREAM=	https://github.com/filiparag/wikiman
 SOURCES= 	${UPSTREAM}/releases/download/
@@ -165,7 +165,7 @@ source-gentoo: source
 	@sha1sum 	${SOURCESDIR}/tmp/gentoo.tar.xz | grep -q '5abbba5ca440865a766bbb939a3cbb5194096dfb'
 	@tar xf 	${SOURCESDIR}/tmp/gentoo.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp
-	
+
 source-fbsd: source
 
 	@curl -L 	'${SOURCES}/2.13/freebsd-docs_20211009.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
@@ -175,7 +175,7 @@ source-fbsd: source
 
 source-tldr: source
 
-	@curl -L 	'${SOURCES}/2.13.1/tldr-pages_20220922.tar.xz' -o ${SOURCESDIR}/tmp/tldr.tar.xz
-	@sha1sum 	${SOURCESDIR}/tmp/tldr.tar.xz | grep -q '6b3a0452e3bdbbc27e37198eb2602ce7e887e2f5'
+	@curl -L 	'${SOURCES}/2.13.2/tldr-pages_20230915.tar.xz' -o ${SOURCESDIR}/tmp/tldr.tar.xz
+	@sha1sum 	${SOURCESDIR}/tmp/tldr.tar.xz | grep -q 'b90d3b8ee953c300df7065ec926664af9c40260a'
 	@tar xf 	${SOURCESDIR}/tmp/tldr.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp

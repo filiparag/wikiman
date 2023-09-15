@@ -84,7 +84,7 @@ init() {
 
 	# Configuration variables
 
-	conf_version='2.13.0'
+	conf_version='2.13.2'
 
 	config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
 	config_file="$conf_sys_etc/wikiman.conf"

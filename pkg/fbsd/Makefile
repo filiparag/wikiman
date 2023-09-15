@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	wikiman
-DISTVERSION=	2.13
+DISTVERSION=	2.13.2
 CATEGORIES=	textproc
 
 MAINTAINER=	filip@parag.rs

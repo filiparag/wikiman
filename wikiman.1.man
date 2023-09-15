@@ -1,5 +1,5 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "7 January 2021" "wikiman 2.12.2" "wikiman manual"
+.TH "wikiman" 1 "15 September 2023" "wikiman 2.13.2" "wikiman manual"
 
 .SH NAME
 .B wikiman
@@ -132,7 +132,7 @@ System-wide configuration location:
 /etc/wikiman.conf
 
 .SS Sources
-sources = 
+sources =
 
 .SS Fuzzy finder
 fuzzy_finder = fzf

@@ -154,8 +154,8 @@ source-uninstall:
 
 source-arch: source
 
-	@curl -L 	'${SOURCES}/2.13.1/arch-wiki_20220922.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
-	@sha1sum 	${SOURCESDIR}/tmp/arch.tar.xz | grep -q '42efd791f7df39a1d4ad3434518e278152f5a00d'
+	@curl -L 	'${SOURCES}/2.13.2/arch-wiki_20230915.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
+	@sha1sum 	${SOURCESDIR}/tmp/arch.tar.xz | grep -q 'edcb59741a98a40ac701caaab38f235e1e0fe95b'
 	@tar xf 	${SOURCESDIR}/tmp/arch.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp
 

@@ -18,7 +18,7 @@ Follow [these](#additional-documentation-sources) instructions to enable optiona
 
 ### Arch Linux
 
-Install from Arch Linux's [community](https://archlinux.org/packages/community/any/wikiman/) repository:
+Install from Arch Linux's [extra](https://archlinux.org/packages/extra/any/wikiman/) repository:
 
 ```bash
 pacman -S wikiman

@@ -18,6 +18,10 @@ export conf_find
 export conf_awk
 export conf_sort
 
+newline='
+'
+export newline
+
 tui_preview() {
 	command="$(echo "$@" | "$conf_awk" -F '\t' \
 		"{

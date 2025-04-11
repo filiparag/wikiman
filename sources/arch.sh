@@ -43,21 +43,25 @@ setup() {
 			}
 		}
 	}')"
-		
+
 	search_paths="$(
 		"$conf_find" "$path" -maxdepth 1 -mindepth 1 -type d -printf '%p\n' | \
 		awk "/$langs/"
 	)"
 
+	paths=''
 	for rg_l in $(echo "$langs" | sed 's|*|.*|g; s|\||\n|g'); do
 		p="$(echo "$search_paths" | awk "/$rg_l/ {printf(\"%s \",\$0)}")"
 		if [ "$p" != '' ]; then
-			paths="$paths $p"
+			paths="$paths${paths:+$newline}$p"
 		else
 			l="$(echo "$rg_l" | sed 's|_\.\*||g')"
 			echo "warning: Arch Wiki for '$l' does not exist" 1>&2
 		fi
 	done
+	paths="$(
+		echo "$paths" | sort | uniq | tr '\n' ' '
+	)"
 
 	if [ "$(echo "$paths" | wc -w | sed 's| ||g')" = '0' ]; then
 		return 1
@@ -158,7 +162,7 @@ search() {
 					lm = length(matched)
 					gsub(\" \",\"\",matched);
 					gsub(\"_\",\"\",matched);
-					
+
 					if (length(matched)==0)
 						accuracy = length(title)*100;
 					else

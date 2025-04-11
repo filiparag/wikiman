@@ -94,7 +94,7 @@ list() {
 			path = \$0
 			gsub(/:[0-9]+$/,\"\",path);
 
-			lang = \$7;
+			lang = \$($nf-1);
 
 			if (title~/^Category:/) {
 				gsub(/^Category:/,\"\",title);
@@ -133,7 +133,7 @@ search() {
 				path = \$0
 				gsub(/:[0-9]+$/,\"\",path);
 
-				lang = \$7;
+				lang = \$($nf-1);
 
 				if (title~/^Category:/) {
 					gsub(/^Category:/,\"\",title);
@@ -202,7 +202,7 @@ search() {
 					path = \$0
 					gsub(/:[0-9]+$/,\"\",path);
 
-					lang = \$7;
+					lang = \$($nf-1);
 
 					if (title~/^Category:/) {
 						gsub(/^Category:/,\"\",title);

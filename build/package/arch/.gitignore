@@ -1,0 +1,5 @@
+*
+!.gitignore
+!compose.yml
+!.env
+!PKGBUILD

@@ -1,12 +1,9 @@
-version: '3.8'
-
 services:
   builder:
     image: fedora:latest
     volumes:
       - ../release:/release:rw
-      - .:/pkg:ro
-      - ../..:/src:ro
+      - ../../..:/src:ro
     command: >
       bash -c "
         echo Building wikiman-${PKGVER}-${PKGREL} for Fedora... &&
@@ -16,7 +13,7 @@ services:
         dnf install -y rpm-build make &&
         mkdir -p ~/rpmbuild/SOURCES &&
         mkdir -p ~/rpmbuild/SPECS &&
-        cp /src/pkg/rpm/.spec ~/rpmbuild/SPECS/wikiman.spec &&
+        cp /src/build/package/rpm/wikiman.spec ~/rpmbuild/SPECS/wikiman.spec &&
         cp -arp /src ~/wikiman-${PKGVER} &&
         cd ~
         tar czf ~/rpmbuild/SOURCES/${PKGVER}.tar.gz ./wikiman-${PKGVER} &&

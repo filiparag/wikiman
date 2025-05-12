@@ -1,16 +1,13 @@
-version: '3.8'
-
 services:
   builder:
     image: archlinux:latest
     volumes:
       - ../release:/release:rw
-      - .:/pkg:ro
-      - ../..:/src:ro
+      - ../../..:/src:ro
     command: >
       bash -c "
         echo Building wikiman-${PKGVER}-${PKGREL} for Arch Linux... &&
-        pacman -Sy --noconfirm make binutils fakeroot curl &&
+        pacman -Sy --noconfirm make binutils fakeroot curl debugedit &&
         mkdir /tmp/build &&
         cd /tmp/build &&
         cp -arp /src /tmp/build/wikiman-${PKGVER} &&
@@ -19,7 +16,7 @@ services:
         echo 'pkgrel=${PKGREL}' >> PKGBUILD &&
         echo \"sha256sums=('`sha256sum ${PKGVER}.tar.gz | cut -d' ' -f1`')\" >> PKGBUILD &&
         echo 'source=('${PKGVER}.tar.gz')' >> PKGBUILD &&
-        curl 'https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=wikiman' -so PKGBUILD.original &&
+        cp /src/build/package/arch/PKGBUILD PKGBUILD.original &&
         sed '/^pkgver=/d; /^pkgrel=/d; /^source=/d; /^sha256sums=/d' -i PKGBUILD.original &&
         cat PKGBUILD.original >> PKGBUILD &&
         echo \"COMPRESSZST=(zstd -c -T0 --ultra -20 -) PKGEXT='.pkg.tar.zst'\" >> /etc/makepkg.conf &&

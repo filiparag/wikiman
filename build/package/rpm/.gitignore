@@ -1,0 +1,5 @@
+*
+!*.spec
+!.gitignore
+!compose.yml
+!.env

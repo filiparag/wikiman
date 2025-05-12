@@ -1,23 +1,21 @@
-version: '3.8'
-
 services:
   builder:
     image: ubuntu:latest
     volumes:
       - ../release:/release:rw
-      - .:/pkg:ro
-      - ../..:/src:ro
+      - ../../..:/src:ro
     command: >
       bash -c "
         echo Building wikiman-${PKGVER}-${PKGREL} for Ubuntu... &&
         apt update &&
         apt -y install make &&
         cp -arp /src ~/wikiman &&
+        chown -R root:root ~/wikiman &&
         cd ~/wikiman &&
         make all &&
         mkdir -p ./pkgbuild/DEBIAN &&
-        cp /pkg/conffiles ./pkgbuild/DEBIAN &&
-        sed 's|BUILDER_PKGVER|${PKGVER}-${PKGREL}|g' /pkg/control > ./pkgbuild/DEBIAN/control &&
+        cp /src/build/package/deb/conffiles ./pkgbuild/DEBIAN &&
+        sed 's|BUILDER_PKGVER|${PKGVER}-${PKGREL}|g' /src/build/package/deb/control > ./pkgbuild/DEBIAN/control &&
         dpkg -b ./pkgbuild /release/wikiman-${PKGVER}-${PKGREL}_any.deb &&
         echo Build completed successfully!
       "

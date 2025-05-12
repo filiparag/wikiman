@@ -2,5 +2,5 @@
 !.gitignore
 !control
 !conffiles
-!docker-compose.yml
+!compose.yml
 !.env

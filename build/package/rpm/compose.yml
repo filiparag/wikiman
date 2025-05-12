@@ -1,5 +1,5 @@
 services:
-  builder:
+  rpm-builder:
     image: fedora:latest
     volumes:
       - ../release:/release:rw

@@ -1,208 +1,49 @@
-name: Packager
+name: Linux packager
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "*.*"
       - "*.*.*"
 
 jobs:
-  arch:
-    name: Arch Linux
+  builder:
+    name: Linux package builder
     runs-on: ubuntu-latest
-    container: archlinux:latest
-
     steps:
-      - uses: actions/checkout@v2.3.2
-      - name: Prepare system
-        id: prepare
-        run: |
-          pacman -Syu --noconfirm make binutils fakeroot nodejs npm curl
-          echo "COMPRESSZST=(zstd -c -T0 --ultra -20 -) PKGEXT='.pkg.tar.zst'" >> /etc/makepkg.conf
-
-      - name: Prepare source package
-        id: package
-        run: |
-          curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
-          echo "pkgver=${GITHUB_REF#refs/*/}" > PKGBUILD
-          echo "pkgrel=1" >> PKGBUILD
-          hashsum="$(sha256sum "${GITHUB_REF#refs/*/}.tar.gz" | cut -d' ' -f1)"
-          echo "sha256sums=('$hashsum')" >> PKGBUILD
-          echo "source=("${GITHUB_REF#refs/*/}.tar.gz")" >> PKGBUILD
-          curl 'https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=wikiman' -so PKGBUILD.original
-          sed '/^pkgver=/d; /^pkgrel=/d; /^source=/d; /^sha256sums=/d' -i PKGBUILD.original
-          cat PKGBUILD.original >> PKGBUILD
-
-      - name: Build package
-        id: build
-        run: |
-          useradd builder
-          chown -R builder:builder .
-          su builder -c 'makepkg --printsrcinfo > .SRCINFO'
-          su builder -c 'makepkg -d'
-          mv ./wikiman-*.pkg.* wikiman-latest-any.pkg.tar.zst
-
-      - name: Test installation
-        id: test
-        run: |
-          pacman -U --noconfirm wikiman-latest-any.pkg.tar.zst
-
-      - name: Upload package
-        id: upload_artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: package-arch
-          path: wikiman-latest-any.pkg.tar.zst
-
-  ubuntu:
-    name: Ubuntu
-    runs-on: ubuntu-latest
-    container: ubuntu:latest
-    steps:
-      - name: Prepare system
-        id: prepare
-        run: |
-          export DEBIAN_FRONTEND=noninteractive
-          ln -fs /usr/share/zoneinfo/Europe/Belgrade /etc/localtime
-          apt update
-          apt -y install make nodejs curl tzdata
-          dpkg-reconfigure --frontend noninteractive tzdata
-
-      - name: Prepare source package
-        id: package
-        run: |
-          curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
-          tar zxf ${GITHUB_REF#refs/*/}.tar.gz
-
-      - name: Compile package
-        id: compile
-        run: |
-          make -f wikiman-${GITHUB_REF#refs/*/}/Makefile
-          mkdir -p wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
-          cp wikiman-${GITHUB_REF#refs/*/}/pkg/deb/conffiles wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
-          cp wikiman-${GITHUB_REF#refs/*/}/pkg/deb/control wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN
-          sed "s|BUILDER_PKGVER|${GITHUB_REF#refs/*/}|g" -i wikiman-${GITHUB_REF#refs/*/}/pkgbuild/DEBIAN/control
-
-      - name: Build package
-        id: build
-        run: |
-          dpkg -b wikiman-${GITHUB_REF#refs/*/}/pkgbuild wikiman-latest_any.deb
-
-      - name: Test installation
-        id: test
-        run: |
-          apt -y install ./wikiman-latest_any.deb
-
-      - name: Upload package
-        id: upload_artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: package-ubuntu
-          path: wikiman-latest_any.deb
-
-  fedora:
-    name: Fedora
-    runs-on: ubuntu-latest
-    container: fedora:latest
-    steps:
-      - name: Prepare system
-        id: prepare
-        run: |
-          dnf install -y rpm-build make nodejs curl
-          mkdir -p ~/rpmbuild/SOURCES
-          mkdir -p ~/rpmbuild/SPECS
-
-      - name: Prepare source package
-        id: package
-        run: |
-          curl -LOs https://github.com/filiparag/wikiman/archive/${GITHUB_REF#refs/*/}.tar.gz
-          tar zxf ${GITHUB_REF#refs/*/}.tar.gz
-          cp wikiman-${GITHUB_REF#refs/*/}/pkg/rpm/.spec ~/rpmbuild/SPECS/wikiman.spec
-          mv ${GITHUB_REF#refs/*/}.tar.gz ~/rpmbuild/SOURCES
-
-      - name: Build package
-        id: build
-        run: |
-          export PKGVER="${GITHUB_REF#refs/*/}"
-          export PKGREL="1"
-          rpmbuild -bb ~/rpmbuild/SPECS/wikiman.spec
-          mv ~/rpmbuild/RPMS/noarch/wikiman-*.rpm wikiman-latest.noarch.rpm
-
-      - name: Test installation
-        id: test
-        run: |
-          dnf install -y wikiman-latest.noarch.rpm
-
-      - name: Upload package
-        id: upload_artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: package-fedora
-          path: wikiman-latest.noarch.rpm
-
-  publish:
-    name: Upload Release Asset
-    runs-on: ubuntu-latest
-    needs: [arch, ubuntu, fedora]
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: v${{ github.ref }}
-          draft: true
-          prerelease: false
-
-      - name: Download Arch package
-        id: download_artifact_arch
-        uses: actions/download-artifact@v2
-        with:
-          name: package-arch
-
-      - name: Upload Arch Package
-        id: upload_arch
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./wikiman-latest-any.pkg.tar.zst
-          asset_name: wikiman-${{ github.ref }}-1-any.pkg.tar.zst
-          asset_content_type: application/zstd
-
-      - name: Download Ubuntu package
-        id: download_artifact_deb
-        uses: actions/download-artifact@v2
-        with:
-          name: package-ubuntu
-
-      - name: Upload Ubuntu Package
-        id: upload_deb
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./wikiman-latest_any.deb
-          asset_name: wikiman-${{ github.ref }}-1_any.deb
-          asset_content_type: application/vnd.debian.binary-package
-
-      - name: Download Fedora package
-        id: download_artifact_rpm
-        uses: actions/download-artifact@v2
-        with:
-          name: package-fedora
-
-      - name: Upload Fedora Package
-        id: upload_rpm
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./wikiman-latest.noarch.rpm
-          asset_name: wikiman-${{ github.ref }}-1.noarch.rpm
-          asset_content_type: application/x-rpm
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Run Docker Compose
+      working-directory: build/package
+      run: docker compose -f arch/compose.yml -f deb/compose.yml -f rpm/compose.yml up
+    - name: Test Arch Linux package
+      run: |
+        docker run --rm -v ./build/package/release:/release:ro archlinux:latest sh -c '
+          pacman -Sy --noconfirm && \
+          pacman -U --noconfirm /release/*.pkg.tar.zst && \
+          wikiman -h | grep -q "^Options"'
+    - name: Test Ubuntu package
+      run: |
+        docker run --rm -v ./build/package/release:/release:ro ubuntu:latest sh -c '
+          apt update && \
+          apt -y install /release/*.deb && \
+          wikiman -h | grep -q "^Options"'
+    - name: Test Fedora package
+      run: |
+        docker run --rm -v ./build/package/release:/release:ro fedora:latest sh -c '
+          dnf install -y /release/*.rpm && \
+          wikiman -h | grep -q "^Options"'
+    - name: Upload packages to a new draft release
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        name: v${{ github.ref }}
+        tag_name: ${{ github.ref }}
+        files: ./build/package/release/*
+        draft: true
+        fail_on_unmatched_files: true
+        generate_release_notes: true

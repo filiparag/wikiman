@@ -2,15 +2,13 @@ name: Source database builder
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: "0 12 10 * *"
+  schedule:
+    - cron: "0 12 10 */6 *"
 
 jobs:
   builder:
     name: Database builder
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4

@@ -100,7 +100,8 @@ init() {
 		config_file_usr=''
 
 	if [ -z "$config_file" -a -z "$config_file_usr" ]; then
-		echo "warning: configuration file missing, using defaults" 1>&2
+		# echo "warning: configuration file missing, using defaults" 1>&2
+		true
 	else
 		conf_sources="$(
 			"$conf_awk" -F '=' "/^[ ,\t]*sources/ {

@@ -6,8 +6,8 @@ on:
   #   - cron: "0 12 10 * *"
 
 jobs:
-  arch:
-    name: Arch Wiki
+  builder:
+    name: Database builder
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -18,7 +18,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
     - name: Run Docker Compose
       working-directory: build/sources
-      run: docker compose up --abort-on-container-exit
+      run: docker compose up
     - name: Find latest release tag
       id: get_release
       uses: actions/github-script@v7
@@ -34,30 +34,6 @@ jobs:
           const latest = releases.data.find(r => !r.draft);
           core.setOutput("upload_url", latest.upload_url);
           core.setOutput("tag_name", latest.tag_name);
-    - name: Remove old artifacts from latest release
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const release = await github.rest.repos.getReleaseByTag({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            tag: "${{ steps.get_release.outputs.tag_name }}"
-          });
-          const assets = await github.rest.repos.listReleaseAssets({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            release_id: release.data.id
-          });
-          for (const asset of assets.data) {
-            if (asset.name.endsWith('.source.tar.xz')) {
-              console.log(`Deleting asset: ${asset.name}`);
-              await github.rest.repos.deleteReleaseAsset({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                asset_id: asset.id
-              });
-            }
-          }
     - name: Upload new artifacts to latest release
       uses: softprops/action-gh-release@v2
       with:
@@ -65,3 +41,45 @@ jobs:
         files: build/sources/release/*.source.tar.xz
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Remove old artifacts
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const tag = "${{ steps.get_release.outputs.tag_name }}";
+          const { repo, owner } = context.repo;
+
+          const release = await github.rest.repos.getReleaseByTag({ owner, repo, tag });
+          const assets = await github.rest.repos.listReleaseAssets({
+            owner,
+            repo,
+            release_id: release.data.id,
+            per_page: 100
+          });
+
+          const sourceAssets = assets.data.filter(a => a.name.endsWith('.source.tar.xz'));
+
+          const assetGroups = {};
+
+          for (const asset of sourceAssets) {
+            const match = asset.name.match(/^(.+?)_(\d{8})\.source\.tar\.xz$/);
+            if (!match) continue;
+
+            const [_, base, date] = match;
+
+            if (!assetGroups[base]) assetGroups[base] = [];
+            assetGroups[base].push({ name: asset.name, id: asset.id, date });
+          }
+
+          for (const [base, group] of Object.entries(assetGroups)) {
+            group.sort((a, b) => b.date.localeCompare(a.date));
+            const toDelete = group.slice(1);
+
+            for (const asset of toDelete) {
+              console.log(`Deleting old asset: ${asset.name}`);
+              await github.rest.repos.deleteReleaseAsset({
+                owner,
+                repo,
+                asset_id: asset.id
+              });
+            }
+          }

@@ -38,5 +38,6 @@ cd "$dir" || exit 1
 echo 'Compressing data'
 archive="tldr-pages_$(date +'%Y%m%d').source.tar.xz"
 tar -cJf "/release/$archive" usr/share/doc/tldr-pages
+echo "Generated $(du -h "/release/$archive" | cut -f1) TLDR Pages archive"
 
 echo 'Done'

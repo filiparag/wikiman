@@ -32,5 +32,6 @@ rdfind -makehardlinks false -makesymlinks true -makeresultsfile false "$dir/usr/
 echo 'Compressing data'
 archive="freebsd-docs_$(date +'%Y%m%d').source.tar.xz"
 tar -cJf "/release/$archive" usr/share/doc/freebsd-docs
+echo "Generated $(du -h "/release/$archive" | cut -f1) FreeBSD Wiki archive"
 
 echo 'Done'

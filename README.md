@@ -1,4 +1,5 @@
 ## About
+
 **Wikiman** is an offline search engine for manual pages, Arch Wiki, Gentoo Wiki and other documentation.
 
 Wikiman provides an easy interface for browsing documentation without the need to be exact and connected to the internet.
@@ -8,11 +9,9 @@ and fuzzy filtering for search results.
 By default, Wikiman only searches system's manual pages.
 Follow [these](#additional-documentation-sources) instructions to enable optional sources.
 
-
 ## Demonstration
 
 ![Demo](demo.gif)
-
 
 ## Installation
 
@@ -27,14 +26,15 @@ pacman -S wikiman
 pacman -S arch-wiki-docs
 ```
 
-If you are running Manjaro or another Arch-based distribution, download the latest *.pkg.tar.zst* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab, and follow [these](https://github.com/filiparag/wikiman#installing-additional-sources) instructions to add Arch Wiki as a source.
+If you are running Manjaro or another Arch-based distribution, download the latest _.pkg.tar.zst_ package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab, and follow [these](https://github.com/filiparag/wikiman#installing-additional-sources) instructions to add Arch Wiki as a source.
+
 ```sh
 sudo pacman -U wikiman*.pkg.tar.zst
 ```
 
 ### Ubuntu / Debian
 
-Download latest *.deb* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
+Download latest _.deb_ package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
 ```bash
 sudo apt update
@@ -43,7 +43,7 @@ sudo apt install ./wikiman*.deb
 
 ### Fedora / openSUSE
 
-Download latest *.rpm* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
+Download latest _.rpm_ package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
 ```bash
 # Fedora
@@ -63,7 +63,7 @@ cd /usr/ports/textproc/wikiman
 make install
 ```
 
-Or download latest *.txz* package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
+Or download latest _.txz_ package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
 ```bash
 pkg install wikiman*.txz
@@ -93,7 +93,6 @@ sudo make install
 
 Wikiman uses GNU `find` and `awk`, so BSD users have to install `findutils` and `gawk`.
 
-
 ## Additional documentation sources
 
 Currently available optional sources are:
@@ -121,8 +120,8 @@ sudo make -f ./wikiman-makefile source-install
 sudo make -f ./wikiman-makefile clean
 ```
 
-After installation, they should be enabled automatically if 
-`sources` [configuration](#configuration) variable is empty. 
+After installation, they should be enabled automatically if
+`sources` [configuration](#configuration) variable is empty.
 
 To verify active sources, run:
 
@@ -130,10 +129,14 @@ To verify active sources, run:
 wikiman -S
 ```
 
+> [!NOTE]
+> Since the Gentoo Wiki lacks a dependable way to download content for offline use,
+> the provided version is noticeably outdated.
+
 ### Compiling a snapshot (database build scripts)
 
 In [`build/`](https://github.com/filiparag/wikiman/tree/master/build) directory there are scripts
-for manual snapshot compilation. These scripts can have external dependencies and are not 
+for manual snapshot compilation. These scripts can have external dependencies and are not
 recommended to be run by end users, but by Wikiman maintainers. Your mileage may vary.
 
 ## Usage
@@ -146,19 +149,19 @@ If no keywords are provided, show all pages.
 
 - `-l` search language(s)
 
-    Default: *en*
+  Default: _en_
 
 - `-s` sources to use
- 
-    Default: (all available)
+
+  Default: (all available)
 
 - `-f` fuzzy finder to use
 
-    Default: *fzf*
+  Default: _fzf_
 
 - `-q` enable quick search mode
 
-- `-a` enable *AND* operator mode
+- `-a` enable _AND_ operator mode
 
 - `-p` disable quick result preview
 
@@ -168,7 +171,7 @@ If no keywords are provided, show all pages.
 
 - `-H` viewer for HTML pages
 
-    Default: *w3m*
+  Default: _w3m_
 
 - `-R` print raw output
 
@@ -185,7 +188,7 @@ If no keywords are provided, show all pages.
 Wikiman can be launched using a shell key binding (default: `Ctrl+F`).
 Current command line buffer will be used as a search query.
 
-Add appropriate line from below to your `.bashrc`-like 
+Add appropriate line from below to your `.bashrc`-like
 configuration file to make the key binding permanent.
 
 ```bash
@@ -204,7 +207,7 @@ source /usr/share/wikiman/widgets/widget.zsh
 User configuration file is located at `~/.config/wikiman/wikiman.conf`,
 and fallback system-wide configuration is `/etc/wikiman.conf`.
 
-If you have set the *XDG_CONFIG_HOME* environment variable, user configuration
+If you have set the _XDG_CONFIG_HOME_ environment variable, user configuration
 will be looked up from there instead.
 
 Example configuration file:
@@ -257,26 +260,25 @@ find '/usr/share/doc/freebsd-docs' -maxdepth 1 -type d -printf '%P '
 find '/usr/share/doc/tldr-pages' -maxdepth 1 -type d -printf '%P '
 ```
 
-
 ## Custom sources
 
 Wikiman is designed to be extensible: each source has it's module in `sources/` directory.
 
-Source modules are POSIX compliant shell scripts. Wikiman calls their `search` function whichs 
-reads `$query` and configuration variables, and prints results to *STDOUT*.
+Source modules are POSIX compliant shell scripts. Wikiman calls their `search` function whichs
+reads `$query` and configuration variables, and prints results to _STDOUT_.
 variable with rows formatted as `NAME\tLANG\tSOURCE\tPATH`.
 
-- `NAME`    title of the page
-- `LANG`    two letter language code (can include locale)
-- `SOURCE`  source name
-- `PATH`    path to HTML file
+- `NAME` title of the page
+- `LANG` two letter language code (can include locale)
+- `SOURCE` source name
+- `PATH` path to HTML file
 
 When listing available sources, Wikiman will call module's `info` funcion which prints
 name, state, number of pages and path of the source.
 
 ## Contributions
 
-If you create a source module useful to the general public, please share it using a 
+If you create a source module useful to the general public, please share it using a
 [pull request](https://github.com/filiparag/wikiman/pulls). Your pull request should contain:
 
 - module script file `sources/your-source.sh`

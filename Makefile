@@ -2,15 +2,15 @@ NAME=		wikiman
 VERSION=	2.13.2
 RELEASE=	1
 UPSTREAM=	https://github.com/filiparag/wikiman
-SOURCES= 	${UPSTREAM}/releases/download/
+UPSTREAM_API=	https://api.github.com/repos/filiparag/wikiman/releases/latest
 
 MKFILEREL!=	echo ${.MAKE.MAKEFILES} | sed 's/.* //'
 MKFILEABS!=	readlink -f ${MKFILEREL} 2>/dev/null
-MKFILEABS+= $(shell readlink -f ${MAKEFILE_LIST})
+MKFILEABS+= 	$(shell readlink -f ${MAKEFILE_LIST})
 WORKDIR!=	dirname ${MKFILEABS} 2>/dev/null
 
 BUILDDIR:=	${WORKDIR}/pkgbuild
-SOURCESDIR:=${WORKDIR}/srcbuild
+SOURCESDIR:=	${WORKDIR}/srcbuild
 PLISTFILE:=	${WORKDIR}/pkg-plist
 
 all: core widgets completions config docs
@@ -109,10 +109,9 @@ local:
 	@rm -rf		${BUILDDIR}/tmp ${BUILDDIR}/etc
 
 	@mkdir -p	${SOURCESDIR}/usr/local/share ${SOURCESDIR}/usr/share/doc
-	@mv			${SOURCESDIR}/usr/share/doc ${SOURCESDIR}/usr/local/share/doc
+	@mv		${SOURCESDIR}/usr/share/doc ${SOURCESDIR}/usr/local/share/doc
 	@rm -rf		${SOURCESDIR}/usr/share
 
-.PHONY: help
 help:
 
 	@sed -n '/^[-a-z]\+:/p;' ${MKFILEABS}
@@ -121,6 +120,22 @@ source:
 
 	@mkdir -p 	${SOURCESDIR}/usr/share/doc \
 				${SOURCESDIR}/tmp
+
+sources.txt:
+
+	curl -s '${UPSTREAM_API}' | awk \
+	'/"name":/ { \
+		name = $$2; \
+		sub(/^[ \t]*"name": "[^"]*/, "", name); \
+		gsub(/[" ,]/, "", name); \
+	} \
+	/"browser_download_url":/ { \
+		url = $$2; \
+		gsub(/[" ,]/, "", url); \
+		if (name ~ /_[0-9]+\.source\.tar\.xz$$/) { \
+			print name "\t" url; \
+		} \
+	}' | sort > sources.txt
 
 source-all: source-arch source-gentoo source-fbsd source-tldr
 
@@ -138,6 +153,7 @@ source-install:
 source-clean:
 
 	@rm -rf 	${SOURCESDIR}
+	@rm -f		sources.txt
 
 source-deinstall: source-uninstall
 source-uninstall:
@@ -152,12 +168,11 @@ source-uninstall:
 				$(prefix)/usr/local/share/doc/freebsd-docs \
 				$(prefix)/usr/local/share/doc/tldr-pages
 
-source-arch: source
+source-arch: source sources.txt
 
-	@curl -L 	'${SOURCES}/2.13.2/arch-wiki_20230915.tar.xz' -o ${SOURCESDIR}/tmp/arch.tar.xz
-	@sha1sum 	${SOURCESDIR}/tmp/arch.tar.xz | grep -q 'edcb59741a98a40ac701caaab38f235e1e0fe95b'
-	@tar xf 	${SOURCESDIR}/tmp/arch.tar.xz -C ${SOURCESDIR}
-	@rm -rf 	${SOURCESDIR}/tmp
+	curl -L '$(shell grep '^arch-wiki_' sources.txt | tail -n1 | cut -f2)' -o ${SOURCESDIR}/tmp/arch.tar.xz
+	tar xf 	${SOURCESDIR}/tmp/arch.tar.xz -C ${SOURCESDIR}
+	rm -rf 	${SOURCESDIR}/tmp
 
 source-gentoo: source
 
@@ -166,16 +181,14 @@ source-gentoo: source
 	@tar xf 	${SOURCESDIR}/tmp/gentoo.tar.xz -C ${SOURCESDIR}
 	@rm -rf 	${SOURCESDIR}/tmp
 
-source-fbsd: source
+source-fbsd: source sources.txt
 
-	@curl -L 	'${SOURCES}/2.13/freebsd-docs_20211009.tar.xz' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
-	@sha1sum 	${SOURCESDIR}/tmp/fbsd.tar.xz | grep -q '96c00949613fd21f107d3bf8f1df59ebd61cc40a'
-	@tar xf 	${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
-	@rm -rf 	${SOURCESDIR}/tmp
+	curl -L '$(shell grep '^freebsd-docs_' sources.txt | tail -n1 | cut -f2)' -o ${SOURCESDIR}/tmp/fbsd.tar.xz
+	tar xf ${SOURCESDIR}/tmp/fbsd.tar.xz -C ${SOURCESDIR}
+	rm -rf ${SOURCESDIR}/tmp
 
-source-tldr: source
+source-tldr: source sources.txt
 
-	@curl -L 	'${SOURCES}/2.13.2/tldr-pages_20230915.tar.xz' -o ${SOURCESDIR}/tmp/tldr.tar.xz
-	@sha1sum 	${SOURCESDIR}/tmp/tldr.tar.xz | grep -q 'b90d3b8ee953c300df7065ec926664af9c40260a'
-	@tar xf 	${SOURCESDIR}/tmp/tldr.tar.xz -C ${SOURCESDIR}
-	@rm -rf 	${SOURCESDIR}/tmp
+	curl -L '$(shell grep '^tldr-pages_' sources.txt | tail -n1 | cut -f2)' -o ${SOURCESDIR}/tmp/tldr.tar.xz
+	tar xf	${SOURCESDIR}/tmp/tldr.tar.xz -C ${SOURCESDIR}
+	rm -rf	${SOURCESDIR}/tmp

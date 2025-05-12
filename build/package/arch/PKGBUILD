@@ -1,8 +1,8 @@
 # Maintainer: Filip Parag <filip@parag.rs>
 
 pkgname=wikiman
-pkgver=2.13.2
-pkgrel=2
+pkgver=2.14
+pkgrel=1
 pkgdesc="Offline search engine for manual pages, Arch Wiki, Gentoo Wiki and other documentation"
 arch=('any')
 url="https://github.com/filiparag/wikiman"

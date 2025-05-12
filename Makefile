@@ -1,5 +1,5 @@
 NAME=		wikiman
-VERSION=	2.13.2
+VERSION=	2.14
 RELEASE=	1
 UPSTREAM=	https://github.com/filiparag/wikiman
 UPSTREAM_API=	https://api.github.com/repos/filiparag/wikiman/releases/latest

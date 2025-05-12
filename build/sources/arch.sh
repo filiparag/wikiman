@@ -13,4 +13,13 @@ archive="arch-wiki_$(date +'%Y%m%d').source.tar.xz"
 tar -cJf "/release/$archive" usr/share/doc/arch-wiki/html
 echo "Generated $(du -h "/release/$archive" | cut -f1) Arch Wiki archive"
 
+echo 'Testing archive contents'
+pagecount="$(tar -tf "/release/$archive" | grep -c '\.html$')"
+if [ "$pagecount" -lt 5000 ]; then
+    echo 'Error: archive page count is too low'
+    exit 1
+else
+    echo "Archive contains ${pagecount} HTML pages"
+fi
+
 echo 'Done'

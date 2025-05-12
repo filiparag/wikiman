@@ -9,7 +9,7 @@ mkdir -p ./fbsd
 cd ./fbsd || exit 1
 dir="$(pwd)"
 
-echo 'Downloading FreeBSD Wiki'
+echo 'Downloading FreeBSD docs'
 wget -r 'ftp://ftp.freebsd.org/pub/FreeBSD/doc/' -A .tar.gz
 mv ./ftp.freebsd.org/pub/FreeBSD/doc ./
 rm -rf ./ftp.freebsd.org
@@ -32,6 +32,15 @@ rdfind -makehardlinks false -makesymlinks true -makeresultsfile false "$dir/usr/
 echo 'Compressing data'
 archive="freebsd-docs_$(date +'%Y%m%d').source.tar.xz"
 tar -cJf "/release/$archive" usr/share/doc/freebsd-docs
-echo "Generated $(du -h "/release/$archive" | cut -f1) FreeBSD Wiki archive"
+echo "Generated $(du -h "/release/$archive" | cut -f1) FreeBSD docs archive"
+
+echo 'Testing archive contents'
+pagecount="$(tar -tf "/release/$archive" | grep -c '\.html$')"
+if [ "$pagecount" -lt 1000 ]; then
+    echo 'Error: archive page count is too low'
+    exit 1
+else
+    echo "Archive contains ${pagecount} HTML pages"
+fi
 
 echo 'Done'

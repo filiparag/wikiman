@@ -30,7 +30,7 @@ echo 'Deduplicating assets'
 rdfind -makehardlinks false -makesymlinks true -makeresultsfile false "$dir/usr/share/doc/freebsd-docs"
 
 echo 'Compressing data'
-archive="freebsd-docs_$(date +'%Y%m%d').tar.xz"
+archive="freebsd-docs_$(date +'%Y%m%d').source.tar.xz"
 tar -cJf "/release/$archive" usr/share/doc/freebsd-docs
 
 echo 'Done'

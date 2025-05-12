@@ -1,0 +1,67 @@
+name: Source database builder
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 12 10 * *"
+
+jobs:
+  arch:
+    name: Arch Wiki
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Run Docker Compose
+      working-directory: build/sources
+      run: docker compose up --abort-on-container-exit
+    - name: Find latest release tag
+      id: get_release
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const releases = await github.rest.repos.listReleases({
+            owner: context.repo.owner,
+            repo: context.repo.repo
+          });
+          if (releases.data.length === 0) {
+            throw new Error("No releases found.");
+          }
+          const latest = releases.data.find(r => !r.draft);
+          core.setOutput("upload_url", latest.upload_url);
+          core.setOutput("tag_name", latest.tag_name);
+    - name: Remove old artifacts from latest release
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const release = await github.rest.repos.getReleaseByTag({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            tag: "${{ steps.get_release.outputs.tag_name }}"
+          });
+          const assets = await github.rest.repos.listReleaseAssets({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            release_id: release.data.id
+          });
+          for (const asset of assets.data) {
+            if (asset.name.endsWith('.source.tar.xz')) {
+              console.log(`Deleting asset: ${asset.name}`);
+              await github.rest.repos.deleteReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                asset_id: asset.id
+              });
+            }
+          }
+    - name: Upload new artifacts to latest release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ steps.get_release.outputs.tag_name }}
+        files: build/sources/release/*.source.tar.xz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

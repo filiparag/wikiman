@@ -36,7 +36,7 @@ mv "$dir/doc" "$dir/usr/share/doc/tldr-pages"
 cd "$dir" || exit 1
 
 echo 'Compressing data'
-archive="tldr-pages_$(date +'%Y%m%d').tar.xz"
+archive="tldr-pages_$(date +'%Y%m%d').source.tar.xz"
 tar -cJf "/release/$archive" usr/share/doc/tldr-pages
 
 echo 'Done'

@@ -1,56 +1,36 @@
 #!/bin/sh
 
-# Targeted for Arch Linux
+export XZ_OPT=-e9T0
+
+echo 'Installing tools'
+pacman -Sy --noconfirm rdfind wget
 
 mkdir -p ./fbsd
-cd ./fbsd
+cd ./fbsd || exit 1
+dir="$(pwd)"
 
-wget -r 'ftp://ftp.freebsd.org/pub/FreeBSD/doc/' -A .html-split.tar.bz2
-
+echo 'Downloading FreeBSD Wiki'
+wget -r 'ftp://ftp.freebsd.org/pub/FreeBSD/doc/' -A .tar.gz
 mv ./ftp.freebsd.org/pub/FreeBSD/doc ./
 rm -rf ./ftp.freebsd.org
 
-dir="$(pwd)"
-
-cd "$dir/doc"
-
-remove_list=''
-for f in $(find . -maxdepth 1 -mindepth 1 -type d -printf '%P\n'); do
-
-    echo "$remove_list" | grep -q "$f" && continue
-
-    n="$(echo "$f" | cut -d'.' -f1)"
-    encodings="$(find . -maxdepth 1 -mindepth 1 -type d -printf '%P\n' | grep "^$n\.")"
-
-    if [ -d "$dir/doc/$n.UTF-8" ]; then
-        keep="$n.UTF-8"
-    else
-        keep="$(echo "$encodings" | head -n 1)"
-    fi
-
-    remove_list="$remove_list $(
-        echo "$encodings" | grep -v "$keep"
-    )"
-
-    mv "$keep" "$n"
-
-done
-eval "rm -rf $remove_list"
-
-for f in $(find "$dir/doc" -type f -name '*.tar.bz2'); do
+echo 'Unpacking pages'
+for f in $(find "$dir/doc" -type f -name '*.tar.gz'); do
     d="$(dirname "$f")"
-    cd "$d"
-    tar -xjf "$f"
+    cd "$d" || exit 1
+    tar -xf "$f"
     rm -f "$f"
 done
 
-cd "$dir"
-
+cd "$dir" || exit 1
 mkdir -p "$dir/usr/share/doc"
 mv "$dir/doc" "$dir/usr/share/doc/freebsd-docs"
 
-tar -cjf "../freebsd-docs_$(date +'%Y%m%d').tar.xz" "usr/share/doc/freebsd-docs"
+echo 'Deduplicating assets'
+rdfind -makehardlinks false -makesymlinks true "$dir/usr/share/doc/freebsd-docs"
 
-cd ..
+echo 'Compressing data'
+archive="freebsd-docs_$(date +'%Y%m%d').tar.xz"
+tar -cJf "/release/$archive" usr/share/doc/freebsd-docs
 
-rm -rf "$dir"
+echo 'Done'

@@ -1,26 +1,15 @@
 #!/bin/bash
 
-# Targeted for Arch Linux
+export XZ_OPT=-e9T0
 
-mkdir -p ./arch
+echo 'Downloading Arch Wiki package'
+pacman -Syw --noconfirm arch-wiki-docs
 
-cd ./arch
+echo 'Extracting data'
+tar --use-compress-program=unzstd -xf /var/cache/pacman/pkg/arch-wiki-docs-*.pkg.tar.zst usr/share/doc/arch-wiki/html/
 
-dir="$(pwd)"
+echo 'Compressing data'
+archive="arch-wiki_$(date +'%Y%m%d').tar.xz"
+tar -cJf "/release/$archive" usr/share/doc/arch-wiki/html
 
-paru -S python-simplemediawiki --noconfirm
-
-pip install --user cssselect
-
-git clone https://github.com/lahwaacz/arch-wiki-docs
-
-python ./arch-wiki-docs/arch-wiki-docs.py --output-directory "$dir/doc"
-
-mkdir -p "$dir/usr/share/doc/arch-wiki"
-mv "$dir/doc" "$dir/usr/share/doc/arch-wiki/html"
-
-tar -cjf "../arch-wiki_$(date +'%Y%m%d').tar.xz" "usr/share/doc/arch-wiki/html"
-
-cd ..
-
-rm -rf "$dir"
+echo 'Done'

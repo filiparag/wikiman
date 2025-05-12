@@ -6,8 +6,9 @@ Wikiman provides an easy interface for browsing documentation without the need t
 This is achieved by utilizing full text search for wikis, partial name and description matching for man pages,
 and fuzzy filtering for search results.
 
-By default, Wikiman only searches system's manual pages.
-Follow [these](#additional-documentation-sources) instructions to enable optional sources.
+> [!TIP]
+> By default, Wikiman only searches system's manual pages.
+> Follow [these](#additional-documentation-sources) instructions to enable optional sources.
 
 ## Demonstration
 
@@ -114,8 +115,9 @@ make -f ./wikiman-makefile source-arch
 sudo make -f ./wikiman-makefile source-install
 sudo make -f ./wikiman-makefile clean
 
-# Example for BSD: install FreeBSD Documentation
-make -f ./wikiman-makefile source-fbsd local
+# Example for BSD: install FreeBSD docs
+make -f ./wikiman-makefile source-fbsd
+make -f ./wikiman-makefile source-local # moves files from /usr to /usr/local
 sudo make -f ./wikiman-makefile source-install
 sudo make -f ./wikiman-makefile clean
 ```

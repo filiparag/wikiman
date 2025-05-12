@@ -27,7 +27,7 @@ mkdir -p "$dir/usr/share/doc"
 mv "$dir/doc" "$dir/usr/share/doc/freebsd-docs"
 
 echo 'Deduplicating assets'
-rdfind -makehardlinks false -makesymlinks true "$dir/usr/share/doc/freebsd-docs"
+rdfind -makehardlinks false -makesymlinks true -makeresultsfile false "$dir/usr/share/doc/freebsd-docs"
 
 echo 'Compressing data'
 archive="freebsd-docs_$(date +'%Y%m%d').tar.xz"

@@ -36,9 +36,13 @@ setup() {
 		for(i=1;i<=NF;i++) {
 			lang=tolower($i);
 			gsub(/[-_].*$/,"",lang);
-			locale=toupper($i);
+			locale=tolower($i);
 			gsub(/^.*[-_]/,"",locale);
-			printf("%s_%s%s",lang,(length($i)==2)?"*":locale,(i==NF)?"":"|");
+			if (length($i)==2) {
+				printf("%s%s",lang,(i==NF)?"":"|");
+			} else {
+				printf("%s-%s%s",lang,(length($i)==2)?"*":locale,(i==NF)?"":"|");
+			}
 		}
 	}')"
 
@@ -80,10 +84,25 @@ list() {
 			OFS=\"\t\"
 		};
 		{
+			for (i=$nf; i<=NF; i++) {
+				if (\$i == \"public\") {
+					if (\$(i+2)==\"books\") {
+						type=\"Book\";
+						start=i+4;
+					} else {
+						type=\"Article\";
+						start=i+3;
+					}
+				}
+			}
+
 			title = \"\";
-			for (i=$nf+3; i<=NF; i++) {
+			for (i=start; i<=NF-1; i++) {
 				fragment = toupper(substr(\$i,0,1))substr(\$i,2);
-				title = title ((i==$nf+3) ? \"\" : \"/\") fragment;
+				title = sprintf(\"%s%s%s\",title,title==\"\"?\"\":\" \",fragment);
+			}
+			if (title==\"\") {
+				next;
 			}
 
 			gsub(/\.html$/,\"\",title);
@@ -113,10 +132,25 @@ search() {
 				split(\"$query\",kwds,\" \");
 			};
 			{
+				for (i=$nf; i<=NF; i++) {
+					if (\$i == \"public\") {
+						if (\$(i+2)==\"books\") {
+							type=\"Book\";
+							start=i+4;
+						} else {
+							type=\"Article\";
+							start=i+3;
+						}
+					}
+				}
+
 				title = \"\";
-				for (i=$nf+3; i<=NF; i++) {
-				 	fragment = toupper(substr(\$i,0,1))substr(\$i,2);
-					title = title ((i==$nf+3) ? \"\" : \"/\") fragment;
+				for (i=start; i<=NF-1; i++) {
+					fragment = toupper(substr(\$i,0,1))substr(\$i,2);
+					title = sprintf(\"%s%s%s\",title,title==\"\"?\"\":\" \",fragment);
+				}
+				if (title==\"\") {
+					next;
 				}
 
 				gsub(/\.html$/,\"\",title);
@@ -178,10 +212,25 @@ search() {
 
 					gsub(/:[0-9]+$/,\"\",\$0);
 
-					title = \"\"
-					for (i=$nf+3; i<=NF; i++) {
+					for (i=$nf; i<=NF; i++) {
+						if (\$i == \"public\") {
+							if (\$(i+2)==\"books\") {
+								type=\"Book\";
+								start=i+4;
+							} else {
+								type=\"Article\";
+								start=i+3;
+							}
+						}
+					}
+
+					title = \"\";
+					for (i=start; i<=NF-1; i++) {
 						fragment = toupper(substr(\$i,0,1))substr(\$i,2);
-						title = title ((i==$nf+3) ? \"\" : \"/\") fragment;
+						title = sprintf(\"%s%s%s\",title,title==\"\"?\"\":\" \",fragment);
+					}
+					if (title==\"\") {
+						next;
 					}
 
 					gsub(/\.html$/,\"\",title);

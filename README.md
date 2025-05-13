@@ -1,16 +1,14 @@
 ## About
 
-**Wikiman** is an offline search engine for manual pages, Arch Wiki, Gentoo Wiki and other documentation.
+**Wikiman** is an offline search engine for manual pages, ArchWiki, Gentoo Wiki and other documentation.
 
 Wikiman provides an easy interface for browsing documentation without the need to be exact and connected to the internet.
-This is achieved by utilizing full text search for wikis, partial name and description matching for man pages,
+This is achieved by utilizing full-text search for wikis, partial name and description matching for man pages,
 and fuzzy filtering for search results.
 
 > [!TIP]
 > By default, Wikiman only searches system's manual pages.
-> Follow [these](#additional-documentation-sources) instructions to enable optional sources.
-
-## Demonstration
+> Follow [these instructions](#additional-documentation-sources) to download and enable optional documentation sources.
 
 ![Demo](demo.gif)
 
@@ -23,11 +21,11 @@ Install from Arch Linux's [extra](https://archlinux.org/packages/extra/any/wikim
 ```bash
 pacman -S wikiman
 
-# Optional: Enable Arch Wiki
+# Optional: Enable ArchWiki
 pacman -S arch-wiki-docs
 ```
 
-If you are running Manjaro or another Arch-based distribution, download the latest _.pkg.tar.zst_ package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab, and follow [these](https://github.com/filiparag/wikiman#installing-additional-sources) instructions to add Arch Wiki as a source.
+If you are running Manjaro or another Arch-based distribution, download the latest _.pkg.tar.zst_ package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab, and follow [these](https://github.com/filiparag/wikiman#installing-additional-sources) instructions to add ArchWiki as a source.
 
 ```sh
 sudo pacman -U wikiman*.pkg.tar.zst
@@ -98,7 +96,7 @@ Wikiman uses GNU `find` and `awk`, so BSD users have to install `findutils` and 
 
 Currently available optional sources are:
 
-- Arch Wiki (`arch`)
+- ArchWiki (`arch`)
 - Gentoo Wiki (`gentoo`)
 - FreeBSD Documentation (`fbsd`)
 - TLDR Pages (`tldr`)
@@ -110,7 +108,7 @@ If you want to use them, you can download their latest snapshots using following
 # Download latest Makefile
 curl -L 'https://raw.githubusercontent.com/filiparag/wikiman/master/Makefile' -o 'wikiman-makefile'
 
-# Example for Linux: install Arch Wiki and TLDR pages
+# Example for Linux: install ArchWiki and TLDR pages
 make -f ./wikiman-makefile source-arch source-tldr
 sudo make -f ./wikiman-makefile source-install
 sudo make -f ./wikiman-makefile clean
@@ -242,7 +240,7 @@ To list available languages, run these commands:
 # Man pages (excluding English)
 find '/usr/share/man' -maxdepth 1 -type d -not -name 'man*' -printf '%P '
 
-# Arch Wiki
+# ArchWiki
 find '/usr/share/doc/arch-wiki/html' -maxdepth 1 -type d -printf '%P '
 
 # FreeBSD Documentation
@@ -254,7 +252,7 @@ find '/usr/share/doc/tldr-pages' -maxdepth 1 -type d -printf '%P '
 
 ## Custom sources
 
-Wikiman is designed to be extensible: each source has it's module in `sources/` directory.
+Wikiman is designed to be extensible: each source has it's module in `sources/` directory. These modules are loaded as needed during runtime.
 
 Source modules are POSIX compliant shell scripts. Wikiman calls their `search` function whichs
 reads `$query` and configuration variables, and prints results to _STDOUT_.
@@ -274,9 +272,9 @@ If you create a source module useful to the general public, please share it usin
 [pull request](https://github.com/filiparag/wikiman/pulls). Your pull request should contain:
 
 - module script file `sources/your-source.sh`
-- Makefile recipe `your-source`
-- installable snapshot of the source database `your-source-TIMESTAMP.tar.xz`
-- build script for the database snapshot `build/your-source.sh`
+- Makefile recipe `source-your-source`
+- build script for the database snapshot `build/sources/your-source.sh`
+- demo snapshot of the source database `your-source-TIMESTAMP.source.tar.xz` (optional)
 - short description in the pull request's body
 
 Other improvements are also welcome!

@@ -11,7 +11,7 @@ makedepends=('make')
 depends=('man' 'fzf' 'ripgrep' 'awk' 'w3m' 'findutils' 'coreutils' 'sed' 'grep' 'parallel')
 optdepends=('arch-wiki-docs: enable Arch Wiki')
 source=("${pkgname}-${pkgver}.tar.gz::${url}/archive/${pkgver}.tar.gz")
-sha256sums=('f9d76ff056e152b70259c35377cfd85a1d506b096955037b2303e548ba5106b7')
+sha256sums=('7bf6d2c309346a1c232cf11d9fe805b97968b4252cbda77563bc89f47982fb11')
 backup=('etc/wikiman.conf')
 
 package() {

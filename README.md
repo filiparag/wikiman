@@ -110,13 +110,13 @@ If you want to use them, you can download their latest snapshots using following
 # Download latest Makefile
 curl -L 'https://raw.githubusercontent.com/filiparag/wikiman/master/Makefile' -o 'wikiman-makefile'
 
-# Example for Linux: install Arch Wiki
-make -f ./wikiman-makefile source-arch
+# Example for Linux: install Arch Wiki and TLDR pages
+make -f ./wikiman-makefile source-arch source-tldr
 sudo make -f ./wikiman-makefile source-install
 sudo make -f ./wikiman-makefile clean
 
-# Example for BSD: install FreeBSD docs
-make -f ./wikiman-makefile source-fbsd
+# Example for BSD: install FreeBSD docs and TLDR pages
+make -f ./wikiman-makefile source-fbsd source-tldr
 make -f ./wikiman-makefile source-local # moves files from /usr to /usr/local
 sudo make -f ./wikiman-makefile source-install
 sudo make -f ./wikiman-makefile clean
@@ -130,16 +130,6 @@ To verify active sources, run:
 ```bash
 wikiman -S
 ```
-
-> [!NOTE]
-> Since the Gentoo Wiki lacks a dependable way to download content for offline use,
-> the provided version is noticeably outdated.
-
-### Compiling a snapshot (database build scripts)
-
-In [`build/`](https://github.com/filiparag/wikiman/tree/master/build) directory there are scripts
-for manual snapshot compilation. These scripts can have external dependencies and are not
-recommended to be run by end users, but by Wikiman maintainers. Your mileage may vary.
 
 ## Usage
 

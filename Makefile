@@ -178,42 +178,42 @@ ${SOURCESDIR}/:
 	mkdir		-p 	${SOURCESDIR}/usr/share/doc \
 				${SOURCESDIR}/dl
 
-${SOURCESDIR}/sources.txt: | ${SOURCESDIR}/
-	test ! -f ${SOURCESDIR}/.local
-	curl -s '${UPSTREAM_API}' | awk \
-	'/"name":/ { \
-		name = $$2; \
-		sub(/^[ \t]*"name": "[^"]*/, "", name); \
-		gsub(/[" ,]/, "", name); \
-	} \
-	/"browser_download_url":/ { \
-		url = $$2; \
-		gsub(/[" ,]/, "", url); \
-		if (name ~ /_[0-9]+\.source\.tar\.xz$$/) { \
-			print name "\t" url; \
-		} \
-	}' | sort > ${SOURCESDIR}/sources.txt
+${SOURCESDIR}/dl/sources.awk: ${SOURCESDIR}/
+	test -f ${SOURCESDIR}/dl/sources.awk || \
+	echo '/Td6WFoAAATm1rRGBMCsAfwBIQEWAAAAAAAAANJru4jgAPsApF0AF4iKRqIWnygmbeoKf/N6TNj2uMRXuJKAP8hO22uy2e8OIzyFihWG/hyEgGi3XQbla/dFWkXc6q4MF/M2CS9vMVFkDP9IUCKI00LzJPixq8UnJ/xpGxTfUwpv6kLAnfJ/FyeE4WK5HiNZVHs/8AWCy+ixAy8A2fg6JwItYxLEKtU1sdVPlo0fxBXo3TRiqLdcZAu5WQD5GbDk8wQB10zENpvrqh8AEZf9obj6SqIAAcgB/AEAAJyi/M6xxGf7AgAAAAAEWVo=' | \
+	base64 -d | xz -d > ${SOURCESDIR}/dl/sources.awk
 
-${SOURCESDIR}/dl/arch-wiki.tar.xz: ${SOURCESDIR}/sources.txt
-	test ! -f ${SOURCESDIR}/.local
-	curl -L '$(shell grep '^arch-wiki_' ${SOURCESDIR}/sources.txt | tail -n1 | cut -f2)' \
-		-o ${SOURCESDIR}/dl/arch-wiki.tar.xz
-	tar xf 	${SOURCESDIR}/dl/arch-wiki.tar.xz -C ${SOURCESDIR}
+${SOURCESDIR}/dl/sources.txt: ${SOURCESDIR}/dl/sources.awk
+	curl -s '${UPSTREAM_API}' | awk -f ${SOURCESDIR}/dl/sources.awk | sort > ${SOURCESDIR}/dl/sources.txt
 
-${SOURCESDIR}/dl/gentoo-wiki.tar.xz: ${SOURCESDIR}/sources.txt
+${SOURCESDIR}/dl/arch-wiki.txt: ${SOURCESDIR}/dl/sources.txt
+	grep '^arch-wiki_' ${SOURCESDIR}/dl/sources.txt | tail -n1 | cut -f2 > ${SOURCESDIR}/dl/arch-wiki.txt
+
+${SOURCESDIR}/dl/gentoo-wiki.txt: ${SOURCESDIR}/dl/sources.txt
+	grep '^gentoo-wiki_' ${SOURCESDIR}/dl/sources.txt | tail -n1 | cut -f2 > ${SOURCESDIR}/dl/gentoo-wiki.txt
+
+${SOURCESDIR}/dl/freebsd-docs.txt: ${SOURCESDIR}/dl/sources.txt
+	grep '^freebsd-docs_' ${SOURCESDIR}/dl/sources.txt | tail -n1 | cut -f2 > ${SOURCESDIR}/dl/freebsd-docs.txt
+
+${SOURCESDIR}/dl/tldr-pages.txt: ${SOURCESDIR}/dl/sources.txt
+	grep '^tldr-pages_' ${SOURCESDIR}/dl/sources.txt | tail -n1 | cut -f2 > ${SOURCESDIR}/dl/tldr-pages.txt
+
+${SOURCESDIR}/dl/arch-wiki.tar.xz: ${SOURCESDIR}/dl/arch-wiki.txt
 	test ! -f ${SOURCESDIR}/.local
-	curl -L '$(shell grep '^gentoo-wiki_' ${SOURCESDIR}/sources.txt | tail -n1 | cut -f2)' \
-		-o ${SOURCESDIR}/dl/gentoo-wiki.tar.xz
+	xargs curl -L < ${SOURCESDIR}/dl/arch-wiki.txt -o ${SOURCESDIR}/dl/arch-wiki.tar.xz
+	tar xf ${SOURCESDIR}/dl/arch-wiki.tar.xz -C ${SOURCESDIR}
+
+${SOURCESDIR}/dl/gentoo-wiki.tar.xz: ${SOURCESDIR}/dl/gentoo-wiki.txt
+	test ! -f ${SOURCESDIR}/.local
+	xargs curl -L < ${SOURCESDIR}/dl/gentoo-wiki.txt -o ${SOURCESDIR}/dl/gentoo-wiki.tar.xz
 	tar xf ${SOURCESDIR}/dl/gentoo-wiki.tar.xz -C ${SOURCESDIR}
 
-${SOURCESDIR}/dl/freebsd-docs.tar.xz: ${SOURCESDIR}/sources.txt
+${SOURCESDIR}/dl/freebsd-docs.tar.xz: ${SOURCESDIR}/dl/freebsd-docs.txt
 	test ! -f ${SOURCESDIR}/.local
-	curl -L '$(shell grep '^freebsd-docs_' ${SOURCESDIR}/sources.txt | tail -n1 | cut -f2)' \
-		-o ${SOURCESDIR}/dl/freebsd-docs.tar.xz
+	xargs curl -L < ${SOURCESDIR}/dl/freebsd-docs.txt -o ${SOURCESDIR}/dl/freebsd-docs.tar.xz
 	tar xf ${SOURCESDIR}/dl/freebsd-docs.tar.xz -C ${SOURCESDIR}
 
-${SOURCESDIR}/dl/tldr-pages.tar.xz: ${SOURCESDIR}/sources.txt
+${SOURCESDIR}/dl/tldr-pages.tar.xz: ${SOURCESDIR}/dl/tldr-pages.txt
 	test ! -f ${SOURCESDIR}/.local
-	curl -L '$(shell grep '^tldr-pages_' ${SOURCESDIR}/sources.txt | tail -n1 | cut -f2)' \
-		-o ${SOURCESDIR}/dl/tldr-pages.tar.xz
-	tar xf	${SOURCESDIR}/dl/tldr-pages.tar.xz -C ${SOURCESDIR}
+	xargs curl -L < ${SOURCESDIR}/dl/tldr-pages.txt -o ${SOURCESDIR}/dl/tldr-pages.tar.xz
+	tar xf ${SOURCESDIR}/dl/tldr-pages.tar.xz -C ${SOURCESDIR}

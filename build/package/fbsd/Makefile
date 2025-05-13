@@ -1,12 +1,11 @@
-# Created by: Filip Parag <filip@parag.rs>
-# $FreeBSD$
-
 PORTNAME=	wikiman
 DISTVERSION=	2.14
+PORTREVISION=	1
 CATEGORIES=	textproc
 
 MAINTAINER=	filip@parag.rs
 COMMENT=	Offline interactive documentation search
+WWW=		https://github.com/filiparag/wikiman
 
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE
@@ -38,7 +37,7 @@ do-install:
 	@${MKDIR} ${STAGEDIR}${DATADIR}/sources
 	(cd ${WRKSRC}/sources && ${COPYTREE_BIN} . ${STAGEDIR}${DATADIR}/sources)
 
-	${INSTALL_MAN} ${WRKSRC}/wikiman.1.man ${STAGEDIR}${MANPREFIX}/share/man/man1/wikiman.1
+	${INSTALL_MAN} ${WRKSRC}/wikiman.1.man ${STAGEDIR}${PREFIX}/share/man/man1/wikiman.1
 
 do-install-BASH-on:
 	@${MKDIR} ${STAGEDIR}${PREFIX}/etc/bash_completion.d

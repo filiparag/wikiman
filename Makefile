@@ -21,6 +21,7 @@ PLISTFILE:=	${WORKDIR}/pkg-plist
 all: core widgets completions config docs
 
 core:
+	test		! -f	${BUILDDIR}/.local
 	mkdir -p		${BUILDDIR}/usr/bin \
 	 			${BUILDDIR}/usr/share/${NAME} \
 				${BUILDDIR}/usr/share/licenses/${NAME} \
@@ -36,11 +37,13 @@ core:
 				${BUILDDIR}/usr/share/man/man1/${NAME}.1.gz
 
 widgets: core
+	test		! -f	${BUILDDIR}/.local
 	mkdir		-p 	${BUILDDIR}/usr/share/${NAME}
 	cp 		-fr 	${WORKDIR}/widgets \
 				${BUILDDIR}/usr/share/${NAME}
 
 completions: core
+	test		! -f	${BUILDDIR}/.local
 	mkdir		-p 	${BUILDDIR}/etc/bash_completion.d \
 				${BUILDDIR}/usr/share/fish/completions \
 				${BUILDDIR}/usr/share/zsh/site-functions
@@ -52,11 +55,13 @@ completions: core
 				${BUILDDIR}/usr/share/zsh/site-functions/_${NAME}
 
 config:
+	test		! -f	${BUILDDIR}/.local
 	mkdir -p 		${BUILDDIR}/etc
 	install 	-Dm644 	${WORKDIR}/${NAME}.conf \
 				${BUILDDIR}/etc
 
 docs:
+	test		! -f	${BUILDDIR}/.local
 	mkdir		-p 	${BUILDDIR}/usr/share/doc/${NAME}
 	install 	-Dm644 	${WORKDIR}/README.md \
 				${BUILDDIR}/usr/share/doc/${NAME}
@@ -105,7 +110,9 @@ uninstall:
 				$(prefix)/usr/local/share/doc/${NAME}
 
 local:
-	test		! -d	${BUILDDIR}/usr/local
+	test		! -d	${BUILDDIR}/usr/local/share/${NAME}
+	test		! -f	${BUILDDIR}/.local
+	touch			${BUILDDIR}/.local
 	mkdir		-p	${BUILDDIR}/tmp \
 				${BUILDDIR}/usr \
 				${BUILDDIR}/etc
@@ -148,11 +155,18 @@ source-uninstall:
 
 source-local:
 	test		! -d	${SOURCESDIR}/usr/local/share/doc
+	test		! -f	${SOURCESDIR}/.local
+	touch			${SOURCESDIR}/.local
 	mkdir		-p	${SOURCESDIR}/usr/local/share \
 				${SOURCESDIR}/usr/share/doc
 	mv			${SOURCESDIR}/usr/share/doc \
 				${SOURCESDIR}/usr/local/share/doc
 	rm		-rf	${SOURCESDIR}/usr/share
+	test		-d	${SOURCESDIR}/usr/local/share/doc/gentoo-wiki && \
+	find			${SOURCESDIR}/usr/local/share/doc/gentoo-wiki/wiki \
+				-name '*.html' \
+				-exec sed -i 's/href="\/usr\/share\/doc\/gentoo-wiki\/wiki\/\([^"]*\)"/href="\/usr\/local\/share\/doc\/gentoo-wiki\/wiki\/\1.html"/g; ' {} \; || \
+	true
 
 source-arch: ${SOURCESDIR}/dl/arch-wiki.tar.xz
 source-gentoo: ${SOURCESDIR}/dl/gentoo-wiki.tar.xz
@@ -160,10 +174,12 @@ source-fbsd: ${SOURCESDIR}/dl/freebsd-docs.tar.xz
 source-tldr: ${SOURCESDIR}/dl/tldr-pages.tar.xz
 
 ${SOURCESDIR}/:
+	test		! -f	${SOURCESDIR}/.local
 	mkdir		-p 	${SOURCESDIR}/usr/share/doc \
 				${SOURCESDIR}/dl
 
 ${SOURCESDIR}/sources.txt: | ${SOURCESDIR}/
+	test ! -f ${SOURCESDIR}/.local
 	curl -s '${UPSTREAM_API}' | awk \
 	'/"name":/ { \
 		name = $$2; \
@@ -179,22 +195,25 @@ ${SOURCESDIR}/sources.txt: | ${SOURCESDIR}/
 	}' | sort > ${SOURCESDIR}/sources.txt
 
 ${SOURCESDIR}/dl/arch-wiki.tar.xz: ${SOURCESDIR}/sources.txt
+	test ! -f ${SOURCESDIR}/.local
 	curl -L '$(shell grep '^arch-wiki_' ${SOURCESDIR}/sources.txt | tail -n1 | cut -f2)' \
 		-o ${SOURCESDIR}/dl/arch-wiki.tar.xz
 	tar xf 	${SOURCESDIR}/dl/arch-wiki.tar.xz -C ${SOURCESDIR}
 
 ${SOURCESDIR}/dl/gentoo-wiki.tar.xz: ${SOURCESDIR}/sources.txt
-	@>&2 echo 'Note: Gentoo Wiki source is outdated'
-	curl -L '${UPSTREAM}/releases/download/2.7/gentoo-wiki_20200831-1.tar.xz' \
+	test ! -f ${SOURCESDIR}/.local
+	curl -L '$(shell grep '^gentoo-wiki_' ${SOURCESDIR}/sources.txt | tail -n1 | cut -f2)' \
 		-o ${SOURCESDIR}/dl/gentoo-wiki.tar.xz
-	tar xf 	${SOURCESDIR}/dl/gentoo-wiki.tar.xz -C ${SOURCESDIR}
+	tar xf ${SOURCESDIR}/dl/gentoo-wiki.tar.xz -C ${SOURCESDIR}
 
 ${SOURCESDIR}/dl/freebsd-docs.tar.xz: ${SOURCESDIR}/sources.txt
+	test ! -f ${SOURCESDIR}/.local
 	curl -L '$(shell grep '^freebsd-docs_' ${SOURCESDIR}/sources.txt | tail -n1 | cut -f2)' \
 		-o ${SOURCESDIR}/dl/freebsd-docs.tar.xz
 	tar xf ${SOURCESDIR}/dl/freebsd-docs.tar.xz -C ${SOURCESDIR}
 
 ${SOURCESDIR}/dl/tldr-pages.tar.xz: ${SOURCESDIR}/sources.txt
+	test ! -f ${SOURCESDIR}/.local
 	curl -L '$(shell grep '^tldr-pages_' ${SOURCESDIR}/sources.txt | tail -n1 | cut -f2)' \
 		-o ${SOURCESDIR}/dl/tldr-pages.tar.xz
 	tar xf	${SOURCESDIR}/dl/tldr-pages.tar.xz -C ${SOURCESDIR}

@@ -34,7 +34,7 @@ info() {
 get_man_path() {
 
 	man_default_paths="$(
-		manpath 2>/dev/null | awk -F':' "{
+		manpath 2>/dev/null | "$conf_awk" -F':' "{
 			OFS=\" \";
 			for(i=1; i<=NF; i++)
 				if(\"$lang\"!=\"en\")
@@ -174,7 +174,7 @@ search() {
 	apropos_lang_mode="$?"
 
 	if [ "$conf_quick_search" != 'true' ] && [ "$apropos_lang_mode" != '5' ]; then
-	
+
 		for lang in $conf_man_lang; do
 			if ! get_man_path; then
 				continue

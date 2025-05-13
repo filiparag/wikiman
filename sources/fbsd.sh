@@ -32,7 +32,7 @@ setup() {
 		return 1
 	fi
 
-	langs="$(echo "$conf_wiki_lang" | awk -F ' ' '{
+	langs="$(echo "$conf_wiki_lang" | "$conf_awk" -F ' ' '{
 		for(i=1;i<=NF;i++) {
 			lang=tolower($i);
 			gsub(/[-_].*$/,"",lang);
@@ -48,12 +48,12 @@ setup() {
 
 	search_paths="$(
 		"$conf_find" "$path" -maxdepth 1 -mindepth 1 -type d -printf '%p\n' | \
-		awk "/$langs/"
+		"$conf_awk" "/$langs/"
 	)"
 
 	paths=''
 	for rg_l in $(echo "$langs" | sed 's|*|.*|g; s|\||\n|g'); do
-		p="$(echo "$search_paths" | awk "/$rg_l/ {printf(\"%s/* \",\$0)}")"
+		p="$(echo "$search_paths" | "$conf_awk" "/$rg_l/ {printf(\"%s/* \",\$0)}")"
 		if [ "$p" != '' ]; then
 			paths="$paths${paths:+$newline}$p"
 		else
@@ -62,14 +62,14 @@ setup() {
 		fi
 	done
 	paths="$(
-		echo "$paths" | sort | uniq | tr '\n' ' '
+		echo "$paths" | "$conf_sort" | uniq | tr '\n' ' '
 	)"
 
 	if [ "$(echo "$paths" | wc -w | sed 's| ||g')" = '0' ]; then
 		return 1
 	fi
 
-	nf="$(echo "$path" | awk -F '/' '{print NF+1}')"
+	nf="$(echo "$path" | "$conf_awk" -F '/' '{print NF+1}')"
 
 }
 
@@ -78,7 +78,7 @@ list() {
 	setup || return 1
 
 	eval "$conf_find $paths -type f -name '*.html'" 2>/dev/null | \
-	awk -F '/' \
+	"$conf_awk" -F '/' \
 		"BEGIN {
 			IGNORECASE=1;
 			OFS=\"\t\"

@@ -49,7 +49,7 @@ setup() {
 
 	paths=''
 	for rg_l in $(echo "$langs" | sed 's|*|.*|g; s|\|| |g'); do
-		p="$(echo "$search_paths" | awk "/$rg_l/ {printf(\"%s \",\$0)}")"
+		p="$(echo "$search_paths" | "$conf_awk" "/$rg_l/ {printf(\"%s \",\$0)}")"
 		if [ "$?" = '0' ]; then
 			paths="$paths${paths:+$newline}$p"
 		else
@@ -58,7 +58,7 @@ setup() {
 		fi
 	done
 	paths="$(
-		echo "$paths" | sort | uniq | tr '\n' ' '
+		echo "$paths" | "$conf_sort" | uniq | tr '\n' ' '
 	)"
 
 	if [ "$(echo "$paths" | wc -w | sed 's| ||g')" = '0' ]; then
@@ -165,36 +165,38 @@ search() {
 
 	if [ "$conf_quick_search" != 'true' ]; then
 
-		eval "rg -U -i -c '$rg_query' $paths" | \
-		"$conf_awk" -F '/' \
-			"BEGIN {
-				IGNORECASE=1;
-				OFS=\"\t\"
-			};
-			{
+		results_text="$(
+			eval "rg -U -i -c '$rg_query' $paths" | \
+			"$conf_awk" -F '/' \
+				"BEGIN {
+					IGNORECASE=1;
+					OFS=\"\t\"
+				};
+				{
 
-				hits = \$NF;
-				gsub(/^.*:/,\"\",hits);
+					hits = \$NF;
+					gsub(/^.*:/,\"\",hits);
 
-				gsub(/:[0-9]+$/,\"\",\$0);
+					gsub(/:[0-9]+$/,\"\",\$0);
 
-				title = \"\";
-				for (i=$nf+2; i<=NF; i++) {
-					title = title ((i==$nf+2) ? \"\" : \"/\") \$i;
-				}
+					title = \"\";
+					for (i=$nf+2; i<=NF; i++) {
+						title = title ((i==$nf+2) ? \"\" : \"/\") \$i;
+					}
 
-				gsub(/\.html$/,\"\",title);
-				gsub(\"_\",\" \",title);
-				gsub(\"-\",\" \",title);
+					gsub(/\.html$/,\"\",title);
+					gsub(\"_\",\" \",title);
+					gsub(\"-\",\" \",title);
 
-				title = title \" (\" \$($nf+1) \")\"
+					title = title \" (\" \$($nf+1) \")\"
 
-				lang=\$$nf;
-				path=\$0;
+					lang=\$$nf;
+					path=\$0;
 
-				printf(\"%s\t%s\t%s\t$name\t%s\n\",hits,title,lang,path);
-			};" | \
-		"$conf_sort" -rV -k1 | cut -d'	' -f2-
+					printf(\"%s\t%s\t%s\t$name\t%s\n\",hits,title,lang,path);
+				};" | \
+			"$conf_sort" -rV -k1 | cut -d'	' -f2-
+		)"
 
 	fi
 

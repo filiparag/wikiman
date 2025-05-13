@@ -27,7 +27,7 @@ setup() {
 	results_title=''
 	results_text=''
 
-	langs="$(echo "$conf_wiki_lang" | awk -F ' ' '{
+	langs="$(echo "$conf_wiki_lang" | "$conf_awk" -F ' ' '{
 		for (i = 1; i <= NF; i++) {
 			lang = $i;
 			gsub(/[_-].*$/,"",lang);
@@ -46,12 +46,12 @@ setup() {
 
 	search_paths="$(
 		"$conf_find" "$path" -maxdepth 1 -mindepth 1 -type d -printf '%p\n' | \
-		awk "/$langs/"
+		"$conf_awk" "/$langs/"
 	)"
 
 	paths=''
 	for rg_l in $(echo "$langs" | sed 's|*|.*|g; s|\||\n|g'); do
-		p="$(echo "$search_paths" | awk "/$rg_l/ {printf(\"%s \",\$0)}")"
+		p="$(echo "$search_paths" | "$conf_awk" "/$rg_l/ {printf(\"%s \",\$0)}")"
 		if [ "$p" != '' ]; then
 			paths="$paths${paths:+$newline}$p"
 		else
@@ -60,7 +60,7 @@ setup() {
 		fi
 	done
 	paths="$(
-		echo "$paths" | sort | uniq | tr '\n' ' '
+		echo "$paths" | "$conf_sort" | uniq | tr '\n' ' '
 	)"
 
 	if [ "$(echo "$paths" | wc -w | sed 's| ||g')" = '0' ]; then

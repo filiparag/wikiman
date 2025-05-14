@@ -1,6 +1,7 @@
 #!/bin/sh
 
 name='fbsd'
+description='FreeBSD Documentation'
 path="$conf_sys_usr/share/doc/freebsd-docs"
 
 available() {
@@ -9,15 +10,21 @@ available() {
 
 }
 
+describe() {
+
+	printf "%s\t%s\n" "$name" "$description"
+
+}
+
 info() {
 
 	if available; then
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "+")"
-		count="$("$conf_find" "$path" -type f | wc -l | sed 's| ||g')"
-		printf '%-10s %3s %8i  %s\n' "$name" "$state" "$count" "$path"
+		count="$("$conf_find" "$path" -type f -name '*.html' | wc -l | sed 's| ||g')"
+		printf '%-10s %-28s %3s %8i  %s\n' "$name" "$description" "$state" "$count" "$path"
 	else
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "x")"
-		printf '%-12s %-11s (not installed)\n' "$name" "$state"
+		printf '%-10s %-30s %-11s (not installed)\n' "$name" "$description" "$state"
 	fi
 
 }

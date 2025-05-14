@@ -1,6 +1,7 @@
 #!/bin/sh
 
 name='gentoo'
+description='Gentoo Wiki'
 path="$conf_sys_usr/share/doc/gentoo-wiki/wiki"
 
 available() {
@@ -9,15 +10,21 @@ available() {
 
 }
 
+describe() {
+
+	printf "%s\t%s\n" "$name" "$description"
+
+}
+
 info() {
 
 	if available; then
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "+")"
 		count="$($conf_find "$path" -type f | wc -l | sed 's| ||g')"
-		printf '%-10s %3s %8i  %s\n' "$name" "$state" "$count" "$path"
+		printf '%-10s %-28s %3s %8i  %s\n' "$name" "$description" "$state" "$count" "$path"
 	else
 		state="$(echo "$conf_sources" | grep -q "$name" && echo "x")"
-		printf '%-12s %-11s (not installed)\n' "$name" "$state"
+		printf '%-10s %-30s %-11s (not installed)\n' "$name" "$description" "$state"
 	fi
 
 }
@@ -139,7 +146,7 @@ search() {
 						lm = length(matched)
 						gsub(\" \",\"\",matched);
 						gsub(\"_\",\"\",matched);
-						
+
 						if (length(matched)==0)
 							accuracy = length(title)*100;
 						else

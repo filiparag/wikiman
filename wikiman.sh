@@ -66,19 +66,19 @@ init() {
 		*)
 			case "$(dirname "$(command -v wikiman)")" in
 				"$HOME/bin"|"$HOME/.local/bin")
-					echo 'warning: unsupported installation path, using fallback for user install' 1>&2;
+					>&2 echo 'warning: unsupported installation path, using fallback for user install' ;
 					conf_sys_usr="$HOME/.local/share";
 					conf_sys_etc="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman";;
 				'/bin'|'/sbin'|'/usr/bin'|'/usr/sbin')
-					echo 'warning: unsupported installation path, using fallback for Linux' 1>&2;
+					>&2 echo 'warning: unsupported installation path, using fallback for Linux' ;
 					conf_sys_usr='/usr';
 					conf_sys_etc='/etc';;
 				'/usr/local/bin'|'/usr/local/sbin')
-					echo 'warning: unsupported installation path, using fallback for BSD' 1>&2;
+					>&2 echo 'warning: unsupported installation path, using fallback for BSD' ;
 					conf_sys_usr='/usr/local';
 					conf_sys_etc='/usr/local/etc';;
 				*)
-					echo 'error: unsupported installation path - failed to establish fallback' 1>&2;
+					>&2 echo 'error: unsupported installation path - failed to establish fallback' ;
 					exit 5;;
 			esac;;
 	esac
@@ -94,13 +94,13 @@ init() {
 	config_file="$conf_sys_etc/wikiman.conf"
 	config_file_usr="$config_dir/wikiman.conf"
 
-	[ -f "$config_file" -a -r "$config_file" ] || \
+	[ -f "$config_file" ] && [ -r "$config_file" ] || \
 		config_file=''
-	[ -f "$config_file_usr" -a -r "$config_file_usr" ] || \
+	[ -f "$config_file_usr" ] && [ -r "$config_file_usr" ] || \
 		config_file_usr=''
 
-	if [ -z "$config_file" -a -z "$config_file_usr" ]; then
-		# echo "warning: configuration file missing, using defaults" 1>&2
+	if [ -z "$config_file" ] && [ -z "$config_file_usr" ]; then
+		# >&2 echo "warning: configuration file missing, using defaults"
 		true
 	else
 		conf_sources="$(
@@ -211,7 +211,7 @@ init() {
 	)"
 
 	if [ -z "$sources" ]; then
-		echo "error: no sources available" 1>&2
+		>&2 echo "error: no sources available"
 		exit 3
 	fi
 
@@ -297,8 +297,8 @@ picker_tui() {
 		source_column='3,'
 	fi
 
-	if [ "$(echo "$conf_man_lang" | wc -w)" = '1' -a \
-			"$(echo "$conf_wiki_lang" | wc -w)" = '1' ]; then
+	if [ "$(echo "$conf_man_lang" | wc -w)" = '1' ] && \
+			[ "$(echo "$conf_wiki_lang" | wc -w)" = '1' ]; then
 		columns="${source_column}1"
 	else
 		columns="${source_column}2,1"
@@ -379,7 +379,7 @@ sources() {
 	modules="$(echo "$sources" | "$conf_awk" -F '\t' "{print \$1}")"
 
 	if [ "$modules" != '' ]; then
-		printf '%-10s %5s %6s  %s\n' 'NAME' 'STATE' 'PAGES' 'PATH'
+		printf '%-10s %-28s %5s %6s  %s\n' 'NAME' 'DESCRIPTION' 'STATE' 'PAGES' 'PATH'
 	fi
 
 	for mod in $modules; do
@@ -396,15 +396,41 @@ widget() {
 	if [ "$widget_src" != '' ]; then
 		cat "$widget_src"
 	else
-		echo "error: widget for '$1' does not exist" 1>&2
+		>&2 echo "error: widget for '$1' does not exist"
 		exit 128
 	fi
 
 }
 
+# for internal use only
+completion() {
+
+	if [ -z "$WIKIMAN_INTERNAL" ]; then
+		>&2 echo 'error: invocation of internal functionality'
+		return 1;
+	fi
+
+	source_descriptions="$(
+		echo "$sources" | cut -f2- | xargs -I{} sh -c '{} describe'
+	)"
+	case "$1" in
+		sources_bash)
+			echo "$sources" | "$conf_awk" -F '\t' '{printf("%s ",$1)}';;
+		sources_fish)
+			echo "$source_descriptions" | \
+			"$conf_awk" -F '\t' '{ printf("%s\\t\"%s\"\n", $1, $2); }';;
+		sources_zsh)
+			echo "$source_descriptions" | \
+			"$conf_awk" -F '\t' '{ printf("%s:%s\n", $1, $2); }';;
+		*)
+			return 1;;
+	esac
+
+}
+
 init
 
-while getopts l:s:H:f:W:pqahRSkcv o; do
+while getopts l:s:H:f:W:C:pqahRSkcv o; do
 	case $o in
 		(p) conf_tui_preview='false';;
 		(H) conf_tui_html="$OPTARG";;
@@ -425,6 +451,8 @@ while getopts l:s:H:f:W:pqahRSkcv o; do
 		(c) conf_tui_source_column='true';;
 		(W) widget "$OPTARG";
 			exit;;
+		(C) completion "$OPTARG";
+			exit;;
 		(S) sources;
 			exit;;
 		(v) echo "$conf_version";
@@ -442,7 +470,7 @@ dependencies="man rg w3m $conf_awk $conf_tui_html $conf_fuzzy_finder $conf_find"
 
 for dep in $dependencies; do
 	command -v "$dep" >/dev/null 2>/dev/null || {
-		echo "error: missing dependency: cannot find '$dep' executable" 1>&2
+		>&2 echo "error: missing dependency: cannot find '$dep' executable"
 		exit 127
 	}
 done
@@ -452,7 +480,7 @@ done
 case $conf_fuzzy_finder in
 	'fzf'|'sk');;
 	*)
-		echo "error: $conf_fuzzy_finder is not compatible with the paramters used in this script" 1>&2
+		>&2 echo "error: $conf_fuzzy_finder is not compatible with the paramters used in this script"
 		exit 4;;
 esac
 
@@ -479,7 +507,7 @@ for src in $conf_sources; do
 	module_path="$(echo "$sources" | "$conf_awk" -F '\t' "\$1==\"$src\" {print \$2}")"
 
 	if [ -z "$module_path" ]; then
-		echo "error: source '$src' does not exist" 1>&2
+		>&2 echo "error: source '$src' does not exist"
 		exit 2
 	fi
 
@@ -509,6 +537,6 @@ if echo "$all_results" | grep -cve '^\s*$' >/dev/null; then
 		fi
 	fi
 else
-	echo "search: no results for '$*'" 1>&2
+	>&2 echo "search: no results for '$*'"
 	exit 255
 fi

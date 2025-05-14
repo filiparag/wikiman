@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 export XZ_OPT=-e9T0
 

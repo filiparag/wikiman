@@ -48,7 +48,7 @@ function _wikiman_completions()
 
     case ${prev} in
         -s)
-            COMPREPLY=($(compgen -W "man arch gentoo fbsd tldr" -- ${cur}));;
+            COMPREPLY=($(compgen -W "$(WIKIMAN_INTERNAL=1 wikiman -C sources_bash)" -- ${cur}));;
         -W)
             COMPREPLY=($(compgen -W "bash fish zsh" -- ${cur}));;
         -f)
@@ -60,7 +60,7 @@ function _wikiman_completions()
         *)
             COMPREPLY=($(compgen -W "${opts}" -- ${cur}));;
     esac
-    
+
 }
 
 complete -F _wikiman_completions wikiman

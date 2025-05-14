@@ -29,13 +29,10 @@ case $state in
 		;;
 	sources)
 		local -a _sources
-		_sources=(
-			'arch:Arch Wiki'
-			'fbsd:FreeBSD Documentation'
-			'gentoo:Gentoo Wiki'
-			'man:Manual pages'
-			'tldr:TLDR pages'
-		)
+		_sources=()
+		while IFS= read -r line; do
+		_sources+=("$line")
+		done < <(WIKIMAN_INTERNAL=1 wikiman -C sources_zsh)
 		_describe 'source' _sources
 		;;
 	fuzzy_finders)

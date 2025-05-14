@@ -2,47 +2,42 @@
 
 function __fish_complete_wikiman
 
-	complete -c wikiman -f
-	complete -c wikiman -s h -x -d 'display help and exit'
-	complete -c wikiman -s R -x -d 'print raw output'
-	complete -c wikiman -s S -x -d 'list available sources and exit'
-	complete -c wikiman -s p -x -d 'disable quick result preview'
-	complete -c wikiman -s q -x -d 'enable quick search mode'
-	complete -c wikiman -s a -x -d 'enable AND operator mode'
-	complete -c wikiman -s c -x -d 'show source column'
-	complete -c wikiman -s k -x -d 'keep open after viewing a result'
-	complete -c wikiman -s v -x -d 'print version and exit'
+    complete -c wikiman -f
+    complete -c wikiman -s h -x -d 'display help and exit'
+    complete -c wikiman -s R -x -d 'print raw output'
+    complete -c wikiman -s S -x -d 'list available sources and exit'
+    complete -c wikiman -s p -x -d 'disable quick result preview'
+    complete -c wikiman -s q -x -d 'enable quick search mode'
+    complete -c wikiman -s a -x -d 'enable AND operator mode'
+    complete -c wikiman -s c -x -d 'show source column'
+    complete -c wikiman -s k -x -d 'keep open after viewing a result'
+    complete -c wikiman -s v -x -d 'print version and exit'
 
-	complete -c wikiman -o W -x -d 'print widget code for specified shell and exit' -a '
+    complete -c wikiman -o W -x -d 'print widget code for specified shell and exit' -a '
 		fish\t""
 		bash\t""
 		zsh\t""
 	'
 
-	complete -c wikiman -o s -r -x -d 'comma separated sources' -a '
-		man\t"Manual pages"
-		arch\t"Arch Wiki"
-		gentoo\t"Gentoo Wiki"
-		fbsd\t"FreeBSD Documentation"
-		tldr\t"TLDR pages"
-	'
+    set sources (WIKIMAN_INTERNAL=1 wikiman -C sources_fish)
+    complete -c wikiman -o s -r -x -d 'comma separated sources' -a "$sources"
 
-	for fzff in fzf sk
-		command -v $fzff 1>/dev/null 2>/dev/null && set fuzzy_finders "$fuzzy_finders $fzff\t\"\""
-	end
+    for fzff in fzf sk
+        command -v $fzff 1>/dev/null 2>/dev/null && set fuzzy_finders "$fuzzy_finders $fzff\t\"\""
+    end
 
-	complete -c wikiman -o f -r -x -a "$fuzzy_finders" -d 'fuzzy finder to use'
+    complete -c wikiman -o f -r -x -a "$fuzzy_finders" -d 'fuzzy finder to use'
 
-	set locales (
+    set locales (
 		test -d /usr/share/i18n/locales && \
 		ls /usr/share/i18n/locales |\
 		awk -F'_' '/^[a-z]{2}_[^@]{2}$/ && !seen[$1] {printf("%s\\\t\"\" ", $1); seen[$1]++}' \
 		|| echo 'en'
 	)
 
-	complete -c wikiman -o l -r -x -d 'comma separated search languages' -a "$locales"
+    complete -c wikiman -o l -r -x -d 'comma separated search languages' -a "$locales"
 
-	set browsers (
+    set browsers (
 		test -f /usr/share/applications/mimeinfo.cache && \
 		gawk -F '=' '/html|http/ {
 			gsub(".desktop;"," ",$2);
@@ -55,13 +50,11 @@ function __fish_complete_wikiman
 		} END {print brw}' /usr/share/applications/mimeinfo.cache || echo ''
 	)
 
-	for txtbrw in w3m links links2 elinks lynx browsh
-		command -v $txtbrw 1>/dev/null 2>/dev/null && \
-		echo "$browsers" | grep -qv "$txtbrw\\t" && \
-		set browsers "$browsers $txtbrw\t\"\""
-	end
+    for txtbrw in w3m links links2 elinks lynx browsh
+        command -v $txtbrw 1>/dev/null 2>/dev/null && set browsers "$browsers $txtbrw\t\"\""
+    end
 
-	complete -c wikiman -o H -r -x -a "$browsers" -d 'viewer for HTML pages'
+    complete -c wikiman -o H -r -x -a "$browsers" -d 'viewer for HTML pages'
 
 end
 

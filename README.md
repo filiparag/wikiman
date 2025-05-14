@@ -1,14 +1,11 @@
 ## About
 
-**Wikiman** is an offline search engine for manual pages, ArchWiki, Gentoo Wiki and other documentation.
+**Wikiman** is a universal offline documentation search engine. It can browse system manual pages, [tldr-pages](https://github.com/tldr-pages/tldr), the [ArchWiki](https://wiki.archlinux.org/), [Gentoo Wiki](https://wiki.gentoo.org/wiki/), [FreeBSD documentation](https://docs.freebsd.org/), and many other sources curated by [DevDocs](https://devdocs.io/).
 
-Wikiman provides an easy interface for browsing documentation without the need to be exact and connected to the internet.
-This is achieved by utilizing full-text search for wikis, partial name and description matching for man pages,
-and fuzzy filtering for search results.
+It provides an easy interface for browsing documentation without the need to be exact and connected to the internet. This is achieved by utilizing full-text search for wikis, partial name and description matching for man pages, and fuzzy filtering for search results.
 
 > [!TIP]
-> By default, Wikiman only searches system's manual pages.
-> Follow [these instructions](#additional-documentation-sources) to download and enable optional documentation sources.
+> By default, Wikiman only searches manual pages. Follow [these instructions](#additional-documentation-sources) to download and enable optional documentation sources.
 
 ![Demo](demo.gif)
 
@@ -97,12 +94,12 @@ Wikiman uses GNU `find` and `awk`, so BSD users have to install `findutils` and 
 Currently available optional sources are:
 
 - ArchWiki (`arch`)
-- Gentoo Wiki (`gentoo`)
+- DevDocs (`devdocs`)
 - FreeBSD Documentation (`fbsd`)
+- Gentoo Wiki (`gentoo`)
 - TLDR Pages (`tldr`)
 
-Due to their large size, wikis don't come bundled with Wikiman.
-If you want to use them, you can download their latest snapshots using following commands.
+Due to their large size, wikis don't come bundled with Wikiman. If you want to use them, you can download their latest snapshots using following commands.
 
 ```bash
 # Download latest Makefile
@@ -120,14 +117,16 @@ sudo make -f ./wikiman-makefile source-install
 sudo make -f ./wikiman-makefile clean
 ```
 
-After installation, they should be enabled automatically if
-`sources` [configuration](#configuration) variable is empty.
+After installation, they should be enabled automatically if `sources` [configuration](#configuration) variable is empty.
 
 To verify active sources, run:
 
 ```bash
 wikiman -S
 ```
+
+> [!NOTE]
+> DevDocs source provides access to documentation for hundreds of unrelated individual projects, organized into separate "books." To choose which books are active, prepend your Wikiman queries with `=book` (eg. `=c,cpp,python`). By default, this source returns no results, as no books are selected automatically.
 
 ## Usage
 
@@ -175,11 +174,9 @@ If no keywords are provided, show all pages.
 
 ### Shell keybind widgets
 
-Wikiman can be launched using a shell key binding (default: `Ctrl+F`).
-Current command line buffer will be used as a search query.
+Wikiman can be launched using a shell key binding (default: `Ctrl+F`). Current command line buffer will be used as a search query.
 
-Add appropriate line from below to your `.bashrc`-like
-configuration file to make the key binding permanent.
+Add appropriate line from below to your `.bashrc`-like configuration file to make the key binding permanent.
 
 ```bash
 # bash
@@ -194,11 +191,9 @@ source /usr/share/wikiman/widgets/widget.zsh
 
 ## Configuration
 
-User configuration file is located at `~/.config/wikiman/wikiman.conf`,
-and fallback system-wide configuration is `/etc/wikiman.conf`.
+User configuration file is located at `~/.config/wikiman/wikiman.conf`, and fallback system-wide configuration is `/etc/wikiman.conf`.
 
-If you have set the _XDG_CONFIG_HOME_ environment variable, user configuration
-will be looked up from there instead.
+If you have set the _XDG_CONFIG_HOME_ environment variable, user configuration will be looked up from there instead.
 
 Example configuration file:
 
@@ -254,22 +249,18 @@ find '/usr/share/doc/tldr-pages' -maxdepth 1 -type d -printf '%P '
 
 Wikiman is designed to be extensible: each source has it's module in `sources/` directory. These modules are loaded as needed during runtime.
 
-Source modules are POSIX compliant shell scripts. Wikiman calls their `search` function whichs
-reads `$query` and configuration variables, and prints results to _STDOUT_.
-variable with rows formatted as `NAME\tLANG\tSOURCE\tPATH`.
+Source modules are POSIX compliant shell scripts. Wikiman calls their `search` function which reads `$query` and configuration variables, and prints results to _STDOUT_. variable with rows formatted as `NAME\tLANG\tSOURCE\tPATH`.
 
 - `NAME` title of the page
 - `LANG` two letter language code (can include locale)
 - `SOURCE` source name
 - `PATH` path to HTML file
 
-When listing available sources, Wikiman will call module's `info` funcion which prints
-name, state, number of pages and path of the source.
+When listing available sources, Wikiman will call module's `info` funcion which prints name, state, number of pages and path of the source.
 
 ## Contributions
 
-If you create a source module useful to the general public, please share it using a
-[pull request](https://github.com/filiparag/wikiman/pulls). Your pull request should contain:
+If you create a source module useful to the general public, please share it using a [pull request](https://github.com/filiparag/wikiman/pulls). Your pull request should contain:
 
 - module script file `sources/your-source.sh`
 - Makefile recipe `source-your-source`

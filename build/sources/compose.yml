@@ -23,3 +23,9 @@ services:
       - ./release:/release:rw
       - ./tldr.sh:/build.sh:ro
     entrypoint: /build.sh
+  devdocs:
+    image: archlinux:latest
+    volumes:
+      - ./release:/release:rw
+      - ./devdocs.sh:/build.sh:ro
+    entrypoint: /build.sh

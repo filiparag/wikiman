@@ -31,8 +31,9 @@ make prefix=%{buildroot} install
 /usr/bin/%{name}
 /usr/share/%{name}/sources/man.sh
 /usr/share/%{name}/sources/arch.sh
-/usr/share/%{name}/sources/gentoo.sh
+/usr/share/%{name}/sources/devdocs.sh
 /usr/share/%{name}/sources/fbsd.sh
+/usr/share/%{name}/sources/gentoo.sh
 /usr/share/%{name}/sources/tldr.sh
 /usr/share/%{name}/widgets/widget.bash
 /usr/share/%{name}/widgets/widget.fish

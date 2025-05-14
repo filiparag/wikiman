@@ -1,5 +1,5 @@
 NAME=		wikiman
-VERSION=	2.14
+VERSION=	2.14.1
 RELEASE=	1
 UPSTREAM=	https://github.com/filiparag/wikiman
 UPSTREAM_API=	https://api.github.com/repos/filiparag/wikiman/releases/latest
@@ -16,7 +16,7 @@ PLISTFILE:=	${WORKDIR}/pkg-plist
 .PHONY: all core widgets completions config docs reinstall install plist dist \
 	package distclean clean deinstall uninstall local source-all source-reinstall \
 	source-install source-clean source-deinstall source-uninstall source-local \
-	source-arch source-gentoo source-fbsd source-tldr
+	source-arch source-devdocs source-fbsd source-gentoo source-tldr
 
 all: core widgets completions config docs
 
@@ -125,7 +125,7 @@ local:
 	rm		-rf	${BUILDDIR}/tmp \
 				${BUILDDIR}/etc
 
-source-all: source-arch source-gentoo source-fbsd source-tldr
+source-all: source-arch source-devdocs source-fbsd source-gentoo source-tldr
 
 source-reinstall: source-install
 source-install:
@@ -145,12 +145,14 @@ source-clean:
 source-deinstall: source-uninstall
 source-uninstall:
 	rm		-rf	$(prefix)/usr/share/doc/arch-wiki/html \
-				$(prefix)/usr/share/doc/gentoo-wiki \
+				$(prefix)/usr/share/doc/devdocs \
 				$(prefix)/usr/share/doc/freebsd-docs \
+				$(prefix)/usr/share/doc/gentoo-wiki \
 				$(prefix)/usr/share/doc/tldr-pages
 	rm		-rf	$(prefix)/usr/local/share/doc/arch-wiki/html \
-				$(prefix)/usr/local/share/doc/gentoo-wiki \
+				$(prefix)/usr/local/share/doc/devdocs \
 				$(prefix)/usr/local/share/doc/freebsd-docs \
+				$(prefix)/usr/local/share/doc/gentoo-wiki \
 				$(prefix)/usr/local/share/doc/tldr-pages
 
 source-local:
@@ -169,8 +171,9 @@ source-local:
 	true
 
 source-arch: ${SOURCESDIR}/dl/arch-wiki.tar.xz
-source-gentoo: ${SOURCESDIR}/dl/gentoo-wiki.tar.xz
+source-devdocs: ${SOURCESDIR}/dl/devdocs.tar.xz
 source-fbsd: ${SOURCESDIR}/dl/freebsd-docs.tar.xz
+source-gentoo: ${SOURCESDIR}/dl/gentoo-wiki.tar.xz
 source-tldr: ${SOURCESDIR}/dl/tldr-pages.tar.xz
 
 ${SOURCESDIR}/:
@@ -189,11 +192,15 @@ ${SOURCESDIR}/dl/sources.txt: ${SOURCESDIR}/dl/sources.awk
 ${SOURCESDIR}/dl/arch-wiki.txt: ${SOURCESDIR}/dl/sources.txt
 	grep '^arch-wiki_' ${SOURCESDIR}/dl/sources.txt | tail -n1 | cut -f2 > ${SOURCESDIR}/dl/arch-wiki.txt
 
-${SOURCESDIR}/dl/gentoo-wiki.txt: ${SOURCESDIR}/dl/sources.txt
-	grep '^gentoo-wiki_' ${SOURCESDIR}/dl/sources.txt | tail -n1 | cut -f2 > ${SOURCESDIR}/dl/gentoo-wiki.txt
+${SOURCESDIR}/dl/devdocs.txt: ${SOURCESDIR}/dl/sources.txt
+	grep '^devdocs_' ${SOURCESDIR}/dl/sources.txt | tail -n1 | cut -f2 > ${SOURCESDIR}/dl/devdocs.txt
+
 
 ${SOURCESDIR}/dl/freebsd-docs.txt: ${SOURCESDIR}/dl/sources.txt
 	grep '^freebsd-docs_' ${SOURCESDIR}/dl/sources.txt | tail -n1 | cut -f2 > ${SOURCESDIR}/dl/freebsd-docs.txt
+
+${SOURCESDIR}/dl/gentoo-wiki.txt: ${SOURCESDIR}/dl/sources.txt
+	grep '^gentoo-wiki_' ${SOURCESDIR}/dl/sources.txt | tail -n1 | cut -f2 > ${SOURCESDIR}/dl/gentoo-wiki.txt
 
 ${SOURCESDIR}/dl/tldr-pages.txt: ${SOURCESDIR}/dl/sources.txt
 	grep '^tldr-pages_' ${SOURCESDIR}/dl/sources.txt | tail -n1 | cut -f2 > ${SOURCESDIR}/dl/tldr-pages.txt
@@ -203,15 +210,20 @@ ${SOURCESDIR}/dl/arch-wiki.tar.xz: ${SOURCESDIR}/dl/arch-wiki.txt
 	xargs curl -L < ${SOURCESDIR}/dl/arch-wiki.txt -o ${SOURCESDIR}/dl/arch-wiki.tar.xz
 	tar xf ${SOURCESDIR}/dl/arch-wiki.tar.xz -C ${SOURCESDIR}
 
-${SOURCESDIR}/dl/gentoo-wiki.tar.xz: ${SOURCESDIR}/dl/gentoo-wiki.txt
+${SOURCESDIR}/dl/devdocs.tar.xz: ${SOURCESDIR}/dl/devdocs.txt
 	test ! -f ${SOURCESDIR}/.local
-	xargs curl -L < ${SOURCESDIR}/dl/gentoo-wiki.txt -o ${SOURCESDIR}/dl/gentoo-wiki.tar.xz
-	tar xf ${SOURCESDIR}/dl/gentoo-wiki.tar.xz -C ${SOURCESDIR}
+	xargs curl -L < ${SOURCESDIR}/dl/devdocs.txt -o ${SOURCESDIR}/dl/devdocs.tar.xz
+	tar xf ${SOURCESDIR}/dl/devdocs.tar.xz -C ${SOURCESDIR}
 
 ${SOURCESDIR}/dl/freebsd-docs.tar.xz: ${SOURCESDIR}/dl/freebsd-docs.txt
 	test ! -f ${SOURCESDIR}/.local
 	xargs curl -L < ${SOURCESDIR}/dl/freebsd-docs.txt -o ${SOURCESDIR}/dl/freebsd-docs.tar.xz
 	tar xf ${SOURCESDIR}/dl/freebsd-docs.tar.xz -C ${SOURCESDIR}
+
+${SOURCESDIR}/dl/gentoo-wiki.tar.xz: ${SOURCESDIR}/dl/gentoo-wiki.txt
+	test ! -f ${SOURCESDIR}/.local
+	xargs curl -L < ${SOURCESDIR}/dl/gentoo-wiki.txt -o ${SOURCESDIR}/dl/gentoo-wiki.tar.xz
+	tar xf ${SOURCESDIR}/dl/gentoo-wiki.tar.xz -C ${SOURCESDIR}
 
 ${SOURCESDIR}/dl/tldr-pages.tar.xz: ${SOURCESDIR}/dl/tldr-pages.txt
 	test ! -f ${SOURCESDIR}/.local

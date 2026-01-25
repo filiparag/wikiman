@@ -2,7 +2,7 @@
 
 name='arch'
 description='ArchWiki'
-path="$conf_sys_usr/share/doc/arch-wiki/html"
+path="$conf_sys_share/doc/arch-wiki/html"
 
 available() {
 

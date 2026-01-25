@@ -2,7 +2,7 @@
 
 name='devdocs'
 description='Collection of all DevDocs'
-path="$conf_sys_usr/share/doc/devdocs"
+path="$conf_sys_share/doc/devdocs"
 
 available() {
 

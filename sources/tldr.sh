@@ -2,7 +2,7 @@
 
 name='tldr'
 description='Console commands cheatsheets'
-path="$conf_sys_usr/share/doc/tldr-pages"
+path="$conf_sys_share/doc/tldr-pages"
 
 available() {
 

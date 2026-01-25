@@ -51,31 +51,34 @@ fi
 
 init() {
 
-	# BSD compatibility: Installation prefix
+	# Detect installation prefix
 
 	case "$(dirname "$0")" in
-		"$HOME/bin"|"$HOME/.local/bin")
-			conf_sys_usr="$HOME/.local/share";
-			conf_sys_etc="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman";;
-		'/bin'|'/sbin'|'/usr/bin'|'/usr/sbin')
-			conf_sys_usr='/usr';
+	 	# User (XDG)
+		"$HOME/.local/bin"|"$HOME"/*)
+			conf_sys_share="${XDG_DATA_HOME:-"$HOME/.local/share"}";
+			conf_sys_etc="${XDG_CONFIG_HOME:-"$HOME/.config"}";;
+		# Linux
+		'/usr/bin')
+			conf_sys_share='/usr/share';
 			conf_sys_etc='/etc';;
-		'/usr/local/bin'|'/usr/local/sbin')
-			conf_sys_usr='/usr/local';
+		# Default
+		'/usr/local/bin')
+			conf_sys_share='/usr/local/share';
 			conf_sys_etc='/usr/local/etc';;
 		*)
 			case "$(dirname "$(command -v wikiman)")" in
 				"$HOME/bin"|"$HOME/.local/bin")
 					>&2 echo 'warning: unsupported installation path, using fallback for user install' ;
-					conf_sys_usr="$HOME/.local/share";
-					conf_sys_etc="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman";;
+					conf_sys_share="${XDG_DATA_HOME:-"$HOME/.local/share"}";
+					conf_sys_etc="${XDG_CONFIG_HOME:-"$HOME/.config"}";;
 				'/bin'|'/sbin'|'/usr/bin'|'/usr/sbin')
 					>&2 echo 'warning: unsupported installation path, using fallback for Linux' ;
-					conf_sys_usr='/usr';
+					conf_sys_share='/usr/share';
 					conf_sys_etc='/etc';;
 				'/usr/local/bin'|'/usr/local/sbin')
-					>&2 echo 'warning: unsupported installation path, using fallback for BSD' ;
-					conf_sys_usr='/usr/local';
+					>&2 echo 'warning: unsupported installation path, using default fallback' ;
+					conf_sys_share='/usr/local/share';
 					conf_sys_etc='/usr/local/etc';;
 				*)
 					>&2 echo 'error: unsupported installation path - failed to establish fallback' ;
@@ -83,16 +86,15 @@ init() {
 			esac;;
 	esac
 
-	export conf_sys_usr
+	export conf_sys_share
 	export conf_sys_etc
 
 	# Configuration variables
 
 	conf_version='2.14.1'
 
-	config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
 	config_file="$conf_sys_etc/wikiman.conf"
-	config_file_usr="$config_dir/wikiman.conf"
+	config_file_usr="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman.conf"
 
 	[ -f "$config_file" ] && [ -r "$config_file" ] || \
 		config_file=''
@@ -187,12 +189,12 @@ init() {
 
 	# Widgets
 
-	widgets_dir="$conf_sys_usr/share/wikiman/widgets"
+	widgets_dir="$conf_sys_share/wikiman/widgets/"
 
 	# Sources
 
-	sources_dir="$conf_sys_usr/share/wikiman/sources"
-	sources_dir_usr="$config_dir/sources"
+	sources_dir="$conf_sys_share/wikiman/sources/"
+	sources_dir_usr="${XDG_DATA_HOME:-"$HOME/.local/share"}/wikiman/sources/"
 
 	# Detect source modules
 

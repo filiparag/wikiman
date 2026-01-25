@@ -2,7 +2,7 @@
 
 name='fbsd'
 description='FreeBSD Documentation'
-path="$conf_sys_usr/share/doc/freebsd-docs"
+path="$conf_sys_share/doc/freebsd-docs"
 
 available() {
 

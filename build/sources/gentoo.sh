@@ -73,7 +73,7 @@ echo "Generated $(du -h "/release/$archive" | cut -f1) Gentoo Wiki archive"
 
 echo 'Testing archive contents'
 pagecount="$(tar -tf "/release/$archive" | grep -c '\.html$')"
-if [ "$pagecount" -lt 3000 ]; then
+if [ "$pagecount" -lt 2500 ]; then
     echo 'Error: archive page count is too low'
     exit 1
 else

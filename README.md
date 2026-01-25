@@ -11,7 +11,10 @@ It provides an easy interface for browsing documentation without the need to be 
 
 ## Installation
 
-### Arch Linux
+### Prebuilt packages
+
+<details>
+<summary><b>Arch Linux</b></summary>
 
 Install from Arch Linux's [extra](https://archlinux.org/packages/extra/any/wikiman/) repository:
 
@@ -28,7 +31,10 @@ If you are running Manjaro or another Arch-based distribution, download the late
 sudo pacman -U wikiman*.pkg.tar.zst
 ```
 
-### Ubuntu / Debian
+</details>
+
+<details>
+<summary><b>Ubuntu / Debian</b></summary>
 
 Download latest _.deb_ package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
@@ -37,7 +43,10 @@ sudo apt update
 sudo apt install ./wikiman*.deb
 ```
 
-### Fedora / openSUSE
+</details>
+
+<details>
+<summary><b>Fedora / openSUSE</b></summary>
 
 Download latest _.rpm_ package from [Releases](https://github.com/filiparag/wikiman/releases/latest/) tab.
 
@@ -49,7 +58,12 @@ sudo dnf install wikiman*.rpm
 sudo zypper in wikiman*.rpm
 ```
 
-### FreeBSD
+</details>
+
+</details>
+
+<details>
+<summary><b>FreeBSD</b></summary>
 
 Install [textproc/wikiman](https://www.freshports.org/textproc/wikiman) from the Ports Collection:
 
@@ -65,7 +79,9 @@ Or download latest _.txz_ package from [Releases](https://github.com/filiparag/w
 pkg install wikiman*.txz
 ```
 
-### Manual installation for Linux and BSD
+</details>
+
+### Manual installation
 
 Dependencies: `man`, `fzf`, `ripgrep`, `awk`, `w3m`, `coreutils`, `parallel`
 
@@ -80,14 +96,13 @@ git checkout $(git describe --tags | cut -d'-' -f1)
 # Available targets: all, core, widgets, completions, config, docs
 make all
 
-# Only for BSD users: install to /usr/local instead of /usr
-make local
-
 # Install Wikiman
 sudo make install
 ```
 
-Wikiman uses GNU `find` and `awk`, so BSD users have to install `findutils` and `gawk`.
+Wikiman uses GNU `find` and `awk`, so users with other system utility vendors have to install `findutils` and `gawk`.
+
+To change filesystem root add `target=<chroot>` to make's build command. By default, installation path is `/usr/bin` on Linux systems and `/usr/local/bin` on others. Current user-only install requires `target=user` make variable, and follows [XDG base directory specification](https://specifications.freedesktop.org/basedir/latest/).
 
 ## Additional documentation sources
 
@@ -105,14 +120,8 @@ Due to their large size, wikis don't come bundled with Wikiman. If you want to u
 # Download latest Makefile
 curl -L 'https://raw.githubusercontent.com/filiparag/wikiman/master/Makefile' -o 'wikiman-makefile'
 
-# Example for Linux: install ArchWiki and TLDR pages
+# Example: install ArchWiki and TLDR pages
 make -f ./wikiman-makefile source-arch source-tldr
-sudo make -f ./wikiman-makefile source-install
-sudo make -f ./wikiman-makefile clean
-
-# Example for BSD: install FreeBSD docs and TLDR pages
-make -f ./wikiman-makefile source-fbsd source-tldr
-make -f ./wikiman-makefile source-local # moves files from /usr to /usr/local
 sudo make -f ./wikiman-makefile source-install
 sudo make -f ./wikiman-makefile clean
 ```

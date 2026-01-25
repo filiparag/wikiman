@@ -143,7 +143,7 @@ docs:
 
 	install -m 644 "README.md" "$(BUILDDIR)/$(DOC_I_PATH)/$(NAME)/README.md"
 
-plist: all
+plist:
 	curdir=`pwd`; \
 	cd "$(BUILDDIR)" && \
 	find . -mindepth 1 -type f | sed 's|^\./||' | sort > "$$curdir/$(PLISTFILE)"
@@ -152,7 +152,7 @@ clean:
 	rm -rf "$(BUILDDIR)"
 
 reinstall: install
-install: all
+install:
 	cd "$(BUILDDIR)" && find . -mindepth 1 -type d -exec sh -c 'install -d -m 755 "$(FS_ROOT)$${1#.}"' _ {} \;
 
 	cd "$(BUILDDIR)" && find . -mindepth 1 -type f -perm -100 -exec sh -c 'install -m 755 "$$1" "$(FS_ROOT)$${1#.}"' _ {} \;

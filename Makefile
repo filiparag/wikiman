@@ -84,13 +84,20 @@ ZSH_C_I_PATH=	`case "$${target:-$$(uname -s)}" in \
 					*) \
 						echo "$(prefix)/usr/local/share/zsh/vendor-completions" ;; \
 				esac`
+SOURCES_I_PATH=	`case "$${target:-$$(uname -s)}" in \
+					Linux|linux|GNU|gnu) \
+						echo "$(prefix)/usr/share/doc" ;; \
+					XDG|xdg|user) \
+						echo "$(prefix)/$${XDG_DATA_HOME:-$(HOME)/.local/share}/doc" ;; \
+					*) \
+						echo "$(prefix)/usr/local/share/doc" ;; \
 				esac`
-FS_ROOT=		/
+
 
 .PHONY: core widgets completions config docs \
-		all clean plist reinstall install deinstall uninstall
-		config-default config-linux config-xdg docs-default docs-linux docs-xdg \
-		plist reinstall install deinstall uninstall
+		all clean plist reinstall install deinstall uninstall \
+		source-arch source-devdocs source-fbsd source-gentoo source-tldr \
+		source-all source-clean source-install source-reinstall source-uninstall source-deinstall
 
 all: core widgets completions config docs
 
@@ -163,3 +170,71 @@ uninstall:
 	rm -f "$(FS_ROOT)/$(ZSH_C_I_PATH)/_$(NAME)"
 	rm -rf "$(FS_ROOT)/$(DOC_I_PATH)/$(NAME)"
 
+$(SOURCESDIR)/.dl/sources.awk:
+	install -d -m 755 "$(SOURCESDIR)/.dl"
+	@printf '%s\n' '/"name":/ {' \
+	'    name = $$2' \
+	'    sub(/^[ \t]*"name": "[^"]*/, "", name)' \
+	'    gsub(/[" ,]/, "", name)' \
+	'}' \
+	'/"browser_download_url":/ {' \
+	'    url = $$2' \
+	'    gsub(/[" ,]/, "", url)' \
+	'    if (name ~ /_[0-9]+\.[sS]ource\.tar\.xz$$/) {' \
+	'        print name "\t" url' \
+	'    }' \
+	'}' > $@
+
+$(SOURCESDIR)/.dl/sources.txt: $(SOURCESDIR)/.dl/sources.awk
+	curl -s '$(UPSTREAM_API)' | awk -f "$(SOURCESDIR)/.dl/sources.awk" | sort > "$(SOURCESDIR)/.dl/sources.txt"
+
+$(SOURCESDIR)/.dl/%.txt: $(SOURCESDIR)/.dl/sources.txt
+	grep '^$*_' "$(SOURCESDIR)/.dl/sources.txt" | tail -n1 | cut -f2 > "$@"
+
+$(SOURCESDIR)/.dl/%.tar.xz: $(SOURCESDIR)/.dl/%.txt
+	xargs curl -L < "$<" -o "$@"
+	tar xf "$@" -C "$(SOURCESDIR)"
+
+source-all: source-arch source-devdocs source-fbsd source-gentoo source-tldr
+
+source-arch: $(SOURCESDIR)/.dl/arch-wiki.tar.xz
+	install -d -m 755 "$(SOURCESDIR)/$(SOURCES_I_PATH)"
+
+	tar xf "$(SOURCESDIR)/.dl/arch-wiki.tar.xz" -C "$(SOURCESDIR)/$(SOURCES_I_PATH)"
+
+source-devdocs: $(SOURCESDIR)/.dl/devdocs.tar.xz
+	install -d -m 755 "$(SOURCESDIR)/$(SOURCES_I_PATH)"
+
+	tar xf "$(SOURCESDIR)/.dl/devdocs.tar.xz" -C "$(SOURCESDIR)/$(SOURCES_I_PATH)"
+
+source-fbsd: $(SOURCESDIR)/.dl/freebsd-docs.tar.xz
+	install -d -m 755 "$(SOURCESDIR)/$(SOURCES_I_PATH)"
+
+	tar xf "$(SOURCESDIR)/.dl/freebsd-docs.tar.xz" -C "$(SOURCESDIR)/$(SOURCES_I_PATH)"
+
+source-gentoo: $(SOURCESDIR)/.dl/gentoo-wiki.tar.xz
+	install -d -m 755 "$(SOURCESDIR)/$(SOURCES_I_PATH)"
+
+	tar xf "$(SOURCESDIR)/.dl/gentoo-wiki.tar.xz" -C "$(SOURCESDIR)/$(SOURCES_I_PATH)"
+
+source-tldr: $(SOURCESDIR)/.dl/tldr-pages.tar.xz
+	install -d -m 755 "$(SOURCESDIR)/$(SOURCES_I_PATH)"
+
+	tar xf "$(SOURCESDIR)/.dl/tldr-pages.tar.xz" -C "$(SOURCESDIR)/$(SOURCES_I_PATH)"
+
+source-clean:
+	rm -rf "$(SOURCESDIR)"
+
+source-reinstall: source-install
+source-install:
+	install -d -m 755 "$(FS_ROOT)/$(SOURCES_I_PATH)"
+
+	cp -fR "$(SOURCESDIR)/"* "$(FS_ROOT)"
+
+source-deinstall: source-uninstall
+source-uninstall:
+	rm -rf "$(FS_ROOT)/$(SOURCES_I_PATH)/arch-wiki"
+	rm -rf "$(FS_ROOT)/$(SOURCES_I_PATH)/devdocs"
+	rm -rf "$(FS_ROOT)/$(SOURCES_I_PATH)/freebsd-docs"
+	rm -rf "$(FS_ROOT)/$(SOURCES_I_PATH)/gentoo-wiki"
+	rm -rf "$(FS_ROOT)/$(SOURCES_I_PATH)/tldr-pages"

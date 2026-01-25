@@ -3,7 +3,7 @@
 export XZ_OPT=-e9T0
 
 echo 'Installing tools'
-pacman -Sy --noconfirm rdfind wget git base-devel moreutils
+pacman -Sy --noconfirm rdfind wget git base-devel moreutils parallel
 
 echo 'Building tools'
 git clone --depth 1 https://aur.archlinux.org/pup-bin.git ./pup
@@ -23,19 +23,14 @@ mv ./ftp.freebsd.org/pub/FreeBSD/doc ./
 rm -rf ./ftp.freebsd.org
 
 echo 'Unpacking pages'
-for f in $(find "$dir/doc" -type f -name '*.tar.gz'); do
-    d="$(dirname "$f")"
-    cd "$d" || exit 1
-    tar -xf "$f"
-    rm -f "$f"
-done
+find "$dir/doc" -type f -name '*.tar.gz' | parallel --will-cite \
+    "tar -xf {} -C {//} && rm -f {}"
 
 cd "$dir" || exit 1
-mkdir -p "$dir/usr/share/doc"
-mv "$dir/doc" "$dir/usr/share/doc/freebsd-docs"
+mv "$dir/doc" "$dir/freebsd-docs"
 
 echo 'Deduplicating assets'
-cd "$dir/usr/share/doc/freebsd-docs" || exit 1
+cd "$dir/freebsd-docs" || exit 1
 rdfind \
     -makehardlinks false \
     -makesymlinks true \
@@ -47,12 +42,13 @@ find . -type l | while read -r l; do
 done
 
 echo 'Page post-processing'
-find "$dir/usr/share/doc/freebsd-docs" -type f -name '*.html' -print0 | xargs -0 --no-run-if-empty -I{} sh -c "cat \"{}\" | pup 'head, nav#TableOfContents, div.book, div.article' --pre | sponge \"{}\""
+find "$dir/freebsd-docs" -type f -name '*.html' -print0 | parallel -0 --will-cite \
+    "pup 'head, nav#TableOfContents, div.book, div.article' --pre < {} | sponge {}"
 
 echo 'Compressing data'
 cd "$dir" || exit 1
 archive="freebsd-docs_$(date +'%Y%m%d').source.tar.xz"
-tar -cJf "/release/$archive" usr/share/doc/freebsd-docs
+tar -cJf "/release/$archive" freebsd-docs
 echo "Generated $(du -h "/release/$archive" | cut -f1) FreeBSD docs archive"
 
 echo 'Testing archive contents'

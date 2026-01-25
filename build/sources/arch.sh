@@ -7,10 +7,12 @@ pacman -Syw --noconfirm arch-wiki-docs
 
 echo 'Extracting data'
 tar --use-compress-program=unzstd -xf /var/cache/pacman/pkg/arch-wiki-docs-*.pkg.tar.zst usr/share/doc/arch-wiki/html/
+mkdir -p arch-wiki
+mv usr/share/doc/arch-wiki/html arch-wiki
 
 echo 'Compressing data'
 archive="arch-wiki_$(date +'%Y%m%d').source.tar.xz"
-tar -cJf "/release/$archive" usr/share/doc/arch-wiki/html
+tar -cJf "/release/$archive" arch-wiki/html
 echo "Generated $(du -h "/release/$archive" | cut -f1) Arch Wiki archive"
 
 echo 'Testing archive contents'

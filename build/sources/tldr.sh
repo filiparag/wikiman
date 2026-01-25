@@ -3,7 +3,7 @@
 export XZ_OPT=-e9T0
 
 echo 'Installing tools'
-pacman -Sy --noconfirm curl git discount
+pacman -Sy --noconfirm curl git discount parallel
 
 mkdir -p ./tldr
 cd ./tldr || exit 1
@@ -22,27 +22,29 @@ for lang in $(find "$dir/doc" -maxdepth 1 -mindepth 1 -name 'pages.*' -printf '%
     mv "$dir/doc/$lang" "$dir/doc/$l"
 done
 
+md_to_html() {
+    for file in "$@"; do
+        ht="${file%.*}.html"
+        markdown "$file" > "$ht" && rm "$file"
+    done
+}
+export -f md_to_html
+
 echo "Rendering HTML for $(find "$dir/doc" -name '*.md' | wc -l) pages"
 find . -type f -name "* *.md" -exec rename ' ' '' {} \;
-for md in $(find "$dir/doc" -name '*.md'); do
-    realpath --relative-to "$dir/doc" "$md" >/dev/null
-    ht="$(echo "$md" | cut -d'.' -f1).html"
-    markdown "$md" > "$ht"
-    rm "$md"
-done
+find "$dir/doc" -name '*.md' | parallel --will-cite -N 64 md_to_html
 
-mkdir -p "$dir/usr/share/doc"
-mv "$dir/doc" "$dir/usr/share/doc/tldr-pages"
+mv "$dir/doc" "$dir/tldr-pages"
 cd "$dir" || exit 1
 
 echo 'Compressing data'
 archive="tldr-pages_$(date +'%Y%m%d').source.tar.xz"
-tar -cJf "/release/$archive" usr/share/doc/tldr-pages
+tar -cJf "/release/$archive" tldr-pages
 echo "Generated $(du -h "/release/$archive" | cut -f1) TLDR Pages archive"
 
 echo 'Testing archive contents'
 pagecount="$(tar -tf "/release/$archive" | grep -c '\.html$')"
-if [ "$pagecount" -lt 20000 ]; then
+if [ "$pagecount" -lt 30000 ]; then
     echo 'Error: archive page count is too low'
     exit 1
 else

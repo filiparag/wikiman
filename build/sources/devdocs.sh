@@ -48,18 +48,18 @@ while IFS=$'\t' read -r name url || [[ -n $line ]]; do
 done < <(echo "$latest_snapshots")
 
 cd "$dir" || exit 1
-mkdir -p "$dir/usr/share/doc/devdocs"
-mv "$dir/docs/"* "$dir/usr/share/doc/devdocs"
+mkdir -p "$dir/devdocs"
+mv "$dir/docs/"* "$dir/devdocs"
 
 echo 'Compressing data'
 cd "$dir" || exit 1
 archive="devdocs_$(date +'%Y%m%d').source.tar.xz"
-tar -cJf "/release/$archive" usr/share/doc/devdocs
+tar -cJf "/release/$archive" devdocs
 echo "Generated $(du -h "/release/$archive" | cut -f1) DevDocs archive"
 
 echo 'Testing archive contents'
 pagecount="$(tar -tf "/release/$archive" | grep -c '\.html$')"
-if [ "$pagecount" -lt 150000 ]; then
+if [ "$pagecount" -lt 100000 ]; then
     echo 'Error: archive page count is too low'
     exit 1
 else

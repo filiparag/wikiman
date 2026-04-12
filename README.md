@@ -213,6 +213,9 @@ raw_output = false
 # Manpages language(s)
 man_lang = en, pt
 
+# Output postprocessing
+postprocess_man = bat -l man --color always --style plain
+
 # Wiki language(s)
 wiki_lang = zh-CN
 

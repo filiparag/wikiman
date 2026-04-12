@@ -1,5 +1,5 @@
 .\" Manual for wmrc.
-.TH "wikiman" 1 "12 May 2025" "wikiman 2.14" "wikiman manual"
+.TH "wikiman" 1 "12 April 2026" "wikiman 2.15" "wikiman manual"
 
 .SH NAME
 .B wikiman
@@ -178,6 +178,8 @@ tui_source_column = false
 .SS TUI viewer for HTML pages
 tui_html = w3m
 
+.SS Output postprocessing
+postprocess_man = bat -l man --color always --style plain
 
 .SH ADDITIONAL SOURCES:
 

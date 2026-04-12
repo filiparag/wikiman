@@ -27,13 +27,13 @@ tui_preview() {
 		"{
 			if (\$3==\"man\") {
 				if (NF==4) {
-					printf(\"man %s 2>/dev/null\",\$4);
+					printf(\"man %s 2>/dev/null $conf_postprocess_man\",\$4);
 				} else {
 					sec=\$1
 					gsub(/.*\(/,\"\",sec);
 					gsub(/\).*$/,\"\",sec);
 					gsub(/ .*$/,\"\",\$1);
-					printf(\"man -S %s -L %s %s 2>/dev/null\n\",sec,\$2,\$1);
+					printf(\"man -S %s -L %s %s 2>/dev/null $conf_postprocess_man\n\",sec,\$2,\$1);
 				}
 			} else {
 				gsub(\"\\\"\",\"\\\\\\\"\",\$NF);
@@ -88,7 +88,7 @@ init() {
 
 	# Configuration variables
 
-	conf_version='2.14.1'
+	conf_version='2.15'
 
 	config_dir="${XDG_CONFIG_HOME:-"$HOME/.config"}/wikiman"
 	config_file="$conf_sys_etc/wikiman.conf"
@@ -143,6 +143,13 @@ init() {
 		)"
 		conf_man_lang="$(
 			"$conf_awk" -F '=' "/^[ ,\t]*man_lang/ {
+				gsub(\",\",\" \",\$2);
+				gsub(/#.*/,\"\",\$2);
+				value = \$2;
+			}; END { print value }" "$config_file" "$config_file_usr"
+		)"
+		conf_postprocess_man="$(
+			"$conf_awk" -F '=' "/^[ ,\t]*postprocess_man/ {
 				gsub(\",\",\" \",\$2);
 				gsub(/#.*/,\"\",\$2);
 				value = \$2;
@@ -225,6 +232,19 @@ init() {
 		fi
 	done
 
+	# Detect if postprocessing commands are available
+
+	if command -v "$(
+			echo "$conf_postprocess_man" | \
+			sed 's/^[[:space:]]*//' | \
+			cut -d' ' -f1
+		)" >/dev/null 2>/dev/null; then
+		conf_postprocess_man="| $conf_postprocess_man"
+		MANPAGER='cat'
+	else
+		conf_postprocess_man=''
+	fi
+
 	# Set configuration variables
 
 	conf_sources="${conf_sources:-$available_sources}"
@@ -251,6 +271,8 @@ init() {
 	export conf_tui_source_column
 	export conf_tui_html
 	export conf_version
+	export conf_postprocess_man
+	export MANPAGER
 
 }
 
@@ -306,7 +328,7 @@ picker_tui() {
 
 	choice="$(
 		echo "$all_results" | \
-		eval "$conf_fuzzy_finder --with-nth $columns --delimiter '\t' \
+		eval "$conf_fuzzy_finder --with-nth $columns --ansi --delimiter '\t' \
 			$preview --reverse --preview-window=65%:wrap:border-sharp: --prompt 'wikiman > '"
 	)"
 
@@ -317,13 +339,13 @@ picker_tui() {
 			"$conf_awk" -F '\t' "{
 				if (\$3==\"man\") {
 					if (NF==4) {
-						printf(\"man %s\",\$4);
+						printf(\"man %s $conf_postprocess_man\",\$4);
 					} else {
 						sec=\$1
 						gsub(/.*\(/,\"\",sec);
 						gsub(/\).*$/,\"\",sec);
 						gsub(/ .*$/,\"\",\$1);
-						printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
+						printf(\"man -S %s -L %s %s $conf_postprocess_man\n\",sec,\$2,\$1);
 					}
 				} else {
 					gsub(\"\\\"\",\"\\\\\\\"\",\$NF);

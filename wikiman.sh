@@ -27,13 +27,13 @@ tui_preview() {
 		"{
 			if (\$3==\"man\") {
 				if (NF==4) {
-					printf(\"man %s\",\$4);
+					printf(\"man %s 2>/dev/null\",\$4);
 				} else {
 					sec=\$1
 					gsub(/.*\(/,\"\",sec);
 					gsub(/\).*$/,\"\",sec);
 					gsub(/ .*$/,\"\",\$1);
-					printf(\"man -S %s -L %s %s\n\",sec,\$2,\$1);
+					printf(\"man -S %s -L %s %s 2>/dev/null\n\",sec,\$2,\$1);
 				}
 			} else {
 				gsub(\"\\\"\",\"\\\\\\\"\",\$NF);

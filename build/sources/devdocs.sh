@@ -22,7 +22,7 @@ dir="$(pwd)"
 echo 'Retrieving latest snapshot list'
 kiwix='https://download.kiwix.org/zim/'
 latest_snapshots="$(
-    curl "$kiwix/devdocs/" | \
+    curl -L "$kiwix/devdocs/" | \
     xq -m -q 'a' | sort -r | awk -F '_' -v stub="$kiwix/devdocs/" \
     '/^devdocs_en_/&&/\.zim$/ {
         if (!seen[$3]) {

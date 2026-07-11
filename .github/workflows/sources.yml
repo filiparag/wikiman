@@ -3,7 +3,7 @@ name: Source database builder
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 12 10 */6 *"
+    - cron: "0 12 10 */1 *"
 
 jobs:
   builder:

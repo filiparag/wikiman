@@ -63,6 +63,9 @@ init() {
 		'/usr/local/bin'|'/usr/local/sbin')
 			conf_sys_usr='/usr/local';
 			conf_sys_etc='/usr/local/etc';;
+		${HOMEBREW_PREFIX+"$HOMEBREW_PREFIX/bin"})
+			conf_sys_usr="$HOMEBREW_PREFIX";
+			conf_sys_etc="$HOMEBREW_PREFIX/etc";;
 		*)
 			case "$(dirname "$(command -v wikiman)")" in
 				"$HOME/bin"|"$HOME/.local/bin")
@@ -77,6 +80,9 @@ init() {
 					>&2 echo 'warning: unsupported installation path, using fallback for BSD' ;
 					conf_sys_usr='/usr/local';
 					conf_sys_etc='/usr/local/etc';;
+				${HOMEBREW_PREFIX+"$HOMEBREW_PREFIX/bin"})
+					conf_sys_usr="$HOMEBREW_PREFIX";
+					conf_sys_etc="$HOMEBREW_PREFIX/etc";;
 				*)
 					>&2 echo 'error: unsupported installation path - failed to establish fallback' ;
 					exit 5;;

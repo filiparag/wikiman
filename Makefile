@@ -5,7 +5,7 @@ UPSTREAM=	https://github.com/filiparag/wikiman
 UPSTREAM_API=	https://api.github.com/repos/filiparag/wikiman/releases/latest
 
 MKFILEREL!=	echo ${.MAKE.MAKEFILES} | sed 's/.* //'
-MKFILEABS!=	readlink -f ${MKFILEREL} 2>/dev/null
+MKFILEABS!=	readlink -f "${MKFILEREL}" 2>/dev/null
 MKFILEABS+= 	$(shell readlink -f ${MAKEFILE_LIST})
 WORKDIR!=	dirname ${MKFILEABS} 2>/dev/null
 
@@ -28,7 +28,7 @@ core:
 				${BUILDDIR}/usr/share/man/man1
 	install 	-Dm755 	${WORKDIR}/${NAME}.sh \
 				${BUILDDIR}/usr/bin/${NAME}
-	cp 		-fr 	${WORKDIR}/sources \
+	cp 		-fR 	${WORKDIR}/sources \
 				${BUILDDIR}/usr/share/${NAME}
 	install 	-Dm644 	${WORKDIR}/LICENSE \
 				${BUILDDIR}/usr/share/licenses/${NAME}
@@ -39,7 +39,7 @@ core:
 widgets: core
 	test		! -f	${BUILDDIR}/.local
 	mkdir		-p 	${BUILDDIR}/usr/share/${NAME}
-	cp 		-fr 	${WORKDIR}/widgets \
+	cp 		-fR 	${WORKDIR}/widgets \
 				${BUILDDIR}/usr/share/${NAME}
 
 completions: core
@@ -69,7 +69,7 @@ docs:
 reinstall: install
 install: all
 	mkdir		-p 	$(prefix)/
-	cp		-fr 	${BUILDDIR}/* \
+	cp		-fR 	${BUILDDIR}/* \
 				$(prefix)/
 
 plist: all
@@ -131,13 +131,23 @@ source-reinstall: source-install
 source-install:
 	[ -d ${SOURCESDIR}/usr/share/doc ] && \
 		mkdir	-p	$(prefix)/usr/share/doc && \
-		cp	-rf	${SOURCESDIR}/usr/share/doc \
+		cp	-Rf	${SOURCESDIR}/usr/share/doc \
 				$(prefix)/usr/share || true
 
 	[ -d ${SOURCESDIR}/usr/local/share/doc ] && \
 		mkdir	-p	$(prefix)/usr/local/share/doc && \
-		cp	-rf 	${SOURCESDIR}/usr/local/share/doc \
+		cp	-Rf 	${SOURCESDIR}/usr/local/share/doc \
 				$(prefix)/usr/local/share || true
+
+	[ -d ${SOURCESDIR}/usr/share/doc ] && \
+		[ -d ${HOMEBREW_PREFIX}/share/doc ] && \
+		cp	-Rf 	${SOURCESDIR}/usr/share/doc \
+				${HOMEBREW_PREFIX}/share || true
+
+	[ -d ${SOURCESDIR}/usr/local/share/doc ] && \
+		[ -d ${HOMEBREW_PREFIX}/share/doc ] && \
+		cp	-Rf 	${SOURCESDIR}/usr/local/share/doc \
+				${HOMEBREW_PREFIX}/share || true
 
 source-clean:
 	rm		-rf 	${SOURCESDIR}
@@ -154,6 +164,12 @@ source-uninstall:
 				$(prefix)/usr/local/share/doc/freebsd-docs \
 				$(prefix)/usr/local/share/doc/gentoo-wiki \
 				$(prefix)/usr/local/share/doc/tldr-pages
+source-uninstall-homebrew:
+	rm		-rf	${HOMEBREW_PREFIX}/share/doc/arch-wiki/html \
+				${HOMEBREW_PREFIX}/share/doc/devdocs \
+				${HOMEBREW_PREFIX}/share/doc/freebsd-docs \
+				${HOMEBREW_PREFIX}/share/doc/gentoo-wiki \
+				${HOMEBREW_PREFIX}/share/doc/tldr-pages
 
 source-local:
 	test		! -d	${SOURCESDIR}/usr/local/share/doc
